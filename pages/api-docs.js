@@ -7,6 +7,7 @@ const TABS = [
   { key: "all", label: "All Endpoints", icon: "{ }" },
   { key: "Clips", label: "Clips", icon: "▶" },
   { key: "Articles", label: "Articles", icon: "📰" },
+  { key: "Businesses", label: "Businesses", icon: "🏢" },
   { key: "Bookmarks", label: "Bookmarks", icon: "🔖" },
   { key: "Ideas", label: "Ideas", icon: "💡" },
   { key: "Projects", label: "Projects", icon: "📂" },

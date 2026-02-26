@@ -166,12 +166,52 @@ const spec = {
           created_at: { type: 'string', format: 'date-time', example: '2026-02-26T12:00:00.000Z' },
         },
       },
+      Business: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: '28b9cfbf-373a-4d91-a1af-76cb8969ddd5' },
+          user_id: { type: 'string', format: 'uuid', example: '08dee908-d31b-4c19-ae7d-227ccbb068cf' },
+          name: { type: 'string', example: 'ReviewRush' },
+          columns: { type: 'array', items: { type: 'string' }, example: ['Marketing', 'Follow-up', 'Research', 'Delivery'] },
+          cards: { type: 'array', items: { $ref: '#/components/schemas/BusinessCard' } },
+          resources: { type: 'array', items: { $ref: '#/components/schemas/BusinessResource' } },
+          created_at: { type: 'string', format: 'date-time', example: '2026-02-26T04:00:00.000Z' },
+          updated_at: { type: 'string', format: 'date-time', example: '2026-02-26T04:00:00.000Z' },
+        },
+      },
+      BusinessCard: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+          business_id: { type: 'string', format: 'uuid', example: '28b9cfbf-373a-4d91-a1af-76cb8969ddd5' },
+          title: { type: 'string', example: 'VSL Script Written' },
+          description: { type: 'string', example: '3-minute sales video script' },
+          column_name: { type: 'string', example: 'Marketing' },
+          labels: { type: 'array', items: { type: 'string', enum: ['urgent', 'pending', 'done', 'draft', 'review', 'blocked'] }, example: ['done'] },
+          due_date: { type: 'string', format: 'date', example: '2026-03-15', nullable: true },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-02-26T02:30:00.000Z' },
+          updated_at: { type: 'string', format: 'date-time', example: '2026-02-26T02:30:00.000Z' },
+        },
+      },
+      BusinessResource: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'f1e2d3c4-b5a6-7890-abcd-ef1234567890' },
+          business_id: { type: 'string', format: 'uuid', example: '28b9cfbf-373a-4d91-a1af-76cb8969ddd5' },
+          title: { type: 'string', example: 'Sales Page (Live)' },
+          url: { type: 'string', example: 'https://reviewrush.vercel.app' },
+          type: { type: 'string', enum: ['link', 'doc', 'note'], example: 'link' },
+          created_at: { type: 'string', format: 'date-time', example: '2026-02-26T03:00:00.000Z' },
+        },
+      },
     },
   },
   security: [{ bearerAuth: [] }],
   tags: [
     { name: 'Clips', description: 'Video clips review, approval and publishing workflow' },
     { name: 'Articles', description: 'Newsletter articles from Letterman' },
+    { name: 'Businesses', description: 'Business Kanban board — businesses, cards, and resources' },
     { name: 'Bookmarks', description: 'Saved bookmark links' },
     { name: 'Ideas', description: 'Content idea backlog' },
     { name: 'Projects', description: 'Project tracker' },
@@ -679,6 +719,161 @@ const spec = {
           200: { description: 'Article rejected', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' }, example: { success: true } } } },
           400: { description: 'articleId required or API key not configured', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Article ID required' } } } },
           500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    // ─── BUSINESSES ─────────────────────────────────────────────────────────────
+    '/businesses': {
+      get: {
+        summary: 'List businesses',
+        description: 'Returns all businesses for the authenticated user with their cards and resources nested.',
+        tags: ['Businesses'],
+        responses: {
+          200: {
+            description: 'Businesses list with nested cards and resources',
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { businesses: { type: 'array', items: { $ref: '#/components/schemas/Business' } } } },
+                example: { businesses: [{ id: '28b9cfbf-...', name: 'ReviewRush', columns: ['Marketing', 'Follow-up', 'Research', 'Delivery'], cards: [], resources: [] }] },
+              },
+            },
+          },
+          401: { description: 'Unauthorized' },
+        },
+      },
+      post: {
+        summary: 'Create business, card, or resource',
+        description: 'Use the `action` field to specify what to create: `add_business`, `add_card`, or `add_resource`.',
+        tags: ['Businesses'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['action'],
+                properties: {
+                  action: { type: 'string', enum: ['add_business', 'add_card', 'add_resource'], example: 'add_business' },
+                  name: { type: 'string', description: 'Business name (for add_business)', example: 'My Business' },
+                  columns: { type: 'array', items: { type: 'string' }, description: 'Custom columns (for add_business, optional)', example: ['Marketing', 'Sales'] },
+                  business_id: { type: 'string', format: 'uuid', description: 'Business ID (for add_card / add_resource)' },
+                  title: { type: 'string', description: 'Card or resource title' },
+                  description: { type: 'string', description: 'Card description' },
+                  column_name: { type: 'string', description: 'Column for the card', example: 'Marketing' },
+                  labels: { type: 'array', items: { type: 'string' }, description: 'Card labels', example: ['pending'] },
+                  due_date: { type: 'string', format: 'date', description: 'Card due date', nullable: true, example: '2026-03-15' },
+                  url: { type: 'string', description: 'Resource URL' },
+                  type: { type: 'string', enum: ['link', 'doc', 'note'], description: 'Resource type', example: 'link' },
+                },
+              },
+              examples: {
+                add_business: { summary: 'Add a business', value: { action: 'add_business', name: 'My Business' } },
+                add_card: { summary: 'Add a card', value: { action: 'add_card', business_id: '28b9cfbf-...', title: 'Write copy', column_name: 'Marketing', labels: ['pending'], due_date: '2026-03-15' } },
+                add_resource: { summary: 'Add a resource', value: { action: 'add_resource', business_id: '28b9cfbf-...', title: 'Sales Page', url: 'https://example.com', type: 'link' } },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: 'Created',
+            content: {
+              'application/json': {
+                schema: {
+                  oneOf: [
+                    { type: 'object', properties: { business: { $ref: '#/components/schemas/Business' } } },
+                    { type: 'object', properties: { card: { $ref: '#/components/schemas/BusinessCard' } } },
+                    { type: 'object', properties: { resource: { $ref: '#/components/schemas/BusinessResource' } } },
+                  ],
+                },
+              },
+            },
+          },
+          400: { description: 'Invalid action or missing required fields', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized' },
+        },
+      },
+      put: {
+        summary: 'Update business, card, or resource',
+        description: 'Use the `type` field to specify what to update: `business`, `card`, or `resource`. Include `id` of the item to update.',
+        tags: ['Businesses'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['type', 'id'],
+                properties: {
+                  type: { type: 'string', enum: ['business', 'card', 'resource'], example: 'card' },
+                  id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+                  name: { type: 'string', description: 'Business name (type=business)' },
+                  columns: { type: 'array', items: { type: 'string' }, description: 'Columns array (type=business)' },
+                  title: { type: 'string', description: 'Title (type=card or resource)' },
+                  description: { type: 'string', description: 'Description (type=card)' },
+                  column_name: { type: 'string', description: 'Column (type=card)' },
+                  labels: { type: 'array', items: { type: 'string' }, description: 'Labels (type=card)' },
+                  due_date: { type: 'string', format: 'date', nullable: true, description: 'Due date (type=card)' },
+                  position: { type: 'integer', description: 'Sort position (type=card)' },
+                  url: { type: 'string', description: 'URL (type=resource)' },
+                },
+              },
+              examples: {
+                update_business: { summary: 'Rename business', value: { type: 'business', id: '28b9cfbf-...', name: 'New Name' } },
+                update_card: { summary: 'Move card + set due date', value: { type: 'card', id: 'a1b2c3d4-...', column_name: 'Delivery', due_date: '2026-03-20' } },
+                update_columns: { summary: 'Reorder columns', value: { type: 'business', id: '28b9cfbf-...', columns: ['Research', 'Marketing', 'Delivery'] } },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Updated',
+            content: {
+              'application/json': {
+                schema: {
+                  oneOf: [
+                    { type: 'object', properties: { business: { $ref: '#/components/schemas/Business' } } },
+                    { type: 'object', properties: { card: { $ref: '#/components/schemas/BusinessCard' } } },
+                    { type: 'object', properties: { resource: { $ref: '#/components/schemas/BusinessResource' } } },
+                  ],
+                },
+              },
+            },
+          },
+          400: { description: 'Invalid type or missing id', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized' },
+        },
+      },
+      delete: {
+        summary: 'Delete business, card, or resource',
+        description: 'Use the `type` field to specify what to delete: `business`, `card`, or `resource`. Deleting a business cascades to all its cards and resources.',
+        tags: ['Businesses'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['type', 'id'],
+                properties: {
+                  type: { type: 'string', enum: ['business', 'card', 'resource'], example: 'card' },
+                  id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+                },
+              },
+              examples: {
+                delete_business: { summary: 'Delete business (cascades)', value: { type: 'business', id: '28b9cfbf-...' } },
+                delete_card: { summary: 'Delete a card', value: { type: 'card', id: 'a1b2c3d4-...' } },
+                delete_resource: { summary: 'Delete a resource', value: { type: 'resource', id: 'f1e2d3c4-...' } },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' }, example: { success: true } } } },
+          400: { description: 'Invalid type or missing id', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized' },
         },
       },
     },

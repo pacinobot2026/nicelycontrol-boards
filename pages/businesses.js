@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
+import withAuth from "../lib/withAuth";
+import { useAuth } from "../lib/authContext";
 
 const DEFAULT_COLUMNS = ["Marketing", "Follow-up", "Research", "Delivery"];
 const LABEL_COLORS = {
@@ -12,19 +14,20 @@ const LABEL_COLORS = {
   blocked: { bg: "#ef4444", text: "#fff" },
 };
 
-export default function BusinessBoard() {
+function BusinessBoard() {
+  const { session } = useAuth();
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddBusiness, setShowAddBusiness] = useState(false);
-  const [showAddCard, setShowAddCard] = useState(null); // column name or null
+  const [showAddCard, setShowAddCard] = useState(null);
   const [showEditCard, setShowEditCard] = useState(null);
   const [newBusinessName, setNewBusinessName] = useState("");
   const [newCard, setNewCard] = useState({
     title: "",
     description: "",
     labels: [],
-    column: "",
+    due_date: "",
   });
   const [showResources, setShowResources] = useState(false);
   const [newResource, setNewResource] = useState({
@@ -34,8 +37,26 @@ export default function BusinessBoard() {
   });
   const [showAddResource, setShowAddResource] = useState(false);
   const [draggedCard, setDraggedCard] = useState(null);
-  const [activeColumn, setActiveColumn] = useState(null); // for mobile column tabs
+  const [activeColumn, setActiveColumn] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Search & filter
+  const [searchTerm, setSearchTerm] = useState("");
+  const [labelFilter, setLabelFilter] = useState("");
+
+  // Delete business confirmation
+  const [showDeleteBusiness, setShowDeleteBusiness] = useState(false);
+
+  // Custom column management
+  const [showAddColumn, setShowAddColumn] = useState(false);
+  const [newColumnName, setNewColumnName] = useState("");
+  const [editingColumn, setEditingColumn] = useState(null);
+  const [editingColumnName, setEditingColumnName] = useState("");
+
+  const authHeaders = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${session?.access_token}`,
+  };
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -45,16 +66,19 @@ export default function BusinessBoard() {
   }, []);
 
   useEffect(() => {
-    fetchBusinesses();
-  }, []);
+    if (session) fetchBusinesses();
+  }, [session]);
 
   const fetchBusinesses = async () => {
     try {
-      const res = await fetch("/api/businesses");
+      const res = await fetch("/api/businesses", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
       const data = await res.json();
-      setBusinesses(data.businesses || []);
-      if (data.businesses?.length > 0 && !selectedBusiness) {
-        setSelectedBusiness(data.businesses[0]);
+      const list = data.businesses || [];
+      setBusinesses(list);
+      if (list.length > 0 && !selectedBusiness) {
+        setSelectedBusiness(list[0]);
       }
       setLoading(false);
     } catch (err) {
@@ -63,121 +87,192 @@ export default function BusinessBoard() {
     }
   };
 
-  const saveBusiness = async (business) => {
-    try {
-      await fetch("/api/businesses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "update", business }),
-      });
-    } catch (err) {
-      console.error("Error saving business:", err);
-    }
-  };
+  // ── Business CRUD ──
 
   const handleAddBusiness = async () => {
     if (!newBusinessName.trim()) return;
-    const newBiz = {
-      id: Date.now().toString(),
-      name: newBusinessName.trim(),
-      cards: [],
-      resources: [],
-      columns: DEFAULT_COLUMNS,
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...businesses, newBiz];
-    setBusinesses(updated);
-    setSelectedBusiness(newBiz);
-    setNewBusinessName("");
-    setShowAddBusiness(false);
-    await fetch("/api/businesses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "add", business: newBiz }),
-    });
+    try {
+      const res = await fetch("/api/businesses", {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({ action: "add_business", name: newBusinessName.trim() }),
+      });
+      const data = await res.json();
+      if (data.business) {
+        const updated = [...businesses, data.business];
+        setBusinesses(updated);
+        setSelectedBusiness(data.business);
+      }
+      setNewBusinessName("");
+      setShowAddBusiness(false);
+    } catch (err) {
+      console.error("Error adding business:", err);
+    }
   };
+
+  const handleDeleteBusiness = async () => {
+    if (!selectedBusiness) return;
+    try {
+      await fetch("/api/businesses", {
+        method: "DELETE",
+        headers: authHeaders,
+        body: JSON.stringify({ type: "business", id: selectedBusiness.id }),
+      });
+      const remaining = businesses.filter((b) => b.id !== selectedBusiness.id);
+      setBusinesses(remaining);
+      setSelectedBusiness(remaining.length > 0 ? remaining[0] : null);
+      setShowDeleteBusiness(false);
+    } catch (err) {
+      console.error("Error deleting business:", err);
+    }
+  };
+
+  const handleUpdateBusinessColumns = async (newColumns) => {
+    if (!selectedBusiness) return;
+    try {
+      const res = await fetch("/api/businesses", {
+        method: "PUT",
+        headers: authHeaders,
+        body: JSON.stringify({ type: "business", id: selectedBusiness.id, columns: newColumns }),
+      });
+      const data = await res.json();
+      if (data.business) {
+        const updatedBiz = { ...selectedBusiness, columns: data.business.columns };
+        setSelectedBusiness(updatedBiz);
+        setBusinesses(businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)));
+      }
+    } catch (err) {
+      console.error("Error updating columns:", err);
+    }
+  };
+
+  // ── Card CRUD ──
 
   const handleAddCard = async () => {
     if (!newCard.title.trim() || !showAddCard) return;
-    const card = {
-      id: Date.now().toString(),
-      title: newCard.title.trim(),
-      description: newCard.description.trim(),
-      labels: newCard.labels,
-      column: showAddCard,
-      createdAt: new Date().toISOString(),
-    };
-    const updatedBiz = {
-      ...selectedBusiness,
-      cards: [...(selectedBusiness.cards || []), card],
-    };
-    setSelectedBusiness(updatedBiz);
-    setBusinesses(
-      businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)),
-    );
-    setNewCard({ title: "", description: "", labels: [], column: "" });
-    setShowAddCard(null);
-    await saveBusiness(updatedBiz);
+    try {
+      const res = await fetch("/api/businesses", {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({
+          action: "add_card",
+          business_id: selectedBusiness.id,
+          title: newCard.title.trim(),
+          description: newCard.description.trim(),
+          column_name: showAddCard,
+          labels: newCard.labels,
+          due_date: newCard.due_date || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.card) {
+        const updatedBiz = {
+          ...selectedBusiness,
+          cards: [...(selectedBusiness.cards || []), data.card],
+        };
+        setSelectedBusiness(updatedBiz);
+        setBusinesses(businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)));
+      }
+      setNewCard({ title: "", description: "", labels: [], due_date: "" });
+      setShowAddCard(null);
+    } catch (err) {
+      console.error("Error adding card:", err);
+    }
   };
 
   const handleUpdateCard = async (cardId, updates) => {
-    const updatedCards = selectedBusiness.cards.map((c) =>
-      c.id === cardId ? { ...c, ...updates } : c,
-    );
-    const updatedBiz = { ...selectedBusiness, cards: updatedCards };
-    setSelectedBusiness(updatedBiz);
-    setBusinesses(
-      businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)),
-    );
-    await saveBusiness(updatedBiz);
+    try {
+      const res = await fetch("/api/businesses", {
+        method: "PUT",
+        headers: authHeaders,
+        body: JSON.stringify({ type: "card", id: cardId, ...updates }),
+      });
+      const data = await res.json();
+      if (data.card) {
+        const updatedCards = selectedBusiness.cards.map((c) =>
+          c.id === cardId ? data.card : c,
+        );
+        const updatedBiz = { ...selectedBusiness, cards: updatedCards };
+        setSelectedBusiness(updatedBiz);
+        setBusinesses(businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)));
+      }
+    } catch (err) {
+      console.error("Error updating card:", err);
+    }
   };
 
   const handleDeleteCard = async (cardId) => {
-    const updatedCards = selectedBusiness.cards.filter((c) => c.id !== cardId);
-    const updatedBiz = { ...selectedBusiness, cards: updatedCards };
-    setSelectedBusiness(updatedBiz);
-    setBusinesses(
-      businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)),
-    );
-    setShowEditCard(null);
-    await saveBusiness(updatedBiz);
+    try {
+      await fetch("/api/businesses", {
+        method: "DELETE",
+        headers: authHeaders,
+        body: JSON.stringify({ type: "card", id: cardId }),
+      });
+      const updatedCards = selectedBusiness.cards.filter((c) => c.id !== cardId);
+      const updatedBiz = { ...selectedBusiness, cards: updatedCards };
+      setSelectedBusiness(updatedBiz);
+      setBusinesses(businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)));
+      setShowEditCard(null);
+    } catch (err) {
+      console.error("Error deleting card:", err);
+    }
   };
 
   const handleMoveCard = async (cardId, newColumn) => {
-    await handleUpdateCard(cardId, { column: newColumn });
+    await handleUpdateCard(cardId, { column_name: newColumn });
   };
+
+  // ── Resource CRUD ──
 
   const handleAddResource = async () => {
     if (!newResource.title.trim()) return;
-    const resource = {
-      id: Date.now().toString(),
-      ...newResource,
-      createdAt: new Date().toISOString(),
-    };
-    const updatedBiz = {
-      ...selectedBusiness,
-      resources: [...(selectedBusiness.resources || []), resource],
-    };
-    setSelectedBusiness(updatedBiz);
-    setBusinesses(
-      businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)),
-    );
-    setNewResource({ title: "", url: "", type: "link" });
-    setShowAddResource(false);
-    await saveBusiness(updatedBiz);
+    try {
+      const res = await fetch("/api/businesses", {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({
+          action: "add_resource",
+          business_id: selectedBusiness.id,
+          title: newResource.title.trim(),
+          url: newResource.url.trim(),
+          type: newResource.type,
+        }),
+      });
+      const data = await res.json();
+      if (data.resource) {
+        const updatedBiz = {
+          ...selectedBusiness,
+          resources: [...(selectedBusiness.resources || []), data.resource],
+        };
+        setSelectedBusiness(updatedBiz);
+        setBusinesses(businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)));
+      }
+      setNewResource({ title: "", url: "", type: "link" });
+      setShowAddResource(false);
+    } catch (err) {
+      console.error("Error adding resource:", err);
+    }
   };
 
   const handleDeleteResource = async (resourceId) => {
-    const updatedResources = selectedBusiness.resources.filter(
-      (r) => r.id !== resourceId,
-    );
-    const updatedBiz = { ...selectedBusiness, resources: updatedResources };
-    setSelectedBusiness(updatedBiz);
-    setBusinesses(
-      businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)),
-    );
-    await saveBusiness(updatedBiz);
+    try {
+      await fetch("/api/businesses", {
+        method: "DELETE",
+        headers: authHeaders,
+        body: JSON.stringify({ type: "resource", id: resourceId }),
+      });
+      const updatedResources = selectedBusiness.resources.filter(
+        (r) => r.id !== resourceId,
+      );
+      const updatedBiz = { ...selectedBusiness, resources: updatedResources };
+      setSelectedBusiness(updatedBiz);
+      setBusinesses(businesses.map((b) => (b.id === updatedBiz.id ? updatedBiz : b)));
+    } catch (err) {
+      console.error("Error deleting resource:", err);
+    }
   };
+
+  // ── Labels ──
 
   const toggleLabel = (label) => {
     if (newCard.labels.includes(label)) {
@@ -189,6 +284,8 @@ export default function BusinessBoard() {
       setNewCard({ ...newCard, labels: [...newCard.labels, label] });
     }
   };
+
+  // ── Drag & Drop ──
 
   const handleDragStart = (e, card) => {
     setDraggedCard(card);
@@ -202,10 +299,105 @@ export default function BusinessBoard() {
 
   const handleDrop = async (e, column) => {
     e.preventDefault();
-    if (draggedCard && draggedCard.column !== column) {
+    if (draggedCard && draggedCard.column_name !== column) {
       await handleMoveCard(draggedCard.id, column);
     }
     setDraggedCard(null);
+  };
+
+  // ── Custom Columns ──
+
+  const handleAddColumn = async () => {
+    if (!newColumnName.trim() || !selectedBusiness) return;
+    const cols = [...(selectedBusiness.columns || DEFAULT_COLUMNS), newColumnName.trim()];
+    await handleUpdateBusinessColumns(cols);
+    setNewColumnName("");
+    setShowAddColumn(false);
+  };
+
+  const handleRenameColumn = async (oldName, newName) => {
+    if (!newName.trim() || !selectedBusiness) return;
+    const cols = (selectedBusiness.columns || DEFAULT_COLUMNS).map((c) =>
+      c === oldName ? newName.trim() : c,
+    );
+    // Also update any cards in this column
+    const cardsInColumn = (selectedBusiness.cards || []).filter(
+      (c) => c.column_name === oldName,
+    );
+    await handleUpdateBusinessColumns(cols);
+    for (const card of cardsInColumn) {
+      await handleUpdateCard(card.id, { column_name: newName.trim() });
+    }
+    setEditingColumn(null);
+    setEditingColumnName("");
+  };
+
+  const handleDeleteColumn = async (colName) => {
+    if (!selectedBusiness) return;
+    const cardsInColumn = (selectedBusiness.cards || []).filter(
+      (c) => c.column_name === colName,
+    );
+    if (cardsInColumn.length > 0) {
+      alert("Cannot delete a column that has cards. Move or delete the cards first.");
+      return;
+    }
+    const cols = (selectedBusiness.columns || DEFAULT_COLUMNS).filter(
+      (c) => c !== colName,
+    );
+    await handleUpdateBusinessColumns(cols);
+    if (activeColumn === colName) setActiveColumn(null);
+  };
+
+  // ── Due Date Helpers ──
+
+  const getDueDateStyle = (dueDate) => {
+    if (!dueDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate + "T00:00:00");
+    const diffDays = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return { color: "#ef4444", label: "Overdue" };
+    if (diffDays === 0) return { color: "#f59e0b", label: "Due today" };
+    if (diffDays <= 3) return { color: "#f59e0b", label: `Due in ${diffDays}d` };
+    return { color: "#6b7280", label: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }) };
+  };
+
+  // ── Filtered data ──
+
+  const columns = selectedBusiness?.columns || DEFAULT_COLUMNS;
+  const allCards = selectedBusiness?.cards || [];
+  const resources = selectedBusiness?.resources || [];
+
+  const filteredCards = allCards.filter((c) => {
+    const matchesSearch =
+      !searchTerm ||
+      c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.description && c.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesLabel = !labelFilter || (c.labels && c.labels.includes(labelFilter));
+    return matchesSearch && matchesLabel;
+  });
+
+  // ── Progress ──
+
+  const getColumnProgress = (column) => {
+    const columnCards = filteredCards.filter((c) => c.column_name === column);
+    if (columnCards.length === 0) return { done: 0, total: 0, percent: 0 };
+    const done = columnCards.filter((c) => c.labels?.includes("done")).length;
+    return {
+      done,
+      total: columnCards.length,
+      percent: Math.round((done / columnCards.length) * 100),
+    };
+  };
+
+  const overallProgress = () => {
+    if (allCards.length === 0) return { done: 0, total: 0, percent: 0 };
+    const done = allCards.filter((c) => c.labels?.includes("done")).length;
+    return {
+      done,
+      total: allCards.length,
+      percent: Math.round((done / allCards.length) * 100),
+    };
   };
 
   if (loading) {
@@ -231,32 +423,6 @@ export default function BusinessBoard() {
       </div>
     );
   }
-
-  const columns = selectedBusiness?.columns || DEFAULT_COLUMNS;
-  const cards = selectedBusiness?.cards || [];
-  const resources = selectedBusiness?.resources || [];
-
-  // Calculate progress
-  const getColumnProgress = (column) => {
-    const columnCards = cards.filter((c) => c.column === column);
-    if (columnCards.length === 0) return { done: 0, total: 0, percent: 0 };
-    const done = columnCards.filter((c) => c.labels?.includes("done")).length;
-    return {
-      done,
-      total: columnCards.length,
-      percent: Math.round((done / columnCards.length) * 100),
-    };
-  };
-
-  const overallProgress = () => {
-    if (cards.length === 0) return { done: 0, total: 0, percent: 0 };
-    const done = cards.filter((c) => c.labels?.includes("done")).length;
-    return {
-      done,
-      total: cards.length,
-      percent: Math.round((done / cards.length) * 100),
-    };
-  };
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#0D1423" }}>
@@ -305,7 +471,7 @@ export default function BusinessBoard() {
                   margin: 0,
                 }}
               >
-                🏢 Business Board
+                Business Board
               </h1>
 
               {/* Business Dropdown */}
@@ -314,6 +480,8 @@ export default function BusinessBoard() {
                 onChange={(e) => {
                   const biz = businesses.find((b) => b.id === e.target.value);
                   setSelectedBusiness(biz);
+                  setSearchTerm("");
+                  setLabelFilter("");
                 }}
                 style={{
                   background: "#1f2937",
@@ -355,6 +523,34 @@ export default function BusinessBoard() {
               >
                 + Add Business
               </button>
+
+              {selectedBusiness && (
+                <button
+                  onClick={() => setShowDeleteBusiness(true)}
+                  title="Delete business"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "8px",
+                    color: "#dc2626",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "color 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#f87171")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#dc2626")}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                  </svg>
+                </button>
+              )}
             </div>
 
             {selectedBusiness && (
@@ -432,11 +628,90 @@ export default function BusinessBoard() {
                     cursor: "pointer",
                   }}
                 >
-                  📎 Resources ({resources.length})
+                  Resources ({resources.length})
                 </button>
               </div>
             )}
           </div>
+
+          {/* Search & Filter Bar */}
+          {selectedBusiness && (
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                marginBottom: "16px",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Search cards..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  background: "#1f2937",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  padding: "10px 14px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  minWidth: isMobile ? "100%" : "240px",
+                  flex: isMobile ? "1" : "none",
+                }}
+              />
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                <button
+                  onClick={() => setLabelFilter("")}
+                  style={{
+                    background: !labelFilter ? "#8b5cf6" : "#374151",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "8px 12px",
+                    color: "#fff",
+                    fontSize: "12px",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                  }}
+                >
+                  All
+                </button>
+                {Object.keys(LABEL_COLORS).map((label) => (
+                  <button
+                    key={label}
+                    onClick={() =>
+                      setLabelFilter(labelFilter === label ? "" : label)
+                    }
+                    style={{
+                      background:
+                        labelFilter === label
+                          ? LABEL_COLORS[label].bg
+                          : "#374151",
+                      color:
+                        labelFilter === label
+                          ? LABEL_COLORS[label].text
+                          : "#9ca3af",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "8px 12px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {(searchTerm || labelFilter) && (
+                <span style={{ color: "#9ca3af", fontSize: "13px" }}>
+                  {filteredCards.length} / {allCards.length} cards
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Resources Panel */}
           {showResources && selectedBusiness && (
@@ -458,7 +733,7 @@ export default function BusinessBoard() {
                 }}
               >
                 <h3 style={{ color: "#fff", margin: 0, fontSize: "18px" }}>
-                  📎 Resources for {selectedBusiness.name}
+                  Resources for {selectedBusiness.name}
                 </h3>
                 <button
                   onClick={() => setShowAddResource(true)}
@@ -531,7 +806,7 @@ export default function BusinessBoard() {
                 </div>
               )}
 
-              {/* Add Resource Modal */}
+              {/* Add Resource Form */}
               {showAddResource && (
                 <div
                   style={{
@@ -589,9 +864,9 @@ export default function BusinessBoard() {
                         color: "#fff",
                       }}
                     >
-                      <option value="link">🔗 Link</option>
-                      <option value="doc">📄 Document</option>
-                      <option value="note">📝 Note</option>
+                      <option value="link">Link</option>
+                      <option value="doc">Document</option>
+                      <option value="note">Note</option>
                     </select>
                     <button
                       onClick={handleAddResource}
@@ -656,7 +931,7 @@ export default function BusinessBoard() {
                     flexShrink: 0,
                   }}
                 >
-                  {col} ({cards.filter((c) => c.column === col).length})
+                  {col} ({filteredCards.filter((c) => c.column_name === col).length})
                 </button>
               ))}
             </div>
@@ -697,34 +972,95 @@ export default function BusinessBoard() {
                           marginBottom: "8px",
                         }}
                       >
-                        <h3
-                          style={{
-                            color: "#fff",
-                            margin: 0,
-                            fontSize: "16px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {column}
-                        </h3>
-                        <button
-                          onClick={() => setShowAddCard(column)}
-                          style={{
-                            background: "#374151",
-                            border: "none",
-                            borderRadius: "6px",
-                            width: "28px",
-                            height: "28px",
-                            color: "#9ca3af",
-                            cursor: "pointer",
-                            fontSize: "18px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          +
-                        </button>
+                        {editingColumn === column ? (
+                          <input
+                            type="text"
+                            value={editingColumnName}
+                            onChange={(e) => setEditingColumnName(e.target.value)}
+                            onBlur={() => {
+                              if (editingColumnName.trim() && editingColumnName.trim() !== column) {
+                                handleRenameColumn(column, editingColumnName);
+                              } else {
+                                setEditingColumn(null);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                if (editingColumnName.trim() && editingColumnName.trim() !== column) {
+                                  handleRenameColumn(column, editingColumnName);
+                                } else {
+                                  setEditingColumn(null);
+                                }
+                              }
+                              if (e.key === "Escape") setEditingColumn(null);
+                            }}
+                            autoFocus
+                            style={{
+                              background: "#1f2937",
+                              border: "1px solid #8b5cf6",
+                              borderRadius: "4px",
+                              padding: "4px 8px",
+                              color: "#fff",
+                              fontSize: "16px",
+                              fontWeight: "600",
+                              width: "100%",
+                              maxWidth: "160px",
+                            }}
+                          />
+                        ) : (
+                          <h3
+                            onDoubleClick={() => {
+                              setEditingColumn(column);
+                              setEditingColumnName(column);
+                            }}
+                            title="Double-click to rename"
+                            style={{
+                              color: "#fff",
+                              margin: 0,
+                              fontSize: "16px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {column}
+                          </h3>
+                        )}
+                        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                          {columns.length > 1 && (
+                            <button
+                              onClick={() => handleDeleteColumn(column)}
+                              title="Delete column (must be empty)"
+                              style={{
+                                background: "none",
+                                border: "none",
+                                color: "#6b7280",
+                                cursor: "pointer",
+                                fontSize: "14px",
+                                padding: "4px",
+                              }}
+                            >
+                              ×
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setShowAddCard(column)}
+                            style={{
+                              background: "#374151",
+                              border: "none",
+                              borderRadius: "6px",
+                              width: "28px",
+                              height: "28px",
+                              color: "#9ca3af",
+                              cursor: "pointer",
+                              fontSize: "18px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                       {/* Column Progress Bar */}
                       <div style={{ marginBottom: "8px" }}>
@@ -784,92 +1120,208 @@ export default function BusinessBoard() {
                         gap: "12px",
                       }}
                     >
-                      {cards
-                        .filter((c) => c.column === column)
-                        .map((card) => (
-                          <div
-                            key={card.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, card)}
-                            onClick={() => setShowEditCard(card)}
-                            style={{
-                              background: "#1f2937",
-                              borderRadius: "8px",
-                              padding: "14px",
-                              cursor: "pointer",
-                              border: "1px solid #374151",
-                              transition: "transform 0.1s, box-shadow 0.1s",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.transform =
-                                "translateY(-2px)";
-                              e.currentTarget.style.boxShadow =
-                                "0 4px 12px rgba(0,0,0,0.3)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = "translateY(0)";
-                              e.currentTarget.style.boxShadow = "none";
-                            }}
-                          >
-                            {/* Labels */}
-                            {card.labels?.length > 0 && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  gap: "6px",
-                                  marginBottom: "10px",
-                                  flexWrap: "wrap",
-                                }}
-                              >
-                                {card.labels.map((label) => (
-                                  <span
-                                    key={label}
-                                    style={{
-                                      background:
-                                        LABEL_COLORS[label]?.bg || "#6b7280",
-                                      color:
-                                        LABEL_COLORS[label]?.text || "#fff",
-                                      padding: "2px 8px",
-                                      borderRadius: "4px",
-                                      fontSize: "11px",
-                                      fontWeight: "600",
-                                      textTransform: "uppercase",
-                                    }}
-                                  >
-                                    {label}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            <h4
+                      {filteredCards
+                        .filter((c) => c.column_name === column)
+                        .map((card) => {
+                          const dueDateInfo = getDueDateStyle(card.due_date);
+                          return (
+                            <div
+                              key={card.id}
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, card)}
+                              onClick={() => setShowEditCard(card)}
                               style={{
-                                color: "#fff",
-                                margin: 0,
-                                fontSize: "14px",
-                                fontWeight: "500",
+                                background: "#1f2937",
+                                borderRadius: "8px",
+                                padding: "14px",
+                                cursor: "pointer",
+                                border: "1px solid #374151",
+                                transition: "transform 0.1s, box-shadow 0.1s",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform =
+                                  "translateY(-2px)";
+                                e.currentTarget.style.boxShadow =
+                                  "0 4px 12px rgba(0,0,0,0.3)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform =
+                                  "translateY(0)";
+                                e.currentTarget.style.boxShadow = "none";
                               }}
                             >
-                              {card.title}
-                            </h4>
-                            {card.description && (
-                              <p
+                              {/* Labels */}
+                              {card.labels?.length > 0 && (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "6px",
+                                    marginBottom: "10px",
+                                    flexWrap: "wrap",
+                                  }}
+                                >
+                                  {card.labels.map((label) => (
+                                    <span
+                                      key={label}
+                                      style={{
+                                        background:
+                                          LABEL_COLORS[label]?.bg || "#6b7280",
+                                        color:
+                                          LABEL_COLORS[label]?.text || "#fff",
+                                        padding: "2px 8px",
+                                        borderRadius: "4px",
+                                        fontSize: "11px",
+                                        fontWeight: "600",
+                                        textTransform: "uppercase",
+                                      }}
+                                    >
+                                      {label}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              <h4
                                 style={{
-                                  color: "#9ca3af",
-                                  margin: "8px 0 0",
-                                  fontSize: "13px",
-                                  lineHeight: "1.4",
+                                  color: "#fff",
+                                  margin: 0,
+                                  fontSize: "14px",
+                                  fontWeight: "500",
                                 }}
                               >
-                                {card.description.length > 80
-                                  ? card.description.slice(0, 80) + "..."
-                                  : card.description}
-                              </p>
-                            )}
-                          </div>
-                        ))}
+                                {card.title}
+                              </h4>
+                              {card.description && (
+                                <p
+                                  style={{
+                                    color: "#9ca3af",
+                                    margin: "8px 0 0",
+                                    fontSize: "13px",
+                                    lineHeight: "1.4",
+                                  }}
+                                >
+                                  {card.description.length > 80
+                                    ? card.description.slice(0, 80) + "..."
+                                    : card.description}
+                                </p>
+                              )}
+                              {/* Due Date */}
+                              {dueDateInfo && (
+                                <div
+                                  style={{
+                                    marginTop: "8px",
+                                    fontSize: "12px",
+                                    color: dueDateInfo.color,
+                                    fontWeight: "500",
+                                  }}
+                                >
+                                  {dueDateInfo.label}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                     </div>
                   </div>
                 ),
+              )}
+
+              {/* Add Column Button (desktop only) */}
+              {!isMobile && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    minWidth: "80px",
+                  }}
+                >
+                  {showAddColumn ? (
+                    <div
+                      style={{
+                        background: "#111827",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        border: "1px solid #1f2937",
+                        width: "200px",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Column name"
+                        value={newColumnName}
+                        onChange={(e) => setNewColumnName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddColumn();
+                          if (e.key === "Escape") {
+                            setShowAddColumn(false);
+                            setNewColumnName("");
+                          }
+                        }}
+                        autoFocus
+                        style={{
+                          width: "100%",
+                          background: "#1f2937",
+                          border: "1px solid #374151",
+                          borderRadius: "6px",
+                          padding: "10px",
+                          color: "#fff",
+                          fontSize: "14px",
+                          marginBottom: "10px",
+                        }}
+                      />
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          onClick={handleAddColumn}
+                          style={{
+                            background: "#10b981",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "8px 14px",
+                            color: "#fff",
+                            fontSize: "13px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Add
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowAddColumn(false);
+                            setNewColumnName("");
+                          }}
+                          style={{
+                            background: "#374151",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "8px 14px",
+                            color: "#fff",
+                            fontSize: "13px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowAddColumn(true)}
+                      title="Add column"
+                      style={{
+                        background: "#1f2937",
+                        border: "1px dashed #374151",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        color: "#6b7280",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      + Column
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           ) : (
@@ -984,6 +1436,77 @@ export default function BusinessBoard() {
         </div>
       )}
 
+      {/* Delete Business Confirmation Modal */}
+      {showDeleteBusiness && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100,
+          }}
+          onClick={() => setShowDeleteBusiness(false)}
+        >
+          <div
+            style={{
+              background: "#1f2937",
+              borderRadius: "16px",
+              padding: "20px",
+              width: "90%",
+              maxWidth: "400px",
+              border: "1px solid #374151",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ color: "#fff", margin: "0 0 12px", fontSize: "20px" }}>
+              Delete Business
+            </h2>
+            <p style={{ color: "#9ca3af", margin: "0 0 20px", fontSize: "14px" }}>
+              Are you sure you want to delete <strong style={{ color: "#fff" }}>{selectedBusiness?.name}</strong>?
+              This will permanently delete all {allCards.length} cards and {resources.length} resources.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                onClick={() => setShowDeleteBusiness(false)}
+                style={{
+                  background: "#374151",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "10px 20px",
+                  color: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteBusiness}
+                style={{
+                  background: "#dc2626",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "10px 20px",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+              >
+                Delete Forever
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Card Modal */}
       {showAddCard && (
         <div
@@ -1050,6 +1573,26 @@ export default function BusinessBoard() {
                 resize: "vertical",
               }}
             />
+            {/* Due Date */}
+            <div style={{ marginBottom: "12px" }}>
+              <label style={{ color: "#9ca3af", fontSize: "13px", display: "block", marginBottom: "6px" }}>
+                Due date (optional):
+              </label>
+              <input
+                type="date"
+                value={newCard.due_date}
+                onChange={(e) => setNewCard({ ...newCard, due_date: e.target.value })}
+                style={{
+                  background: "#111827",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  padding: "10px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  colorScheme: "dark",
+                }}
+              />
+            </div>
             <div style={{ marginBottom: "16px" }}>
               <p
                 style={{
@@ -1100,7 +1643,7 @@ export default function BusinessBoard() {
                     title: "",
                     description: "",
                     labels: [],
-                    column: "",
+                    due_date: "",
                   });
                 }}
                 style={{
@@ -1227,6 +1770,44 @@ export default function BusinessBoard() {
               }}
             />
 
+            {/* Due Date */}
+            <div style={{ marginBottom: "16px" }}>
+              <label style={{ color: "#9ca3af", fontSize: "13px", display: "block", marginBottom: "6px" }}>
+                Due date:
+              </label>
+              <input
+                type="date"
+                value={showEditCard.due_date || ""}
+                onChange={(e) =>
+                  setShowEditCard({ ...showEditCard, due_date: e.target.value || null })
+                }
+                style={{
+                  background: "#111827",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  padding: "10px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  colorScheme: "dark",
+                }}
+              />
+              {showEditCard.due_date && (
+                <button
+                  onClick={() => setShowEditCard({ ...showEditCard, due_date: null })}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#ef4444",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    marginLeft: "8px",
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
             <div style={{ marginBottom: "16px" }}>
               <p
                 style={{
@@ -1242,11 +1823,11 @@ export default function BusinessBoard() {
                   <button
                     key={col}
                     onClick={() =>
-                      setShowEditCard({ ...showEditCard, column: col })
+                      setShowEditCard({ ...showEditCard, column_name: col })
                     }
                     style={{
                       background:
-                        showEditCard.column === col ? "#8b5cf6" : "#374151",
+                        showEditCard.column_name === col ? "#8b5cf6" : "#374151",
                       color: "#fff",
                       border: "none",
                       borderRadius: "6px",
@@ -1336,8 +1917,9 @@ export default function BusinessBoard() {
                   await handleUpdateCard(showEditCard.id, {
                     title: showEditCard.title,
                     description: showEditCard.description,
-                    column: showEditCard.column,
+                    column_name: showEditCard.column_name,
                     labels: showEditCard.labels,
+                    due_date: showEditCard.due_date || null,
                   });
                   setShowEditCard(null);
                 }}
@@ -1360,3 +1942,5 @@ export default function BusinessBoard() {
     </div>
   );
 }
+
+export default withAuth(BusinessBoard);

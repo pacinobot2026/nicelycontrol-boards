@@ -147,10 +147,11 @@ function Articles() {
       const data = await res.json();
       console.log("Approve data:", data);
       if (res.ok) {
-        alert("Article approved! Check Letterman.");
+        alert("✅ Article approved! Moved to Approved tab. Pacino will create it in Letterman.");
+        setStatusFilter("approved"); // Switch to approved tab
         loadArticles(); // Reload articles
       } else {
-        alert("Failed to approve: " + (data.error || "Unknown error"));
+        alert("❌ Failed to approve: " + (data.error || "Unknown error"));
       }
     } catch (err) {
       console.error("Failed to approve article:", err);

@@ -45,6 +45,33 @@ export default async function handler(req, res) {
       // Don't fail the whole request if Supabase update fails
     }
 
+    // Send wake notification to OpenClaw
+    const GATEWAY_URL = process.env.OPENCLAW_GATEWAY_URL || 'http://localhost:3080';
+    try {
+      const { data: article } = await supabase
+        .from('articles')
+        .select('id, title, publication')
+        .eq('id', articleId)
+        .single();
+      
+      if (article) {
+        await axios.post(
+          `${GATEWAY_URL}/api/v1/cron/wake`,
+          {
+            text: `📰 Article approved: "${article.title}" (${article.publication || 'Unknown publication'}) - Article ID: ${articleId}`,
+            mode: 'now'
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 5000
+          }
+        );
+      }
+    } catch (wakeError) {
+      console.error('Failed to send wake notification:', wakeError.message);
+      // Don't fail the whole request if wake fails
+    }
+
     return res.status(200).json({ success: true });
 
   } catch (error) {

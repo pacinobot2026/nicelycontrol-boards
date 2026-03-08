@@ -10,6 +10,7 @@ function Articles() {
   const [allArticles, setAllArticles] = useState([]);
   const [publications, setPublications] = useState([]);
   const [publication, setPublication] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date_desc");
   const [viewMode, setViewMode] = useState("list");
@@ -131,6 +132,42 @@ function Articles() {
     }
   }
 
+  async function handleApprove(articleId) {
+    try {
+      const res = await fetch("/api/articles/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ articleId }),
+      });
+      if (res.ok) {
+        loadArticles(); // Reload articles
+      }
+    } catch (err) {
+      console.error("Failed to approve article:", err);
+    }
+  }
+
+  async function handleDisapprove(articleId) {
+    try {
+      const res = await fetch("/api/articles/reject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ articleId }),
+      });
+      if (res.ok) {
+        loadArticles(); // Reload articles
+      }
+    } catch (err) {
+      console.error("Failed to disapprove article:", err);
+    }
+  }
+
   async function loadArticles() {
     // Check cache first
     const cached = getCache('articles');
@@ -204,6 +241,14 @@ function Articles() {
     publication === "all"
       ? allArticles
       : allArticles.filter((a) => a.publication === publication);
+  
+  // Filter by status
+  if (statusFilter !== "all") {
+    filteredArticles = filteredArticles.filter((a) => 
+      (a.status || "pending") === statusFilter
+    );
+  }
+  
   if (sortBy === "date_desc")
     filteredArticles = [...filteredArticles].sort(
       (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
@@ -386,6 +431,34 @@ function Articles() {
                 </div>
               </div>
 
+              {/* Status Tabs */}
+              <div className="flex gap-2 mb-4 border-b border-gray-600/30 pb-1">
+                <button
+                  onClick={() => setStatusFilter("all")}
+                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "all" ? "text-purple-400 border-purple-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setStatusFilter("approved")}
+                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "approved" ? "text-green-400 border-green-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
+                >
+                  ✓ Approved
+                </button>
+                <button
+                  onClick={() => setStatusFilter("disapproved")}
+                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "disapproved" ? "text-red-400 border-red-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
+                >
+                  ✕ Disapproved
+                </button>
+                <button
+                  onClick={() => setStatusFilter("pending")}
+                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "pending" ? "text-yellow-400 border-yellow-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
+                >
+                  ⏳ Pending
+                </button>
+              </div>
+
               {/* Publications Filter + View Toggle */}
               <div className="flex justify-between items-center flex-wrap gap-3 mb-4">
                 <div className="flex gap-2 flex-wrap">
@@ -480,6 +553,8 @@ function Articles() {
                           article={article}
                           index={index}
                           onClick={() => setSelectedArticle(article)}
+                          onApprove={handleApprove}
+                          onDisapprove={handleDisapprove}
                         />
                       ))}
                     </tbody>
@@ -499,6 +574,8 @@ function Articles() {
                         key={article._id || article.id || index}
                         article={article}
                         onClick={() => setSelectedArticle(article)}
+                        onApprove={handleApprove}
+                        onDisapprove={handleDisapprove}
                       />
                     ))}
                   </div>
@@ -525,7 +602,7 @@ function Articles() {
   );
 }
 
-function ArticleRow({ article, index, onClick }) {
+function ArticleRow({ article, index, onClick, onApprove, onDisapprove }) {
   const [isHovered, setIsHovered] = useState(false);
   const date = article.created_at || article.createdAt;
   const imageUrl = article.image_url || article.image;
@@ -534,14 +611,12 @@ function ArticleRow({ article, index, onClick }) {
 
   const handleApprove = (e) => {
     e.stopPropagation();
-    // TODO: Add approve logic
-    console.log("Approved:", article.id);
+    onApprove(article.id);
   };
 
   const handleDisapprove = (e) => {
     e.stopPropagation();
-    // TODO: Add disapprove logic
-    console.log("Disapproved:", article.id);
+    onDisapprove(article.id);
   };
 
   return (
@@ -606,7 +681,7 @@ function ArticleRow({ article, index, onClick }) {
   );
 }
 
-function ArticleCard({ article, onClick }) {
+function ArticleCard({ article, onClick, onApprove, onDisapprove }) {
   // Article card with description and approve/disapprove buttons
   const [isHovered, setIsHovered] = useState(false);
   const date = article.created_at || article.createdAt;
@@ -616,14 +691,12 @@ function ArticleCard({ article, onClick }) {
 
   const handleApprove = (e) => {
     e.stopPropagation();
-    // TODO: Add approve logic
-    console.log("Approved:", article.id);
+    onApprove(article.id);
   };
 
   const handleDisapprove = (e) => {
     e.stopPropagation();
-    // TODO: Add disapprove logic
-    console.log("Disapproved:", article.id);
+    onDisapprove(article.id);
   };
 
   return (

@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     const { error: supabaseError } = await supabase
       .from('articles')
       .update({ 
-        status: 'rejected',
+        status: 'disapproved',
         updated_at: new Date().toISOString()
       })
       .eq('id', articleId);

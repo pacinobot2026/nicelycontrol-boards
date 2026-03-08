@@ -12,7 +12,7 @@ function Articles() {
   const [publication, setPublication] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date_desc");
-  const [viewMode, setViewMode] = useState("cards");
+  const [viewMode, setViewMode] = useState("list");
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [searchCountdown, setSearchCountdown] = useState(3600);
@@ -255,7 +255,7 @@ function Articles() {
           {/* Header */}
           <div className="mb-6 flex justify-between items-start flex-wrap gap-3">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+              <h1 className="text-3xl font-bold gradient-text mb-1">
                 📰 Article Cue Board
               </h1>
               <p className="text-sm text-gray-400">
@@ -526,13 +526,30 @@ function Articles() {
 }
 
 function ArticleRow({ article, index, onClick }) {
+  const [isHovered, setIsHovered] = useState(false);
   const date = article.created_at || article.createdAt;
   const imageUrl = article.image_url || article.image;
+  const description = article.content || article.seo_description || "";
+  const truncatedDesc = description.length > 100 ? description.substring(0, 100) + "..." : description;
+
+  const handleApprove = (e) => {
+    e.stopPropagation();
+    // TODO: Add approve logic
+    console.log("Approved:", article.id);
+  };
+
+  const handleDisapprove = (e) => {
+    e.stopPropagation();
+    // TODO: Add disapprove logic
+    console.log("Disapproved:", article.id);
+  };
 
   return (
     <tr
       className={`border-b border-gray-600/30 hover:bg-purple-900/10 transition-colors cursor-pointer ${index % 2 === 0 ? "bg-gray-800/30" : ""}`}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <td className="px-5 py-3">
         <div className="w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0">
@@ -546,9 +563,28 @@ function ArticleRow({ article, index, onClick }) {
         </div>
       </td>
       <td className="px-5 py-3">
-        <div className="text-white text-sm font-medium leading-snug hover:text-blue-400 transition-colors">
+        <div className="text-white text-sm font-medium leading-snug hover:text-blue-400 transition-colors mb-1">
           {article.title || "Untitled"}
         </div>
+        <div className="text-gray-400 text-xs leading-relaxed">
+          {truncatedDesc || "No description available"}
+        </div>
+        {isHovered && (
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={handleApprove}
+              className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              ✓ Approve
+            </button>
+            <button
+              onClick={handleDisapprove}
+              className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              ✕ Disapprove
+            </button>
+          </div>
+        )}
       </td>
       <td className="px-5 py-3">
         {article.publication && (
@@ -571,13 +607,31 @@ function ArticleRow({ article, index, onClick }) {
 }
 
 function ArticleCard({ article, onClick }) {
+  // Article card with description and approve/disapprove buttons
+  const [isHovered, setIsHovered] = useState(false);
   const date = article.created_at || article.createdAt;
   const imageUrl = article.image_url || article.image;
+  const description = article.content || article.seo_description || "";
+  const truncatedDesc = description.length > 80 ? description.substring(0, 80) + "..." : description;
+
+  const handleApprove = (e) => {
+    e.stopPropagation();
+    // TODO: Add approve logic
+    console.log("Approved:", article.id);
+  };
+
+  const handleDisapprove = (e) => {
+    e.stopPropagation();
+    // TODO: Add disapprove logic
+    console.log("Disapproved:", article.id);
+  };
 
   return (
     <div
-      className="bg-gray-800/70 rounded-xl border border-gray-600/50 overflow-hidden cursor-pointer hover:border-purple-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-900/20 transition-all"
+      className="bg-gray-800/70 rounded-xl border border-gray-600/50 overflow-hidden cursor-pointer hover:border-purple-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-900/20 transition-all relative"
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="aspect-[4/5] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden grayscale hover:grayscale-0 transition-all">
         {imageUrl ? (
@@ -593,9 +647,31 @@ function ArticleCard({ article, onClick }) {
         )}
       </div>
       <div className="p-4">
-        <h3 className="text-white text-sm font-semibold mb-2 leading-snug">
+        <h3 className="text-white text-sm font-semibold mb-2 leading-snug line-clamp-2">
           {article.title || "Untitled"}
         </h3>
+        <p className="text-gray-400 text-xs mb-3 leading-relaxed line-clamp-3">
+          {truncatedDesc || "No description available"}
+        </p>
+        
+        {/* Hover buttons */}
+        {isHovered && (
+          <div className="flex gap-2 mb-2">
+            <button
+              onClick={handleApprove}
+              className="flex-1 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              ✓ Approve
+            </button>
+            <button
+              onClick={handleDisapprove}
+              className="flex-1 px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              ✕ Disapprove
+            </button>
+          </div>
+        )}
+        
         <div className="flex gap-2 flex-wrap">
           {article.publication && (
             <span className="px-2 py-1 bg-gray-900 rounded text-xs text-gray-400">

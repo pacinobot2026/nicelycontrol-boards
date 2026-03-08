@@ -133,6 +133,7 @@ function Articles() {
   }
 
   async function handleApprove(articleId) {
+    console.log("Approving article:", articleId);
     try {
       const res = await fetch("/api/articles/approve", {
         method: "POST",
@@ -142,11 +143,18 @@ function Articles() {
         },
         body: JSON.stringify({ articleId }),
       });
+      console.log("Approve response:", res.status);
+      const data = await res.json();
+      console.log("Approve data:", data);
       if (res.ok) {
+        alert("Article approved! Check Letterman.");
         loadArticles(); // Reload articles
+      } else {
+        alert("Failed to approve: " + (data.error || "Unknown error"));
       }
     } catch (err) {
       console.error("Failed to approve article:", err);
+      alert("Error: " + err.message);
     }
   }
 

@@ -1,6 +1,14 @@
 import { supabase } from '../../../lib/supabase';
 const axios = require('axios');
 
+// Publication name to Letterman ID mapping
+const PUBLICATION_IDS = {
+  'West Valley Shoutouts': '677895a2584a3ce5878fcf5b',
+  'Save the Doggy': '68a78eba3ce3e647df7fefaa',
+  'Vegas Fork': '68a790aa3ce3e647df7ff272',
+  'Summerlin Shoutouts': '66569dc96c58db7f4dfff4a5'
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -19,10 +27,47 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Letterman API key not configured' });
     }
 
-    // Update article status to approved in Letterman
-    await axios.put(
-      `https://api.letterman.ai/api/newsletters/${articleId}`,
-      { status: 'approved' },
+    // Get article from Supabase
+    const { data: article, error: fetchError } = await supabase
+      .from('articles')
+      .select('*')
+      .eq('id', articleId)
+      .single();
+
+    if (fetchError || !article) {
+      return res.status(404).json({ error: 'Article not found' });
+    }
+
+    // Get publication ID
+    const publicationId = PUBLICATION_IDS[article.publication];
+    if (!publicationId) {
+      return res.status(400).json({ error: `Unknown publication: ${article.publication}` });
+    }
+
+    // Create article in Letterman as DRAFT using keepOriginal mode
+    const lettermanArticle = {
+      storageId: publicationId,
+      type: 'ARTICLE',
+      articleOptions: {
+        contentFrom: 'CONTENT',
+        keepOriginal: true,
+        headline: article.title || 'Untitled',
+        subHeadline: article.seo_description || '',
+        content: article.content || '<p>No content</p>',
+        keywords: [],
+        imageUrl: article.image_url || '',
+        summary: {
+          title: article.seo_title || article.title || 'Untitled',
+          description: article.seo_description || '',
+          imageUrl: article.image_url || '',
+          content: article.content || '<p>No content</p>'
+        }
+      }
+    };
+
+    const lettermanResponse = await axios.post(
+      'https://api.letterman.ai/api/ai/newsletters',
+      lettermanArticle,
       {
         headers: {
           'Authorization': `Bearer ${LETTERMAN_API_KEY}`,
@@ -31,18 +76,20 @@ export default async function handler(req, res) {
       }
     );
 
-    // Also update in Supabase
-    const { error: supabaseError } = await supabase
+    const lettermanId = lettermanResponse.data?._id || lettermanResponse.data?.id;
+
+    // Update Supabase with Letterman ID and approved status
+    const { error: updateError } = await supabase
       .from('articles')
       .update({ 
         status: 'approved',
+        letterman_id: lettermanId,
         updated_at: new Date().toISOString()
       })
       .eq('id', articleId);
 
-    if (supabaseError) {
-      console.error('Error updating Supabase:', supabaseError.message);
-      // Don't fail the whole request if Supabase update fails
+    if (updateError) {
+      console.error('Error updating Supabase:', updateError.message);
     }
 
     // Send wake notification to OpenClaw

@@ -37,8 +37,29 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to update article status' });
     }
 
-    // Article status updated to "approved"
-    // OpenClaw will pick it up on next heartbeat check
+    // Send wake event to OpenClaw
+    const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:18789';
+    const GATEWAY_TOKEN = process.env.GATEWAY_TOKEN;
+
+    if (GATEWAY_TOKEN) {
+      try {
+        await fetch(`${GATEWAY_URL}/api/cron/wake`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${GATEWAY_TOKEN}`
+          },
+          body: JSON.stringify({
+            text: `🆕 Article approved and ready to process! Article ID: ${articleId}, Title: ${article.title}`,
+            mode: 'now'
+          })
+        });
+      } catch (wakeError) {
+        console.error('Failed to send wake event:', wakeError);
+        // Don't fail the request if wake fails
+      }
+    }
+
     return res.status(200).json({ success: true });
 
   } catch (error) {

@@ -1,5 +1,4 @@
 import { supabase } from '../../../lib/supabase';
-const axios = require('axios');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -38,33 +37,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to update article status' });
     }
 
-    // Send wake notification to OpenClaw
-    const GATEWAY_URL = process.env.OPENCLAW_GATEWAY_URL || 'http://localhost:3080';
-    try {
-      const { data: article } = await supabase
-        .from('articles')
-        .select('id, title, publication')
-        .eq('id', articleId)
-        .single();
-      
-      if (article) {
-        await axios.post(
-          `${GATEWAY_URL}/api/v1/cron/wake`,
-          {
-            text: `📰 Article approved: "${article.title}" (${article.publication || 'Unknown publication'}) - Run /local article workflow to generate full content, create in Letterman as draft, then mark as published. Article ID: ${articleId}`,
-            mode: 'now'
-          },
-          {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 5000
-          }
-        );
-      }
-    } catch (wakeError) {
-      console.error('Failed to send wake notification:', wakeError.message);
-      // Don't fail the whole request if wake fails
-    }
-
+    // Article status updated to "approved"
+    // OpenClaw will pick it up on next heartbeat check
     return res.status(200).json({ success: true });
 
   } catch (error) {

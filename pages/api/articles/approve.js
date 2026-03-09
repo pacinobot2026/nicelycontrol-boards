@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         await axios.post(
           `${GATEWAY_URL}/api/v1/cron/wake`,
           {
-            text: `📰 Article approved: "${article.title}" (${article.publication || 'Unknown publication'}) - Use /article skill to create in Letterman as draft. Article ID: ${articleId}`,
+            text: `📰 Article approved: "${article.title}" (${article.publication || 'Unknown publication'}) - Run /local article workflow to generate full content, create in Letterman as draft, then mark as published. Article ID: ${articleId}`,
             mode: 'now'
           },
           {

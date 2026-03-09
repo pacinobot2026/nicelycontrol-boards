@@ -1,0 +1,36 @@
+import { supabase } from '../../../lib/supabase';
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { articleId, letterManId } = req.body;
+    
+    if (!articleId) {
+      return res.status(400).json({ error: 'Article ID required' });
+    }
+
+    // Update status to published in Supabase
+    const { error: updateError } = await supabase
+      .from('articles')
+      .update({ 
+        status: 'published',
+        letterman_id: letterManId || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', articleId);
+
+    if (updateError) {
+      console.error('Error updating Supabase:', updateError.message);
+      return res.status(500).json({ error: 'Failed to update article status' });
+    }
+
+    return res.status(200).json({ success: true });
+
+  } catch (error) {
+    console.error('Error publishing article:', error);
+    return res.status(500).json({ error: 'Failed to publish article' });
+  }
+}

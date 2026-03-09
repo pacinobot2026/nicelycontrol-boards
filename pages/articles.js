@@ -10,7 +10,7 @@ function Articles() {
   const [allArticles, setAllArticles] = useState([]);
   const [publications, setPublications] = useState([]);
   const [publication, setPublication] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date_desc");
   const [viewMode, setViewMode] = useState("list");
@@ -252,11 +252,9 @@ function Articles() {
       : allArticles.filter((a) => a.publication === publication);
   
   // Filter by status
-  if (statusFilter !== "all") {
-    filteredArticles = filteredArticles.filter((a) => 
-      (a.status || "pending") === statusFilter
-    );
-  }
+  filteredArticles = filteredArticles.filter((a) => 
+    (a.status || "pending") === statusFilter
+  );
   
   if (sortBy === "date_desc")
     filteredArticles = [...filteredArticles].sort(
@@ -443,10 +441,10 @@ function Articles() {
               {/* Status Tabs */}
               <div className="flex gap-2 mb-4 border-b border-gray-600/30 pb-1">
                 <button
-                  onClick={() => setStatusFilter("all")}
-                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "all" ? "text-purple-400 border-purple-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
+                  onClick={() => setStatusFilter("pending")}
+                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "pending" ? "text-yellow-400 border-yellow-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
                 >
-                  All
+                  ⏳ Pending
                 </button>
                 <button
                   onClick={() => setStatusFilter("approved")}
@@ -455,16 +453,16 @@ function Articles() {
                   ✓ Approved
                 </button>
                 <button
+                  onClick={() => setStatusFilter("published")}
+                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "published" ? "text-blue-400 border-blue-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
+                >
+                  📰 Published
+                </button>
+                <button
                   onClick={() => setStatusFilter("disapproved")}
                   className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "disapproved" ? "text-red-400 border-red-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
                 >
                   ✕ Disapproved
-                </button>
-                <button
-                  onClick={() => setStatusFilter("pending")}
-                  className={`px-5 py-2 text-sm font-semibold transition-colors border-b-2 ${statusFilter === "pending" ? "text-yellow-400 border-yellow-400" : "text-gray-400 border-transparent hover:text-gray-300"}`}
-                >
-                  ⏳ Pending
                 </button>
               </div>
 
@@ -655,12 +653,14 @@ function ArticleRow({ article, index, onClick, onApprove, onDisapprove }) {
         </div>
         {isHovered && (
           <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleApprove}
-              className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors"
-            >
-              ✓ Approve
-            </button>
+            {article.status !== "approved" && (
+              <button
+                onClick={handleApprove}
+                className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors"
+              >
+                ✓ Approve
+              </button>
+            )}
             <button
               onClick={handleDisapprove}
               className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition-colors"
@@ -739,12 +739,14 @@ function ArticleCard({ article, onClick, onApprove, onDisapprove }) {
         {/* Hover buttons */}
         {isHovered && (
           <div className="flex gap-2 mb-2">
-            <button
-              onClick={handleApprove}
-              className="flex-1 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors"
-            >
-              ✓ Approve
-            </button>
+            {article.status !== "approved" && (
+              <button
+                onClick={handleApprove}
+                className="flex-1 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-semibold rounded-lg transition-colors"
+              >
+                ✓ Approve
+              </button>
+            )}
             <button
               onClick={handleDisapprove}
               className="flex-1 px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition-colors"

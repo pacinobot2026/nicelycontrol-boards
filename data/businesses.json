@@ -1,66 +1,1049 @@
 {
-  "businesses": [
-    {
-      "id": "reviewrush-001",
-      "name": "ReviewRush",
-      "columns": ["Marketing", "Follow-up", "Research", "Delivery"],
-      "createdAt": "2026-02-26T04:00:00.000Z",
-      "cards": [
-        {"id": "m1", "title": "VSL Script Written", "description": "3-minute sales video script for ReviewRush", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "m2", "title": "VSL Audio Generated", "description": "ElevenLabs with Chad voice clone", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T02:45:00Z"},
-        {"id": "m3", "title": "VSL Text Slides Built", "description": "120 slides synced to audio timestamps", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T03:30:00Z"},
-        {"id": "m4", "title": "HeyGen Avatar VSL", "description": "Generate avatar video with Chad clone - needs credits", "column": "Marketing", "labels": ["blocked"], "createdAt": "2026-02-26T03:55:00Z"},
-        {"id": "m5", "title": "Sales Page Copy", "description": "Long-form sales copy following directive", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "m6", "title": "Facebook Ad Creative", "description": "3 ad variations for cold traffic", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m7", "title": "Instagram Carousel", "description": "5-slide carousel for organic reach", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m8", "title": "YouTube Short Script", "description": "60-second teaser script", "column": "Marketing", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m9", "title": "Email Swipes for Affiliates", "description": "3 email templates for JV partners", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m10", "title": "Twitter Thread", "description": "Review acquisition tips thread", "column": "Marketing", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m11", "title": "LinkedIn Article", "description": "Why reviews matter for local business", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m12", "title": "Testimonial Graphics", "description": "Design quote cards from beta users", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-
-        {"id": "f1", "title": "7-Email Non-Buyer Sequence", "description": "Build in Global Control for cart abandoners", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f2", "title": "SMS Follow-up Templates", "description": "3 text message templates for leads", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f3", "title": "Retargeting Pixel Setup", "description": "FB and Google pixels on sales page", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f4", "title": "Abandoned Cart Email", "description": "Trigger email for incomplete checkouts", "column": "Follow-up", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f5", "title": "Buyer Onboarding Sequence", "description": "Welcome emails for new customers", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f6", "title": "Review Request to Buyers", "description": "Ask buyers to review after 7 days", "column": "Follow-up", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f7", "title": "Upsell Sequence", "description": "Offer done-for-you service to buyers", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f8", "title": "Re-engagement Campaign", "description": "Win back cold leads after 30 days", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f9", "title": "Webinar Invite Sequence", "description": "Invite list to live demo", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f10", "title": "Affiliate Recruitment Email", "description": "Invite past buyers to promote", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-
-        {"id": "r1", "title": "Competitor Analysis", "description": "Review 5 competing products", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:00:00Z"},
-        {"id": "r2", "title": "Pricing Research", "description": "Survey similar products pricing", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:30:00Z"},
-        {"id": "r3", "title": "Target Audience Profile", "description": "Define ideal customer avatar", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:45:00Z"},
-        {"id": "r4", "title": "Keyword Research", "description": "SEO keywords for organic traffic", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "r5", "title": "Ad Targeting Research", "description": "FB interests and lookalikes", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "r6", "title": "Industry Stats", "description": "Review statistics for copy", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "r7", "title": "Objection Mapping", "description": "List all potential objections", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "r8", "title": "Beta User Feedback", "description": "Collect testimonials from testers", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "r9", "title": "Platform Comparison", "description": "Compare Google vs Yelp vs FB reviews", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:30:00Z"},
-        {"id": "r10", "title": "Legal Compliance Check", "description": "Review guidelines compliance", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-
-        {"id": "d1", "title": "Sales Page Deployed", "description": "Live on Vercel", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "d2", "title": "Stripe Checkout Working", "description": "$47 payment processing", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T03:00:00Z"},
-        {"id": "d3", "title": "Product Assets Created", "description": "Email templates, scripts, QR guide", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "d4", "title": "VSL Embedded on Page", "description": "Text-slides version live", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T03:45:00Z"},
-        {"id": "d5", "title": "Thank You Page", "description": "Post-purchase redirect page", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d6", "title": "Product Delivery Email", "description": "Auto-send assets on purchase", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d7", "title": "Member Area Setup", "description": "Course Sprout or download page", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d8", "title": "Support Email Setup", "description": "Customer support workflow", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d9", "title": "Refund Policy Page", "description": "Terms and refund policy", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d10", "title": "Analytics Setup", "description": "GA4 + FB Pixel tracking", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d11", "title": "A/B Test Setup", "description": "Headline variations test", "column": "Delivery", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d12", "title": "Launch Checklist Review", "description": "Final QA before traffic", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"}
-      ],
-      "resources": [
-        {"id": "res1", "title": "Sales Page (Live)", "url": "https://reviewrush-pacino-bots-projects.vercel.app", "type": "link", "createdAt": "2026-02-26T03:00:00Z"},
-        {"id": "res2", "title": "GitHub Repo", "url": "https://github.com/pacinobot2026/reviewrush", "type": "link", "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "res3", "title": "VSL Video", "url": "https://files.catbox.moe/gitmqs.mp4", "type": "link", "createdAt": "2026-02-26T03:45:00Z"},
-        {"id": "res4", "title": "VSL Script", "url": "", "type": "doc", "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "res5", "title": "Stripe Product ID", "url": "", "type": "note", "createdAt": "2026-02-26T03:00:00Z"}
-      ]
-    }
-  ]
+    "businesses":  [
+                       {
+                           "id":  "reviewrush-001",
+                           "name":  "ReviewRush",
+                           "columns":  [
+                                           "Marketing",
+                                           "Follow-up",
+                                           "Research",
+                                           "Delivery"
+                                       ],
+                           "createdAt":  "2026-02-26T04:00:00.000Z",
+                           "cards":  [
+                                         {
+                                             "id":  "m1",
+                                             "title":  "VSL Script Written",
+                                             "description":  "3-minute sales video script for ReviewRush",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:30:00Z"
+                                         },
+                                         {
+                                             "id":  "m2",
+                                             "title":  "VSL Audio Generated",
+                                             "description":  "ElevenLabs with Chad voice clone",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:45:00Z"
+                                         },
+                                         {
+                                             "id":  "m3",
+                                             "title":  "VSL Text Slides Built",
+                                             "description":  "120 slides synced to audio timestamps",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T03:30:00Z"
+                                         },
+                                         {
+                                             "id":  "m4",
+                                             "title":  "HeyGen Avatar VSL",
+                                             "description":  "Generate avatar video with Chad clone - needs credits",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "blocked"
+                                                        ],
+                                             "createdAt":  "2026-02-26T03:55:00Z"
+                                         },
+                                         {
+                                             "id":  "m5",
+                                             "title":  "Sales Page Copy",
+                                             "description":  "Long-form sales copy following directive",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m6",
+                                             "title":  "Facebook Ad Creative",
+                                             "description":  "3 ad variations for cold traffic",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m7",
+                                             "title":  "Instagram Carousel",
+                                             "description":  "5-slide carousel for organic reach",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m8",
+                                             "title":  "YouTube Short Script",
+                                             "description":  "60-second teaser script",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "draft"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m9",
+                                             "title":  "Email Swipes for Affiliates",
+                                             "description":  "3 email templates for JV partners",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m10",
+                                             "title":  "Twitter Thread",
+                                             "description":  "Review acquisition tips thread",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "draft"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m11",
+                                             "title":  "LinkedIn Article",
+                                             "description":  "Why reviews matter for local business",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "m12",
+                                             "title":  "Testimonial Graphics",
+                                             "description":  "Design quote cards from beta users",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f1",
+                                             "title":  "7-Email Non-Buyer Sequence",
+                                             "description":  "Build in Global Control for cart abandoners",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f2",
+                                             "title":  "SMS Follow-up Templates",
+                                             "description":  "3 text message templates for leads",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f3",
+                                             "title":  "Retargeting Pixel Setup",
+                                             "description":  "FB and Google pixels on sales page",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f4",
+                                             "title":  "Abandoned Cart Email",
+                                             "description":  "Trigger email for incomplete checkouts",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "draft"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f5",
+                                             "title":  "Buyer Onboarding Sequence",
+                                             "description":  "Welcome emails for new customers",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f6",
+                                             "title":  "Review Request to Buyers",
+                                             "description":  "Ask buyers to review after 7 days",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "draft"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f7",
+                                             "title":  "Upsell Sequence",
+                                             "description":  "Offer done-for-you service to buyers",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f8",
+                                             "title":  "Re-engagement Campaign",
+                                             "description":  "Win back cold leads after 30 days",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f9",
+                                             "title":  "Webinar Invite Sequence",
+                                             "description":  "Invite list to live demo",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "f10",
+                                             "title":  "Affiliate Recruitment Email",
+                                             "description":  "Invite past buyers to promote",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r1",
+                                             "title":  "Competitor Analysis",
+                                             "description":  "Review 5 competing products",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T01:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r2",
+                                             "title":  "Pricing Research",
+                                             "description":  "Survey similar products pricing",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T01:30:00Z"
+                                         },
+                                         {
+                                             "id":  "r3",
+                                             "title":  "Target Audience Profile",
+                                             "description":  "Define ideal customer avatar",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T01:45:00Z"
+                                         },
+                                         {
+                                             "id":  "r4",
+                                             "title":  "Keyword Research",
+                                             "description":  "SEO keywords for organic traffic",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r5",
+                                             "title":  "Ad Targeting Research",
+                                             "description":  "FB interests and lookalikes",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r6",
+                                             "title":  "Industry Stats",
+                                             "description":  "Review statistics for copy",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r7",
+                                             "title":  "Objection Mapping",
+                                             "description":  "List all potential objections",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r8",
+                                             "title":  "Beta User Feedback",
+                                             "description":  "Collect testimonials from testers",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "r9",
+                                             "title":  "Platform Comparison",
+                                             "description":  "Compare Google vs Yelp vs FB reviews",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T01:30:00Z"
+                                         },
+                                         {
+                                             "id":  "r10",
+                                             "title":  "Legal Compliance Check",
+                                             "description":  "Review guidelines compliance",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d1",
+                                             "title":  "Sales Page Deployed",
+                                             "description":  "Live on Vercel",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:30:00Z"
+                                         },
+                                         {
+                                             "id":  "d2",
+                                             "title":  "Stripe Checkout Working",
+                                             "description":  "$47 payment processing",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T03:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d3",
+                                             "title":  "Product Assets Created",
+                                             "description":  "Email templates, scripts, QR guide",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T02:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d4",
+                                             "title":  "VSL Embedded on Page",
+                                             "description":  "Text-slides version live",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-02-26T03:45:00Z"
+                                         },
+                                         {
+                                             "id":  "d5",
+                                             "title":  "Thank You Page",
+                                             "description":  "Post-purchase redirect page",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d6",
+                                             "title":  "Product Delivery Email",
+                                             "description":  "Auto-send assets on purchase",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d7",
+                                             "title":  "Member Area Setup",
+                                             "description":  "Course Sprout or download page",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d8",
+                                             "title":  "Support Email Setup",
+                                             "description":  "Customer support workflow",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d9",
+                                             "title":  "Refund Policy Page",
+                                             "description":  "Terms and refund policy",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d10",
+                                             "title":  "Analytics Setup",
+                                             "description":  "GA4 + FB Pixel tracking",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d11",
+                                             "title":  "A/B Test Setup",
+                                             "description":  "Headline variations test",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "draft"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         },
+                                         {
+                                             "id":  "d12",
+                                             "title":  "Launch Checklist Review",
+                                             "description":  "Final QA before traffic",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-02-26T04:00:00Z"
+                                         }
+                                     ],
+                           "resources":  [
+                                             {
+                                                 "id":  "res1",
+                                                 "title":  "Sales Page (Live)",
+                                                 "url":  "https://reviewrush-pacino-bots-projects.vercel.app",
+                                                 "type":  "link",
+                                                 "createdAt":  "2026-02-26T03:00:00Z"
+                                             },
+                                             {
+                                                 "id":  "res2",
+                                                 "title":  "GitHub Repo",
+                                                 "url":  "https://github.com/pacinobot2026/reviewrush",
+                                                 "type":  "link",
+                                                 "createdAt":  "2026-02-26T02:30:00Z"
+                                             },
+                                             {
+                                                 "id":  "res3",
+                                                 "title":  "VSL Video",
+                                                 "url":  "https://files.catbox.moe/gitmqs.mp4",
+                                                 "type":  "link",
+                                                 "createdAt":  "2026-02-26T03:45:00Z"
+                                             },
+                                             {
+                                                 "id":  "res4",
+                                                 "title":  "VSL Script",
+                                                 "url":  "",
+                                                 "type":  "doc",
+                                                 "createdAt":  "2026-02-26T02:30:00Z"
+                                             },
+                                             {
+                                                 "id":  "res5",
+                                                 "title":  "Stripe Product ID",
+                                                 "url":  "",
+                                                 "type":  "note",
+                                                 "createdAt":  "2026-02-26T03:00:00Z"
+                                             }
+                                         ]
+                       },
+                       {
+                           "id":  "printables-empire-001",
+                           "name":  "Printables Empire",
+                           "columns":  [
+                                           "Marketing",
+                                           "Follow-up",
+                                           "Research",
+                                           "Delivery"
+                                       ],
+                           "createdAt":  "2026-03-10T23:14:00.000Z",
+                           "cards":  [
+                                         {
+                                             "id":  "m1",
+                                             "title":  "Launch Post Published",
+                                             "description":  "Post to Facebook, Instagram, Twitter about Printables Empire",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m2",
+                                             "title":  "Day 2 Follow-up Post",
+                                             "description":  "Create once. Sell 500 times. That\u0027s passive income.",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m3",
+                                             "title":  "Day 4 Social Proof Post",
+                                             "description":  "People make $2K-$10K/month selling Etsy printables",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m4",
+                                             "title":  "Day 6 Mechanism Post",
+                                             "description":  "How it works: Create → Upload → Earn",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m5",
+                                             "title":  "Day 8 Objection Handling Post",
+                                             "description":  "Not creative? Use templates. No time? Sells 24/7.",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m6",
+                                             "title":  "Day 10 Urgency Post",
+                                             "description":  "$47 now. $97 soon. Lock it in.",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m7",
+                                             "title":  "Facebook Ad Campaign",
+                                             "description":  "Launch Your Etsy Shop in 7 Days - $20-50/day budget",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m8",
+                                             "title":  "Retargeting Ad",
+                                             "description":  "$47 Now, $97 Soon - target page visitors",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m9",
+                                             "title":  "Join Facebook Groups",
+                                             "description":  "Find 5-10 groups about side hustles, passive income, Etsy",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "m10",
+                                             "title":  "DM 20 Friends",
+                                             "description":  "Personal message to friends about new launch",
+                                             "column":  "Marketing",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f1",
+                                             "title":  "Email Sequence - Day 1",
+                                             "description":  "Announcement: Launched Printables Empire. $47.",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f2",
+                                             "title":  "Email Sequence - Day 2",
+                                             "description":  "Problem: Tired of trading time for money?",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f3",
+                                             "title":  "Email Sequence - Day 3",
+                                             "description":  "How it works: Create → Upload → Earn passive income",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f4",
+                                             "title":  "Email Sequence - Day 4",
+                                             "description":  "Why it works: Massive demand + zero marginal cost",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f5",
+                                             "title":  "Email Sequence - Day 5",
+                                             "description":  "Objections: Not creative? Use templates. No time? Sells 24/7.",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f6",
+                                             "title":  "Email Sequence - Day 6",
+                                             "description":  "Urgency: Founder pricing ends soon. $47 → $97.",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f7",
+                                             "title":  "Email Sequence - Day 7",
+                                             "description":  "Last chance: Price goes up tonight",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f8",
+                                             "title":  "Collect First Testimonials",
+                                             "description":  "After 5-10 sales, ask for feedback",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f9",
+                                             "title":  "Add Testimonials to Page",
+                                             "description":  "Update sales page with customer feedback",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "f10",
+                                             "title":  "Customer Onboarding Email",
+                                             "description":  "Welcome email with access instructions",
+                                             "column":  "Follow-up",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "r1",
+                                             "title":  "Niche Opportunity Analysis",
+                                             "description":  "Identified Etsy digital products as high-demand, low-barrier business",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:14:00Z"
+                                         },
+                                         {
+                                             "id":  "r2",
+                                             "title":  "Market Validation",
+                                             "description":  "Thousands earn $500-$10K/month selling printables",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:14:00Z"
+                                         },
+                                         {
+                                             "id":  "r3",
+                                             "title":  "Pricing Strategy",
+                                             "description":  "$47 founder price, $97 regular (one-time payment)",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:16:00Z"
+                                         },
+                                         {
+                                             "id":  "r4",
+                                             "title":  "Target Audience Profile",
+                                             "description":  "Beginners wanting passive income, tired of 9-5, no business experience",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:16:00Z"
+                                         },
+                                         {
+                                             "id":  "r5",
+                                             "title":  "Competitor Analysis",
+                                             "description":  "Most Etsy courses are overcomplicated or outdated",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:16:00Z"
+                                         },
+                                         {
+                                             "id":  "r6",
+                                             "title":  "Test Different Headlines",
+                                             "description":  "Try 3-5 variations, track which gets most clicks",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:49:00Z"
+                                         },
+                                         {
+                                             "id":  "r7",
+                                             "title":  "Track Sales Metrics",
+                                             "description":  "Monitor conversion rate, traffic sources, revenue",
+                                             "column":  "Research",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:49:00Z"
+                                         },
+                                         {
+                                             "id":  "d1",
+                                             "title":  "Sales Page Copy Written",
+                                             "description":  "3,000+ word long-form sales page with 10 elements",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:28:00Z"
+                                         },
+                                         {
+                                             "id":  "d2",
+                                             "title":  "Sales Page Deployed",
+                                             "description":  "Live on Vercel: https://etsy-printables-empire.vercel.app",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:29:00Z"
+                                         },
+                                         {
+                                             "id":  "d3",
+                                             "title":  "VSL Script Written",
+                                             "description":  "175 phrases, 5-minute spoken script",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:30:00Z"
+                                         },
+                                         {
+                                             "id":  "d4",
+                                             "title":  "VSL Audio Generated",
+                                             "description":  "ElevenLabs with Chad\u0027s voice (5 min)",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:32:00Z"
+                                         },
+                                         {
+                                             "id":  "d5",
+                                             "title":  "VSL Video Created",
+                                             "description":  "175 slides synced to audio, 6.46 MB MP4",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:33:00Z"
+                                         },
+                                         {
+                                             "id":  "d6",
+                                             "title":  "VSL Embedded on Page",
+                                             "description":  "Video player in hero section below headline",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:37:00Z"
+                                         },
+                                         {
+                                             "id":  "d7",
+                                             "title":  "Stripe Product Created",
+                                             "description":  "Product: Printables Empire ($47 one-time)",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:33:00Z"
+                                         },
+                                         {
+                                             "id":  "d8",
+                                             "title":  "Stripe Payment Link",
+                                             "description":  "Direct link checkout (no JavaScript needed)",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:33:00Z"
+                                         },
+                                         {
+                                             "id":  "d9",
+                                             "title":  "Checkout Connected to Page",
+                                             "description":  "All CTA buttons link to Stripe payment",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "done"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:34:00Z"
+                                         },
+                                         {
+                                             "id":  "d10",
+                                             "title":  "Create 20+ Canva Templates",
+                                             "description":  "Planners, worksheets, calendars, checklists for customers",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d11",
+                                             "title":  "Write Niche Research Guide",
+                                             "description":  "PDF guide on finding profitable Etsy niches",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d12",
+                                             "title":  "Write Listing Optimization Guide",
+                                             "description":  "Title formulas, description templates, tag strategies",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d13",
+                                             "title":  "Write Pricing Strategy Guide",
+                                             "description":  "How to price printables for maximum profit",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d14",
+                                             "title":  "Write Scaling Blueprint",
+                                             "description":  "Step-by-step plan: 10 products → 50+",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d15",
+                                             "title":  "Create 7-Day Launch Checklist",
+                                             "description":  "Daily action plan for first week",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d16",
+                                             "title":  "Setup Product Delivery System",
+                                             "description":  "Google Drive folder or member area with all materials",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d17",
+                                             "title":  "Create Welcome Email Template",
+                                             "description":  "Auto-send after purchase with access instructions",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:40:00Z"
+                                         },
+                                         {
+                                             "id":  "d18",
+                                             "title":  "Setup Upsell: Done-For-You Service",
+                                             "description":  "Offer $197 done-for-you Etsy shop setup",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:49:00Z"
+                                         },
+                                         {
+                                             "id":  "d19",
+                                             "title":  "Setup Upsell: Monthly Template Club",
+                                             "description":  "Offer $27/month recurring new templates",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:49:00Z"
+                                         },
+                                         {
+                                             "id":  "d20",
+                                             "title":  "Create YouTube Channel",
+                                             "description":  "Document Etsy journey, link to Printables Empire",
+                                             "column":  "Delivery",
+                                             "labels":  [
+                                                            "pending"
+                                                        ],
+                                             "createdAt":  "2026-03-10T23:49:00Z"
+                                         }
+                                     ],
+                           "resources":  [
+                                             {
+                                                 "id":  "res1",
+                                                 "title":  "Sales Page (Live)",
+                                                 "url":  "https://etsy-printables-empire.vercel.app",
+                                                 "type":  "link",
+                                                 "createdAt":  "2026-03-10T23:29:00Z"
+                                             },
+                                             {
+                                                 "id":  "res2",
+                                                 "title":  "VSL Video (6.46 MB)",
+                                                 "url":  "workspace/etsy-printables-empire/vsl-video.mp4",
+                                                 "type":  "file",
+                                                 "createdAt":  "2026-03-10T23:33:00Z"
+                                             },
+                                             {
+                                                 "id":  "res3",
+                                                 "title":  "Stripe Payment Link",
+                                                 "url":  "https://buy.stripe.com/5kQ7sKcGA7K46UmgS11oI0a",
+                                                 "type":  "link",
+                                                 "createdAt":  "2026-03-10T23:33:00Z"
+                                             },
+                                             {
+                                                 "id":  "res4",
+                                                 "title":  "Stripe Product ID",
+                                                 "url":  "prod_U7uGVPfcaJetiN",
+                                                 "type":  "note",
+                                                 "createdAt":  "2026-03-10T23:33:00Z"
+                                             },
+                                             {
+                                                 "id":  "res5",
+                                                 "title":  "Stripe Price ID",
+                                                 "url":  "price_1T9eSUCDxYH1XF8FjZ796755",
+                                                 "type":  "note",
+                                                 "createdAt":  "2026-03-10T23:33:00Z"
+                                             },
+                                             {
+                                                 "id":  "res6",
+                                                 "title":  "VSL Script",
+                                                 "url":  "workspace/etsy-printables-empire/vsl-script.txt",
+                                                 "type":  "file",
+                                                 "createdAt":  "2026-03-10T23:30:00Z"
+                                             },
+                                             {
+                                                 "id":  "res7",
+                                                 "title":  "Delivery Documentation",
+                                                 "url":  "workspace/etsy-printables-empire/DELIVERY.md",
+                                                 "type":  "file",
+                                                 "createdAt":  "2026-03-10T23:34:00Z"
+                                             },
+                                             {
+                                                 "id":  "res8",
+                                                 "title":  "Organic Social Posts (6)",
+                                                 "url":  "Stage 5 - Saved in chat transcript",
+                                                 "type":  "note",
+                                                 "createdAt":  "2026-03-10T23:43:00Z"
+                                             },
+                                             {
+                                                 "id":  "res9",
+                                                 "title":  "Email Sequence (7 emails)",
+                                                 "url":  "Stage 5 - Saved in chat transcript",
+                                                 "type":  "note",
+                                                 "createdAt":  "2026-03-10T23:43:00Z"
+                                             },
+                                             {
+                                                 "id":  "res10",
+                                                 "title":  "Paid Ad Templates",
+                                                 "url":  "Stage 5 - Facebook + Retargeting ads",
+                                                 "type":  "note",
+                                                 "createdAt":  "2026-03-10T23:43:00Z"
+                                             }
+                                         ]
+                       }
+                   ]
 }

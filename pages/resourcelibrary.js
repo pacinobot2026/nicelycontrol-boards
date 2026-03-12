@@ -3,25 +3,24 @@ import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
+import { getCache, setCache } from "../lib/cache";
 
 const EMPTY_FORM = {
   title: "",
   url: "",
   description: "",
   category: "",
-  status: "to-buy",
-  price: "",
-  image: "",
+  status: "read-later",
   tags: "",
 };
 
-function Shopping() {
+function ResourceLibrary() {
   const { session } = useAuth();
-  const [allShopping, setAllShopping] = useState([]);
-  const [shopping, setShopping] = useState([]);
+  const [allBookmarks, setAllBookmarks] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
   const [stats, setStats] = useState({});
   const [categories, setCategories] = useState([]);
-  const [filter, setFilter] = useState("to-buy");
+  const [filter, setFilter] = useState("read-later");
   const [category, setCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date_desc");
@@ -32,22 +31,32 @@ function Shopping() {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    if (session) loadShopping();
+    if (session) loadBookmarks();
   }, [session]);
   useEffect(() => {
-    applyFilters(allShopping);
-  }, [allShopping, filter, category, sortBy]);
+    applyFilters(allBookmarks);
+  }, [allBookmarks, filter, category, sortBy]);
 
-  async function loadShopping() {
-    setLoading(true);
+  async function loadBookmarks() {
+    // Check cache first
+    const cached = getCache('bookmarks');
+    if (cached) {
+      setAllBookmarks(cached.bookmarks || []);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    // Fetch fresh data
     try {
-      const res = await fetch("/api/shopping", {
+      const res = await fetch("/api/bookmarks", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
-      setAllShopping(data.items || []);
+      setAllBookmarks(data.bookmarks || []);
+      setCache('bookmarks', { bookmarks: data.bookmarks || [] });
     } catch (err) {
-      console.error("Failed to load shopping items:", err);
+      console.error("Failed to load bookmarks:", err);
     } finally {
       setLoading(false);
     }
@@ -65,8 +74,8 @@ function Shopping() {
       filtered.sort((a, b) => a.title.localeCompare(b.title));
 
     const statsCalc = {
-      "to-buy": source.filter((b) => b.status === "to-buy").length,
-      watching: source.filter((b) => b.status === "watching").length,
+      "read-later": source.filter((b) => b.status === "read-later").length,
+      favorites: source.filter((b) => b.status === "favorites").length,
       archived: source.filter((b) => b.status === "archived").length,
     };
     const categoryMap = {};
@@ -76,7 +85,7 @@ function Shopping() {
       }
     });
 
-    setShopping(filtered);
+    setBookmarks(filtered);
     setStats(statsCalc);
     setCategories(
       Object.keys(categoryMap).map((name) => ({
@@ -99,8 +108,6 @@ function Shopping() {
       description: item.description || "",
       category: item.category || "",
       status: item.status,
-      price: item.price || "",
-      image: item.image || "",
       tags: (item.tags || []).join(", "),
     });
     setModal({ mode: "edit", item });
@@ -118,7 +125,7 @@ function Shopping() {
           .filter(Boolean),
       };
       const isEdit = modal.mode === "edit";
-      const res = await fetch("/api/shopping", {
+      const res = await fetch("/api/bookmarks", {
         method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,7 +137,7 @@ function Shopping() {
       });
       if (res.ok) {
         setModal(null);
-        loadShopping();
+        loadBookmarks();
       }
     } finally {
       setSaving(false);
@@ -138,7 +145,7 @@ function Shopping() {
   }
 
   async function deleteItem(id) {
-    await fetch("/api/shopping", {
+    await fetch("/api/bookmarks", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -147,25 +154,25 @@ function Shopping() {
       body: JSON.stringify({ id }),
     });
     setDeleteId(null);
-    loadShopping();
+    loadBookmarks();
   }
 
-  const filteredShopping = shopping.filter(
-    (item) =>
+  const filteredBookmarks = bookmarks.filter(
+    (b) =>
       searchTerm === "" ||
-      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description?.toLowerCase().includes(searchTerm.toLowerCase()),
+      b.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.description?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   if (loading) {
     return (
       <div className="flex min-h-screen">
         <Head>
-          <title>Wish List</title>
+          <title>Resource Library</title>
         </Head>
         <NavigationSidebar />
         <div className="flex-1 flex items-center justify-center text-gray-400">
-          Loading items...
+          Loading bookmarks…
         </div>
       </div>
     );
@@ -174,7 +181,7 @@ function Shopping() {
   return (
     <div className="flex min-h-screen">
       <Head>
-        <title>Wish List</title>
+        <title>Resource Library</title>
       </Head>
       <NavigationSidebar />
       <main className="flex-1 p-8 pt-16 md:pt-8">
@@ -182,11 +189,11 @@ function Shopping() {
           {/* Header */}
           <div className="mb-6">
             <div>
-              <h1 className="text-3xl font-bold gradient-text mb-1">
-                🛒 Shopping/Watch
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+                📑 Resource Library
               </h1>
               <p className="text-sm text-gray-400">
-                Track things to buy or watch
+                Save and organize useful links
               </p>
             </div>
             <div className="flex justify-end mt-3">
@@ -194,7 +201,7 @@ function Shopping() {
                 onClick={openAdd}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                + Add Item
+                + Add Bookmark
               </button>
             </div>
           </div>
@@ -202,8 +209,8 @@ function Shopping() {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {[
-              { icon: "🛍️", label: "To Buy", key: "to-buy" },
-              { icon: "👀", label: "Watching", key: "watching" },
+              { icon: "📖", label: "Read Later", key: "read-later" },
+              { icon: "⭐", label: "Favorites", key: "favorites" },
               { icon: "📦", label: "Archived", key: "archived" },
             ].map(({ icon, label, key }) => (
               <button
@@ -251,7 +258,7 @@ function Shopping() {
           <div className="flex gap-3 flex-wrap mb-6">
             <input
               type="text"
-              placeholder="🔍 Search items..."
+              placeholder="🔍 Search bookmarks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 min-w-48 bg-gray-800/50 border border-gray-600/50 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-purple-500"
@@ -269,11 +276,11 @@ function Shopping() {
 
           {/* Grid */}
           <div className="glass-card rounded-2xl p-6">
-            {filteredShopping.length === 0 ? (
+            {filteredBookmarks.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
                 {searchTerm
-                  ? `No items matching "${searchTerm}"`
-                  : `No ${filter} items`}
+                  ? `No bookmarks matching "${searchTerm}"`
+                  : `No ${filter} bookmarks`}
               </div>
             ) : (
               <div
@@ -282,12 +289,12 @@ function Shopping() {
                   gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
                 }}
               >
-                {filteredShopping.map((item) => (
-                  <ShoppingCard
-                    key={item.id}
-                    item={item}
-                    onEdit={() => openEdit(item)}
-                    onDelete={() => setDeleteId(item.id)}
+                {filteredBookmarks.map((b) => (
+                  <BookmarkCard
+                    key={b.id}
+                    bookmark={b}
+                    onEdit={() => openEdit(b)}
+                    onDelete={() => setDeleteId(b.id)}
                   />
                 ))}
               </div>
@@ -295,8 +302,8 @@ function Shopping() {
           </div>
 
           <div className="mt-4 text-right text-sm text-gray-400">
-            {filteredShopping.length}{" "}
-            {filteredShopping.length === 1 ? "item" : "items"}
+            {filteredBookmarks.length}{" "}
+            {filteredBookmarks.length === 1 ? "bookmark" : "bookmarks"}
           </div>
         </div>
       </main>
@@ -304,9 +311,9 @@ function Shopping() {
       {/* Add/Edit Modal */}
       {modal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-lg">
             <h2 className="text-xl font-bold text-white mb-4">
-              {modal.mode === "add" ? "Add Item" : "Edit Item"}
+              {modal.mode === "add" ? "Add Bookmark" : "Edit Bookmark"}
             </h2>
             <div className="flex flex-col gap-3">
               <input
@@ -349,26 +356,10 @@ function Shopping() {
                 }
                 className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-white text-sm outline-none focus:border-purple-500"
               >
-                <option value="to-buy">To Buy</option>
-                <option value="watching">Watching</option>
+                <option value="read-later">Read Later</option>
+                <option value="favorites">Favorites</option>
                 <option value="archived">Archived</option>
               </select>
-              <input
-                placeholder="Price (e.g. $29.99)"
-                value={form.price}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, price: e.target.value }))
-                }
-                className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-white text-sm outline-none focus:border-purple-500"
-              />
-              <input
-                placeholder="Image URL (optional)"
-                value={form.image}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, image: e.target.value }))
-                }
-                className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2.5 text-white text-sm outline-none focus:border-purple-500"
-              />
               <input
                 placeholder="Tags (comma separated)"
                 value={form.tags}
@@ -401,7 +392,9 @@ function Shopping() {
       {deleteId && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm">
-            <h2 className="text-lg font-bold text-white mb-2">Delete Item?</h2>
+            <h2 className="text-lg font-bold text-white mb-2">
+              Delete Bookmark?
+            </h2>
             <p className="text-gray-400 text-sm mb-5">This cannot be undone.</p>
             <div className="flex justify-end gap-3">
               <button
@@ -424,24 +417,17 @@ function Shopping() {
   );
 }
 
-function ShoppingCard({ item, onEdit, onDelete }) {
+function BookmarkCard({ bookmark, onEdit, onDelete }) {
   return (
     <div className="group bg-gray-800/70 rounded-xl border border-gray-600/50 p-4 transition-all hover:border-purple-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-900/20">
-      {item.image && (
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-48 object-cover rounded-lg mb-3"
-        />
-      )}
       <div className="flex items-start justify-between gap-2 mb-2">
         <a
-          href={item.url}
+          href={bookmark.url}
           target="_blank"
           rel="noopener noreferrer"
           className="text-white hover:text-blue-400 text-base font-semibold block no-underline leading-snug transition-colors"
         >
-          {item.title}
+          {bookmark.title}
         </a>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
           <button
@@ -459,25 +445,20 @@ function ShoppingCard({ item, onEdit, onDelete }) {
         </div>
       </div>
       <p className="text-gray-400 text-sm mb-3 leading-relaxed">
-        {item.description}
+        {bookmark.description}
       </p>
-      <div className="flex gap-2 flex-wrap mb-3 items-center">
-        {item.price && (
-          <span className="px-2 py-1 bg-green-700 rounded text-xs font-semibold text-white">
-            {item.price}
-          </span>
-        )}
-        {item.category && (
+      <div className="flex gap-2 flex-wrap mb-3">
+        {bookmark.category && (
           <span className="px-2 py-1 bg-gray-900 rounded text-xs text-gray-400">
-            {item.category}
+            {bookmark.category}
           </span>
         )}
         <span className="px-2 py-1 bg-gray-900 rounded text-xs text-gray-400">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(bookmark.created_at).toLocaleDateString()}
         </span>
       </div>
       <div className="flex gap-1.5 flex-wrap">
-        {(item.tags || []).map((tag) => (
+        {(bookmark.tags || []).map((tag) => (
           <span
             key={tag}
             className="px-2 py-0.5 bg-purple-900/30 border border-purple-700/40 rounded text-xs text-purple-300"
@@ -490,4 +471,4 @@ function ShoppingCard({ item, onEdit, onDelete }) {
   );
 }
 
-export default withAuth(Shopping);
+export default withAuth(ResourceLibrary);

@@ -1,7 +1,7 @@
 {
-  "name": "vizard-clips-dashboard",
-  "version": "1.0.0",
-  "description": "Vizard clips review and publishing dashboard",
+  "name": "nicelycontrol-boards",
+  "version": "0.1.1",
+  "description": "Nicely Control - All Boards Dashboard",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,6 +9,7 @@
     "monitor": "node scripts/vimeo-monitor.js"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@supabase/supabase-js": "^2.97.0",
     "@vercel/kv": "^3.0.0",
     "axios": "^1.6.5",

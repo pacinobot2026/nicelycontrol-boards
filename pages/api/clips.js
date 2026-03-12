@@ -132,12 +132,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Require auth so clips are scoped per user
-  const getToken = req.headers.authorization?.replace('Bearer ', '');
-  if (!getToken) return res.status(401).json({ error: 'Unauthorized' });
-  const { data: { user: getUser } } = await supabase.auth.getUser(getToken);
-  if (!getUser) return res.status(401).json({ error: 'Unauthorized' });
-  const userId = getUser.id;
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const { data: { user } } = await supabase.auth.getUser(token);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const userId = user.id;
 
   const { filter, category, sortBy } = req.query;
 

@@ -1,49 +1,68 @@
+require('dotenv').config({ path: '.env.local' });
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = 'https://jqqvqdjxviqnsgpxcgfs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxcXZxZGp4dmlxbnNncHhjZ2ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTk2MjIwOSwiZXhwIjoyMDg3NTM4MjA5fQ.ibJyHrxx2TlfRbfh-9IKD3-kY9aSXAfrDJ1ZHVFijOQ';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function createTable() {
-  console.log('Creating clips table in Supabase...');
-  
-  // Use Postgres connection string to execute raw SQL
-  const { data, error } = await supabase.rpc('exec', {
-    sql: `
-      CREATE TABLE IF NOT EXISTS clips (
-        id SERIAL PRIMARY KEY,
-        clip_id TEXT UNIQUE NOT NULL,
-        title TEXT NOT NULL,
-        duration_seconds INTEGER,
-        viral_score TEXT,
-        source_video TEXT,
-        vizard_project_id TEXT,
-        status TEXT DEFAULT 'pending_review',
-        post_status TEXT DEFAULT 'not_posted',
-        category TEXT,
-        category_emoji TEXT,
-        clip_url TEXT NOT NULL,
-        suggested_caption TEXT,
-        transcript TEXT,
-        rejection_note TEXT,
-        published_at TEXT,
-        published_to_platforms TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      );
+  console.log('📋 Creating articles table...\n');
 
-      CREATE INDEX IF NOT EXISTS idx_clips_clip_id ON clips(clip_id);
-      CREATE INDEX IF NOT EXISTS idx_clips_status ON clips(status);
-      CREATE INDEX IF NOT EXISTS idx_clips_post_status ON clips(post_status);
-    `
-  });
+  const schema = `
+    CREATE TABLE IF NOT EXISTS articles (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      publication TEXT NOT NULL,
+      publication_id TEXT NOT NULL,
+      status TEXT DEFAULT 'draft',
+      image_url TEXT,
+      seo_title TEXT,
+      seo_description TEXT,
+      url_path TEXT,
+      content TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      letterman_data JSONB
+    );
 
-  if (error) {
-    console.error('Error:', error);
-  } else {
-    console.log('Success! Table created.');
-    console.log('Data:', data);
+    CREATE INDEX IF NOT EXISTS idx_articles_publication_id ON articles(publication_id);
+    CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
+    CREATE INDEX IF NOT EXISTS idx_articles_created_at ON articles(created_at DESC);
+  `;
+
+  try {
+    const { data, error } = await supabase.rpc('exec_sql', { sql: schema });
+
+    if (error) {
+      // Try alternative approach - direct SQL via REST
+      console.log('⚠️  RPC not available, using REST API...\n');
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({ query: schema }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Table creation failed. Please run the SQL manually in Supabase dashboard.');
+      }
+    }
+
+    console.log('✅ Table created successfully!\n');
+  } catch (err) {
+    console.error('❌ Error:', err.message);
+    console.log('\n📝 Please run this SQL manually in Supabase dashboard:\n');
+    console.log(schema);
   }
 }
 

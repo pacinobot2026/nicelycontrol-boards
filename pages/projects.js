@@ -3,6 +3,7 @@ import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
+import { getCache, setCache } from "../lib/cache";
 
 const EMPTY_FORM = {
   title: "",
@@ -36,13 +37,23 @@ function Projects() {
   }, [allProjects, filter, category, sortBy]);
 
   async function loadProjects() {
-    setLoading(true);
+    // Check cache first
+    const cached = getCache('projects');
+    if (cached) {
+      setAllProjects(cached.projects || []);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    // Fetch fresh data
     try {
       const res = await fetch("/api/projects", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
       setAllProjects(data.projects || []);
+      setCache('projects', { projects: data.projects || [] });
     } catch (err) {
       console.error("Failed to load projects:", err);
     } finally {
@@ -176,7 +187,7 @@ function Projects() {
           {/* Header */}
           <div className="mb-6">
             <div>
-              <h1 className="text-3xl font-bold gradient-text mb-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
                 📂 Projects
               </h1>
               <p className="text-sm text-gray-400">

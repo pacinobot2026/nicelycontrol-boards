@@ -1,3 +1,4 @@
+import { supabase } from '../../../lib/supabase';
 const axios = require('axios');
 
 export default async function handler(req, res) {
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Letterman API key not configured' });
     }
 
-    // Update article status to approved
+    // Update article status to approved in Letterman
     await axios.put(
       `https://api.letterman.ai/api/newsletters/${articleId}`,
       { status: 'approved' },
@@ -29,6 +30,20 @@ export default async function handler(req, res) {
         }
       }
     );
+
+    // Also update in Supabase
+    const { error: supabaseError } = await supabase
+      .from('articles')
+      .update({ 
+        status: 'approved',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', articleId);
+
+    if (supabaseError) {
+      console.error('Error updating Supabase:', supabaseError.message);
+      // Don't fail the whole request if Supabase update fails
+    }
 
     return res.status(200).json({ success: true });
 

@@ -205,6 +205,112 @@ const spec = {
           created_at: { type: 'string', format: 'date-time', example: '2026-02-26T03:00:00.000Z' },
         },
       },
+      CcApiKey: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000001' },
+          name: { type: 'string', example: 'Anthropic' },
+          key_masked: { type: 'string', example: 'sk-ant-••••••hK7gAA' },
+          status: { type: 'string', enum: ['connected', 'disconnected'], example: 'connected' },
+          spent: { type: 'number', example: 12.47 },
+          budget: { type: 'number', example: 50 },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      CcModel: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000002' },
+          name: { type: 'string', example: 'Claude Opus 4.5' },
+          provider: { type: 'string', example: 'Anthropic' },
+          status: { type: 'string', enum: ['active', 'available', 'disabled'], example: 'active' },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      CcCronJob: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000003' },
+          name: { type: 'string', example: 'Morning Briefing' },
+          schedule: { type: 'string', example: '8:00 AM daily' },
+          status: { type: 'string', enum: ['active', 'paused', 'warning'], example: 'active' },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      CcTask: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000004' },
+          title: { type: 'string', example: 'OpenClaw webinar' },
+          priority: { type: 'string', enum: ['high', 'med', 'low'], example: 'high' },
+          task_status: { type: 'string', enum: ['in_progress', 'backlog', 'done'], example: 'in_progress' },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+          updated_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      CcChannel: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000005' },
+          name: { type: 'string', example: 'Telegram' },
+          subtitle: { type: 'string', example: 'Primary' },
+          status: { type: 'string', enum: ['connected', 'disconnected'], example: 'connected' },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      CcIntegration: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000006' },
+          name: { type: 'string', example: 'Zoom' },
+          key_masked: { type: 'string', example: 'cy1••••••Rk2' },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      CcFeature: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'a1b2c3d4-0000-0000-0000-000000000007' },
+          name: { type: 'string', example: 'Auto Model Selection' },
+          position: { type: 'integer', example: 0 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      TeamProject: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'b2c3d4e5-0000-0000-0000-000000000001' },
+          name: { type: 'string', example: 'OpenClaw v2' },
+          color: { type: 'string', example: '#7c3aed' },
+          task_count: { type: 'integer', example: 5 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+          updated_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
+      TeamTask: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid', example: 'b2c3d4e5-0000-0000-0000-000000000002' },
+          title: { type: 'string', example: 'Build onboarding flow' },
+          description: { type: 'string', example: 'Design and implement the user onboarding flow' },
+          status: { type: 'string', enum: ['todo', 'in-progress', 'review', 'done'], example: 'in-progress' },
+          priority: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'], example: 'high' },
+          tags: { type: 'array', items: { type: 'string' }, example: ['frontend', 'ux'] },
+          progress: { type: 'integer', minimum: 0, maximum: 100, example: 40 },
+          assignee: { type: 'string', example: 'Pranay' },
+          start_date: { type: 'string', format: 'date', example: '2026-03-01', nullable: true },
+          due_date: { type: 'string', format: 'date', example: '2026-03-15', nullable: true },
+          project_id: { type: 'string', format: 'uuid', example: 'b2c3d4e5-0000-0000-0000-000000000001', nullable: true },
+          created_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+          updated_at: { type: 'string', format: 'date-time', example: '2026-03-01T00:00:00.000Z' },
+        },
+      },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -219,6 +325,12 @@ const spec = {
     { name: 'Vault', description: 'Operator Vault — links, files, notes' },
     { name: 'Settings', description: 'Per-user settings (API keys, preferences)' },
     { name: 'PostBridge', description: 'Proxied PostBridge API endpoints' },
+    { name: 'Command Center', description: 'OpenClaw Command Center — API keys, models, cron jobs, tasks, channels, integrations, features' },
+    { name: 'Team', description: 'Team Board — projects and tasks' },
+    { name: 'Ads', description: 'Ad performance metrics (mock)' },
+    { name: 'Sales', description: 'Sales metrics (mock)' },
+    { name: 'Support', description: 'Support ticket metrics (mock)' },
+    { name: 'Systems', description: 'System health checks for APIs and URLs' },
   ],
   paths: {
     // ─── CLIPS ────────────────────────────────────────────────────────────────
@@ -1557,6 +1669,471 @@ const spec = {
           },
           401: { description: 'PostBridge API key not configured' },
           500: { description: 'Server error' },
+        },
+      },
+    },
+
+    // ─── COMMAND CENTER ───────────────────────────────────────────────────────
+    '/control': {
+      get: {
+        summary: 'Get all Command Center data',
+        description: 'Returns all 7 Command Center tables for the authenticated user: API keys (with spend), AI models, cron jobs, tasks, channels, integrations, and features.',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Command Center data',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    apiKeys: { type: 'array', items: { $ref: '#/components/schemas/CcApiKey' } },
+                    models: { type: 'array', items: { $ref: '#/components/schemas/CcModel' } },
+                    cronJobs: { type: 'array', items: { $ref: '#/components/schemas/CcCronJob' } },
+                    tasks: { type: 'array', items: { $ref: '#/components/schemas/CcTask' } },
+                    channels: { type: 'array', items: { $ref: '#/components/schemas/CcChannel' } },
+                    integrations: { type: 'array', items: { $ref: '#/components/schemas/CcIntegration' } },
+                    features: { type: 'array', items: { $ref: '#/components/schemas/CcFeature' } },
+                  },
+                },
+                example: {
+                  apiKeys: [
+                    { id: 'uuid-1', name: 'Anthropic', key_masked: 'sk-ant-••••••hK7gAA', status: 'connected', spent: 12.47, budget: 50, position: 0 },
+                    { id: 'uuid-2', name: 'Moonshot', key_masked: 'sk-••••••3Kx9', status: 'connected', spent: 3.20, budget: 20, position: 1 },
+                  ],
+                  models: [
+                    { id: 'uuid-3', name: 'Claude Opus 4.5', provider: 'Anthropic', status: 'active', position: 0 },
+                    { id: 'uuid-4', name: 'Kimi K2.5', provider: 'Moonshot', status: 'active', position: 1 },
+                  ],
+                  cronJobs: [
+                    { id: 'uuid-5', name: 'Morning Briefing', schedule: '8:00 AM daily', status: 'active', position: 0 },
+                    { id: 'uuid-6', name: 'Email Watch', schedule: 'Real-time', status: 'active', position: 4 },
+                  ],
+                  tasks: [
+                    { id: 'uuid-7', title: 'OpenClaw webinar', priority: 'high', task_status: 'in_progress', position: 0 },
+                    { id: 'uuid-8', title: 'OpenClaw ads', priority: 'high', task_status: 'backlog', position: 1 },
+                  ],
+                  channels: [
+                    { id: 'uuid-9', name: 'Telegram', subtitle: 'Primary', status: 'connected', position: 0 },
+                  ],
+                  integrations: [
+                    { id: 'uuid-10', name: 'Zoom', key_masked: 'cy1••••••Rk2', position: 0 },
+                  ],
+                  features: [
+                    { id: 'uuid-11', name: 'Auto Model Selection', position: 0 },
+                    { id: 'uuid-12', name: 'Cron Scheduling', position: 5 },
+                  ],
+                },
+              },
+            },
+          },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+          500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    // ─── TEAM PROJECTS ────────────────────────────────────────────────────────
+    '/team/projects': {
+      get: {
+        summary: 'List team projects',
+        description: 'Returns all team projects for the authenticated user. Each project includes a `task_count` derived from linked tasks.',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'List of team projects',
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { projects: { type: 'array', items: { $ref: '#/components/schemas/TeamProject' } } } },
+                example: { projects: [{ id: 'uuid-1', name: 'OpenClaw v2', color: '#7c3aed', task_count: 4 }] },
+              },
+            },
+          },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+      post: {
+        summary: 'Create a team project',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['name'],
+                properties: {
+                  name: { type: 'string', example: 'OpenClaw v2' },
+                  color: { type: 'string', example: '#7c3aed' },
+                },
+              },
+              example: { name: 'OpenClaw v2', color: '#7c3aed' },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Project created', content: { 'application/json': { schema: { type: 'object', properties: { project: { $ref: '#/components/schemas/TeamProject' } } }, example: { project: { id: 'uuid-1', name: 'OpenClaw v2', color: '#7c3aed' } } } } },
+          400: { description: 'name is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'name is required' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+      put: {
+        summary: 'Update a team project',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                  id: { type: 'string', format: 'uuid', example: 'uuid-1' },
+                  name: { type: 'string', example: 'OpenClaw v3' },
+                  color: { type: 'string', example: '#2563eb' },
+                },
+              },
+              example: { id: 'uuid-1', name: 'OpenClaw v3', color: '#2563eb' },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Project updated', content: { 'application/json': { schema: { type: 'object', properties: { project: { $ref: '#/components/schemas/TeamProject' } } } } } },
+          400: { description: 'id is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'id is required' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+      delete: {
+        summary: 'Delete a team project',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { type: 'object', required: ['id'], properties: { id: { type: 'string', format: 'uuid', example: 'uuid-1' } } },
+              example: { id: 'uuid-1' },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Project deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' }, example: { success: true } } } },
+          400: { description: 'id is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'id is required' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+    },
+
+    // ─── TEAM TASKS ───────────────────────────────────────────────────────────
+    '/team/tasks': {
+      get: {
+        summary: 'List team tasks',
+        description: 'Returns team tasks for the authenticated user. Optionally filter by `project_id`.',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'project_id', in: 'query', description: 'Filter tasks by project UUID. Omit to return all tasks.', schema: { type: 'string', format: 'uuid' }, example: 'uuid-1' },
+        ],
+        responses: {
+          200: {
+            description: 'List of team tasks',
+            content: {
+              'application/json': {
+                schema: { type: 'object', properties: { tasks: { type: 'array', items: { $ref: '#/components/schemas/TeamTask' } } } },
+                example: { tasks: [{ id: 'uuid-2', title: 'Build onboarding flow', status: 'in-progress', priority: 'high', progress: 40, assignee: 'Pranay', project_id: 'uuid-1' }] },
+              },
+            },
+          },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+      post: {
+        summary: 'Create a team task',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['title'],
+                properties: {
+                  title: { type: 'string', example: 'Build onboarding flow' },
+                  description: { type: 'string', example: 'Design and implement the user onboarding flow' },
+                  status: { type: 'string', enum: ['todo', 'in-progress', 'review', 'done'], example: 'todo' },
+                  priority: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'], example: 'high' },
+                  tags: { type: 'array', items: { type: 'string' }, example: ['frontend', 'ux'] },
+                  progress: { type: 'integer', example: 0 },
+                  assignee: { type: 'string', example: 'Pranay' },
+                  start_date: { type: 'string', format: 'date', example: '2026-03-01' },
+                  due_date: { type: 'string', format: 'date', example: '2026-03-15' },
+                  project_id: { type: 'string', format: 'uuid', example: 'uuid-1' },
+                },
+              },
+              example: { title: 'Build onboarding flow', priority: 'high', status: 'todo', assignee: 'Pranay', project_id: 'uuid-1' },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Task created', content: { 'application/json': { schema: { type: 'object', properties: { task: { $ref: '#/components/schemas/TeamTask' } } } } } },
+          400: { description: 'title is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'title is required' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+      put: {
+        summary: 'Update a team task',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                  id: { type: 'string', format: 'uuid', example: 'uuid-2' },
+                  title: { type: 'string', example: 'Build onboarding flow v2' },
+                  status: { type: 'string', enum: ['todo', 'in-progress', 'review', 'done'], example: 'in-progress' },
+                  priority: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'], example: 'high' },
+                  progress: { type: 'integer', example: 60 },
+                  assignee: { type: 'string', example: 'Gaurav' },
+                  due_date: { type: 'string', format: 'date', example: '2026-03-20' },
+                  project_id: { type: 'string', format: 'uuid', example: 'uuid-1' },
+                },
+              },
+              example: { id: 'uuid-2', status: 'in-progress', progress: 60 },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Task updated', content: { 'application/json': { schema: { type: 'object', properties: { task: { $ref: '#/components/schemas/TeamTask' } } } } } },
+          400: { description: 'id is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'id is required' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+      delete: {
+        summary: 'Delete a team task',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { type: 'object', required: ['id'], properties: { id: { type: 'string', format: 'uuid', example: 'uuid-2' } } },
+              example: { id: 'uuid-2' },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Task deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' }, example: { success: true } } } },
+          400: { description: 'id is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'id is required' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
+        },
+      },
+    },
+
+    // ─── ADS ──────────────────────────────────────────────────────────────────
+    '/ads': {
+      get: {
+        summary: 'Get ad performance metrics',
+        description: 'Returns month-to-date and yesterday ad performance metrics (spend, sales, ROAS, profit, CAC). Currently returns mock data.',
+        tags: ['Ads'],
+        security: [],
+        responses: {
+          200: {
+            description: 'Ad performance metrics',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    mtdSpend: { type: 'string', example: '$1,240' },
+                    mtdSales: { type: 'string', example: '$4,800' },
+                    mtdRoas: { type: 'string', example: '3.87x' },
+                    mtdProfit: { type: 'string', example: '$3,560' },
+                    mtdCac: { type: 'string', example: '$31' },
+                    yesterdaySpend: { type: 'string', example: '$87' },
+                    yesterdaySales: { type: 'string', example: '$340' },
+                    yesterdayRoas: { type: 'string', example: '3.9x' },
+                    yesterdayProfit: { type: 'string', example: '$253' },
+                  },
+                },
+                example: { mtdSpend: '$1,240', mtdSales: '$4,800', mtdRoas: '3.87x', mtdProfit: '$3,560', mtdCac: '$31', yesterdaySpend: '$87', yesterdaySales: '$340', yesterdayRoas: '3.9x', yesterdayProfit: '$253' },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    // ─── SALES ────────────────────────────────────────────────────────────────
+    '/sales': {
+      get: {
+        summary: 'Get sales metrics',
+        description: 'Returns month-to-date, yesterday, and today sales figures with order counts and average order value. Currently returns mock data.',
+        tags: ['Sales'],
+        security: [],
+        responses: {
+          200: {
+            description: 'Sales metrics',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    mtd: { type: 'string', example: '$12,400' },
+                    mtdOrders: { type: 'integer', example: 87 },
+                    yesterday: { type: 'string', example: '$1,240' },
+                    yesterdayOrders: { type: 'integer', example: 9 },
+                    today: { type: 'string', example: '$480' },
+                    todayOrders: { type: 'integer', example: 3 },
+                    avgOrderValue: { type: 'string', example: '$142' },
+                    trend: { type: 'string', enum: ['up', 'down', 'flat'], example: 'up' },
+                  },
+                },
+                example: { mtd: '$12,400', mtdOrders: 87, yesterday: '$1,240', yesterdayOrders: 9, today: '$480', todayOrders: 3, avgOrderValue: '$142', trend: 'up' },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    // ─── PRODUCTS ─────────────────────────────────────────────────────────────
+    '/products': {
+      get: {
+        summary: 'Get products list',
+        description: 'Returns active, paused, and archived products with name, price, URL, and status. Currently returns mock data.',
+        tags: ['Sales'],
+        security: [],
+        responses: {
+          200: {
+            description: 'Products grouped by status',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    active: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          name: { type: 'string', example: 'Creator Masterclass' },
+                          price: { type: 'string', example: '$297' },
+                          url: { type: 'string', example: 'https://example.com/masterclass' },
+                          status: { type: 'string', example: 'active' },
+                        },
+                      },
+                    },
+                    paused: { type: 'array', items: { type: 'object' } },
+                    archived: { type: 'array', items: { type: 'object' } },
+                  },
+                },
+                example: {
+                  active: [{ name: 'Creator Masterclass', price: '$297', url: 'https://example.com/masterclass', status: 'active' }],
+                  paused: [],
+                  archived: [],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    // ─── SUPPORT ──────────────────────────────────────────────────────────────
+    '/support': {
+      get: {
+        summary: 'Get support ticket metrics',
+        description: 'Returns open ticket count, urgent count, DFY phase breakdowns, and a list of urgent ticket titles. Currently returns mock data.',
+        tags: ['Support'],
+        security: [],
+        responses: {
+          200: {
+            description: 'Support metrics',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    open: { type: 'integer', example: 14 },
+                    urgent: { type: 'integer', example: 3 },
+                    dfyPhase1: { type: 'integer', example: 5 },
+                    dfyPhase2: { type: 'integer', example: 4 },
+                    urgentTickets: {
+                      type: 'array',
+                      items: { type: 'object', properties: { title: { type: 'string', example: 'Client cannot access portal' }, phase: { type: 'string', example: 'Phase 1' } } },
+                    },
+                  },
+                },
+                example: { open: 14, urgent: 3, dfyPhase1: 5, dfyPhase2: 4, urgentTickets: [{ title: 'Client cannot access portal', phase: 'Phase 1' }] },
+              },
+            },
+          },
+        },
+      },
+    },
+
+    // ─── SYSTEMS ──────────────────────────────────────────────────────────────
+    '/systems': {
+      get: {
+        summary: 'Get system health status',
+        description: 'Pings configured APIs (MintBird, Global Control, Course Sprout, Letterman, SaaSOnboard) and checks reachability of 7 URLs. Returns online/total counts and per-system status.',
+        tags: ['Systems'],
+        security: [],
+        responses: {
+          200: {
+            description: 'System health results',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    apis: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          name: { type: 'string', example: 'MintBird' },
+                          online: { type: 'boolean', example: true },
+                          latency: { type: 'integer', description: 'Response time in ms', example: 120 },
+                        },
+                      },
+                    },
+                    urls: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          name: { type: 'string', example: 'Sales Page' },
+                          url: { type: 'string', example: 'https://example.com/sales' },
+                          online: { type: 'boolean', example: true },
+                          latency: { type: 'integer', example: 95 },
+                        },
+                      },
+                    },
+                    online: { type: 'integer', example: 11 },
+                    total: { type: 'integer', example: 12 },
+                    allOnline: { type: 'boolean', example: false },
+                    lastCheck: { type: 'string', format: 'date-time', example: '2026-03-12T02:33:35.000Z' },
+                  },
+                },
+                example: {
+                  apis: [{ name: 'MintBird', online: true, latency: 120 }, { name: 'Global Control', online: true, latency: 85 }],
+                  urls: [{ name: 'Sales Page', url: 'https://example.com/sales', online: true, latency: 95 }],
+                  online: 11, total: 12, allOnline: false,
+                  lastCheck: '2026-03-12T02:33:35.000Z',
+                },
+              },
+            },
+          },
         },
       },
     },

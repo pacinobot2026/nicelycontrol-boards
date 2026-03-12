@@ -3,6 +3,7 @@ import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
+import { getCache, setCache } from "../lib/cache";
 
 function Articles() {
   const { session } = useAuth();
@@ -11,7 +12,7 @@ function Articles() {
   const [publication, setPublication] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date_desc");
-  const [viewMode, setViewMode] = useState("list");
+  const [viewMode, setViewMode] = useState("cards");
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [searchCountdown, setSearchCountdown] = useState(3600);
@@ -24,6 +25,7 @@ function Articles() {
   const [savingKey, setSavingKey] = useState(false);
   const [keyError, setKeyError] = useState("");
   const [apiError, setApiError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -41,7 +43,7 @@ function Articles() {
   }, []);
 
   async function loadSettings() {
-    // Only used to pre-fill the key input panel — does NOT control hasKey
+    // Only used to pre-fill the key input panel - does NOT control hasKey
     try {
       const res = await fetch("/api/settings", {
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -85,8 +87,72 @@ function Articles() {
     }
   }
 
+  async function refreshArticles() {
+    setRefreshing(true);
+    setApiError("");
+    try {
+      const res = await fetch("/api/articles?refresh=true", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const data = await res.json();
+
+      if (data.noKey) {
+        setHasKey(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setApiError(data.error || `API error (${res.status})`);
+        return;
+      }
+
+      setHasKey(true);
+      const fetched = data.articles || [];
+      setAllArticles(fetched);
+
+      // Update cache
+      setCache('articles', { articles: fetched });
+
+      const pubMap = {};
+      fetched.forEach((a) => {
+        if (a.publication) {
+          if (!pubMap[a.publication]) pubMap[a.publication] = 0;
+          pubMap[a.publication]++;
+        }
+      });
+      setPublications(
+        Object.keys(pubMap).map((name) => ({ name, count: pubMap[name] })),
+      );
+    } catch (err) {
+      console.error("Failed to refresh articles:", err);
+      setApiError("Network error - could not reach the server.");
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   async function loadArticles() {
-    setLoading(true);
+    // Check cache first
+    const cached = getCache('articles');
+    if (cached) {
+      setAllArticles(cached.articles || []);
+      const pubMap = {};
+      (cached.articles || []).forEach((a) => {
+        if (a.publication) {
+          if (!pubMap[a.publication]) pubMap[a.publication] = 0;
+          pubMap[a.publication]++;
+        }
+      });
+      setPublications(
+        Object.keys(pubMap).map((name) => ({ name, count: pubMap[name] })),
+      );
+      setHasKey(true);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    // Fetch fresh data
     setApiError("");
     try {
       const res = await fetch("/api/articles", {
@@ -106,9 +172,12 @@ function Articles() {
         return;
       }
 
-      setHasKey(true); // key found (DB or env var)
+      setHasKey(true);
       const fetched = data.articles || [];
       setAllArticles(fetched);
+
+      // Update cache
+      setCache('articles', { articles: fetched });
 
       const pubMap = {};
       fetched.forEach((a) => {
@@ -122,13 +191,15 @@ function Articles() {
       );
     } catch (err) {
       console.error("Failed to load articles:", err);
-      setApiError("Network error — could not reach the server.");
+      if (!cached) {
+        setApiError("Network error - could not reach the server.");
+      }
     } finally {
       setLoading(false);
     }
   }
 
-  // Compute filtered articles directly — no intermediate state or useEffect needed
+  // Compute filtered articles directly - no intermediate state or useEffect needed
   let filteredArticles =
     publication === "all"
       ? allArticles
@@ -184,7 +255,7 @@ function Articles() {
           {/* Header */}
           <div className="mb-6 flex justify-between items-start flex-wrap gap-3">
             <div>
-              <h1 className="text-3xl font-bold gradient-text mb-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
                 📰 Article Cue Board
               </h1>
               <p className="text-sm text-gray-400">
@@ -260,7 +331,7 @@ function Articles() {
             </div>
           )}
 
-          {/* No key configured — placeholder */}
+          {/* No key configured - placeholder */}
           {!hasKey && !showKeyInput && (
             <div className="glass-card rounded-2xl p-16 text-center">
               <div className="text-5xl mb-4">🔑</div>
@@ -279,7 +350,7 @@ function Articles() {
             </div>
           )}
 
-          {/* Main content — only shown when key is configured */}
+          {/* Main content - only shown when key is configured */}
           {hasKey && (
             <>
               {/* API error banner */}
@@ -350,7 +421,7 @@ function Articles() {
                 </div>
               </div>
 
-              {/* Search + Sort */}
+              {/* Search + Sort + Refresh */}
               <div className="flex gap-3 flex-wrap mb-6">
                 <input
                   type="text"
@@ -368,6 +439,14 @@ function Articles() {
                   <option value="date_asc">Oldest First</option>
                   <option value="title">Title</option>
                 </select>
+                <button
+                  onClick={refreshArticles}
+                  disabled={refreshing}
+                  className="px-5 py-2.5 bg-purple-600 border-none rounded-lg text-white text-sm font-semibold cursor-pointer hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                >
+                  <span className={refreshing ? "animate-spin" : ""}>🔄</span>
+                  {refreshing ? "Refreshing..." : "Refresh"}
+                </button>
               </div>
 
               {/* Articles */}
@@ -485,7 +564,7 @@ function ArticleRow({ article, index, onClick }) {
               day: "numeric",
               year: "numeric",
             })
-          : "—"}
+          : "-"}
       </td>
     </tr>
   );

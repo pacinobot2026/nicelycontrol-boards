@@ -1,84 +1,74 @@
 const { Client } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
-const client = new Client({
-  host: 'aws-1-us-east-1.pooler.supabase.com',
-  port: 5432,
-  database: 'postgres',
-  user: 'postgres.jqqvqdjxviqnsgpxcgfs',
-  password: 'HUxTv6nSBmk9y1Qm',
-  ssl: {
-    rejectUnauthorized: false
+// Read .env.local
+const envPath = path.join(__dirname, '..', '.env.local');
+const envContent = fs.readFileSync(envPath, 'utf8');
+const envVars = {};
+envContent.split(/\r?\n/).forEach(line => {
+  if (line.trim().startsWith('#') || !line.trim()) return;
+  const match = line.match(/^([^=]+)=(.*)$/);
+  if (match) {
+    const key = match[1].trim();
+    let value = match[2].trim();
+    value = value.replace(/^["']|["']$/g, '');
+    envVars[key] = value;
   }
 });
 
+const connectionString = envVars.POSTGRES_URL_NON_POOLING;
+
+// Disable SSL verification for Node.js
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 async function createTable() {
+  const client = new Client({ 
+    connectionString
+  });
+
   try {
-    console.log('Connecting to Supabase Postgres...');
+    console.log('📋 Connecting to Supabase Postgres...\n');
     await client.connect();
-    console.log('Connected!');
-    
-    console.log('Creating clips table...');
-    
-    const createTableSQL = `
-      CREATE TABLE IF NOT EXISTS clips (
-        id SERIAL PRIMARY KEY,
-        clip_id TEXT UNIQUE NOT NULL,
+
+    console.log('✅ Connected! Creating articles table...\n');
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS articles (
+        id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
-        duration_seconds INTEGER,
-        viral_score TEXT,
-        source_video TEXT,
-        vizard_project_id TEXT,
-        status TEXT DEFAULT 'pending_review',
-        post_status TEXT DEFAULT 'not_posted',
-        category TEXT,
-        category_emoji TEXT,
-        clip_url TEXT NOT NULL,
-        suggested_caption TEXT,
-        transcript TEXT,
-        rejection_note TEXT,
-        published_at TEXT,
-        published_to_platforms TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
+        publication TEXT NOT NULL,
+        publication_id TEXT NOT NULL,
+        status TEXT DEFAULT 'draft',
+        image_url TEXT,
+        seo_title TEXT,
+        seo_description TEXT,
+        url_path TEXT,
+        content TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        letterman_data JSONB
       );
-    `;
-    
-    await client.query(createTableSQL);
-    console.log('✅ Table created!');
-    
-    console.log('Creating indexes...');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_clips_clip_id ON clips(clip_id);');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_clips_status ON clips(status);');
-    await client.query('CREATE INDEX IF NOT EXISTS idx_clips_post_status ON clips(post_status);');
-    console.log('✅ Indexes created!');
-    
-    // Seed initial data
-    console.log('Checking if table is empty...');
-    const countResult = await client.query('SELECT COUNT(*) FROM clips');
-    const count = parseInt(countResult.rows[0].count);
-    
-    if (count === 0) {
-      console.log('Table is empty. Seeding initial data...');
-      
-      const insertSQL = `
-        INSERT INTO clips (clip_id, title, duration_seconds, viral_score, source_video, vizard_project_id, status, post_status, category, category_emoji, clip_url)
-        VALUES 
-          ('36882833', 'How to Earn Commissions Without Doing the Selling', 39, '9.2', 'Vimeo 1153676279', '28404293', 'pending_review', 'not_posted', 'Newsletter Hour', '📰', 'https://cdn-video.vizard.ai/vizard/video/export/20260220/36882833-8c693cf59e424f21897ee7221cabc0e9.mp4?Expires=1772224541&Signature=p1jNYVIplqUDqloHPHxCi9LzVQXGPJjthBqqfUy0SUVL4Bc0ThzzZ9F~qgqunlmbQTXentmsEQD9C4eETxwGKHe8GEiaMPpVgQ6GCZb54R-xaZh3mPKTLoxSd0Ear9xItWt6mYbacgXURlnKAf~mGWwBjLCuyUNLuYvtmwu-Mx93KcoYE76QlkYq5FMGuKsOXi6YigG4vC~WzD8KwxyJSdiM3TwvmhZJxjG7SOhU7S81xjQVixhESjkRMW96Z--JqrXdzM~~Sgi1dk2OhiYativ96nsPZ~~XaMTCJLUL0Y8IPztaZPq7LjlJocMoGIG7OhfbGKylKzTYJ6ZnyruyPg__&Key-Pair-Id=K1STSG6HQYFY8F'),
-          ('36882832', 'Why You Should Start A Local Newsletter', 18, '9', 'Vimeo 1153676279', '28404293', 'pending_review', 'not_posted', 'Newsletter Hour', '📰', 'https://cdn-video.vizard.ai/vizard/video/export/20260220/36882832-9dfd3be11fb240f3a8333425255f8d58.mp4?Expires=1772224541&Signature=pNK0AKjJD3aHoAieUe2ItMseRW9coYlkfN~AwuvPw5kHGA4jaG4S-y-vX9nBkSFWKbdF4uDu--hJ9vMkpXj47PL89nttE30VUTOesuekcQFmJEk4QKc1Xwuv0ZMBPiGQ6LmuyqRxSJE91uVExUuwp7cL1KlGFVX8oLh-3q6m~afWew09FpVYfIZML5Dh1OskVMJIIXkFl8c4Zr0UeJsfjMAf5c-NcykdEDRqTNRN1fDjQI9P8RWvuMriMl3q2DuUWnxs41-oP4hkXpGNjJ5WbNJI6EDn8mmjOyy3uRo2ZUokghFrhb36NV0kEAlnaZYo6DYradEmgDl8BcrH62VNxg__&Key-Pair-Id=K1STSG6HQYFY8F'),
-          ('36882831', 'We Build Your Brand For You', 17, '8.7', 'Vimeo 1153676279', '28404293', 'pending_review', 'not_posted', 'Newsletter Hour', '📰', 'https://cdn-video.vizard.ai/vizard/video/export/20260220/36882831-f7a61e0d811d47ac84b84936058ac1c1.mp4?Expires=1772224541&Signature=A0JsRoEpRfLN2ALSurkS4PScv6fTlvvqR0o~Sd8Pul~JJSVcaf-Y~zhmVWckRsqkNrWs5biMFy7OKkzv3D1VCi4lWoTmhgaiPiCM01Jf9o3iHm1FeqEVeacHAOK9fyyR8HeOUh-G8ynTHmctkt-n3O~ZtkC3B-pnLdabk3zSLiFSeX97hanhdIS1FgFe2HQADXH7I0dCnpHtFBf4GBYofQSTvS3bGBAh1jFnXkSYCmsxSpZmKOm6sxm4hkKtExnyITeN4NjXYLOUscD22SvRRnP-EB6l6MXSb16nQ6Za3vRMbJrxAr-Td-2xJ8FXJ9sQuAysPWyNkn3GOmhALmlDZw__&Key-Pair-Id=K1STSG6HQYFY8F')
-        ON CONFLICT (clip_id) DO NOTHING;
-      `;
-      
-      const result = await client.query(insertSQL);
-      console.log(`✅ Seeded ${result.rowCount} clips!`);
-    } else {
-      console.log(`Table already has ${count} rows. Skipping seed.`);
-    }
-    
-    console.log('\n🎉 Database setup complete!');
-    
-  } catch (error) {
-    console.error('❌ Error:', error.message);
+    `);
+
+    console.log('✅ Table created!\n');
+    console.log('Creating indexes...\n');
+
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_articles_publication_id ON articles(publication_id);
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_articles_created_at ON articles(created_at DESC);
+    `);
+
+    console.log('✅ Indexes created!\n');
+    console.log('🎉 Setup complete! Now run: node scripts/populate-articles.js');
+
+  } catch (err) {
+    console.error('❌ Error:', err.message);
   } finally {
     await client.end();
   }

@@ -3,6 +3,7 @@ import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
+import { getCache, setCache } from "../lib/cache";
 
 const DEFAULT_COLUMNS = ["Marketing", "Follow-up", "Research", "Delivery"];
 const LABEL_COLORS = {
@@ -70,6 +71,17 @@ function BusinessBoard() {
   }, [session]);
 
   const fetchBusinesses = async () => {
+    // Check cache first
+    const cached = getCache('businesses');
+    if (cached) {
+      setBusinesses(cached.businesses || []);
+      if (cached.businesses?.length > 0 && !selectedBusiness) {
+        setSelectedBusiness(cached.businesses[0]);
+      }
+      setLoading(false);
+    }
+
+    // Fetch fresh data
     try {
       const res = await fetch("/api/businesses", {
         headers: { Authorization: `Bearer ${session.access_token}` },
@@ -80,6 +92,7 @@ function BusinessBoard() {
       if (list.length > 0 && !selectedBusiness) {
         setSelectedBusiness(list[0]);
       }
+      setCache('businesses', { businesses: data.businesses || [] });
       setLoading(false);
     } catch (err) {
       console.error("Error fetching businesses:", err);

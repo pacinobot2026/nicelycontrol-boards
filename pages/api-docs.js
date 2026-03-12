@@ -15,6 +15,12 @@ const TABS = [
   { key: "Vault", label: "Vault", icon: "🔐" },
   { key: "Settings", label: "Settings", icon: "⚙" },
   { key: "PostBridge", label: "PostBridge", icon: "🌉" },
+  { key: "Command Center", label: "Command Center", icon: "⚡" },
+  { key: "Team", label: "Team", icon: "▦" },
+  { key: "Ads", label: "Ads", icon: "📊" },
+  { key: "Sales", label: "Sales", icon: "💰" },
+  { key: "Support", label: "Support", icon: "🎧" },
+  { key: "Systems", label: "Systems", icon: "🖥" },
 ];
 
 function ApiDocs() {

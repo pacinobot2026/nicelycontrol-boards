@@ -3,6 +3,7 @@ import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
+import { getCache, setCache } from "../lib/cache";
 
 function Ideas() {
   const { session } = useAuth();
@@ -35,13 +36,23 @@ function Ideas() {
   }, [allIdeas, filter, category, sortBy]);
 
   async function loadIdeas() {
-    setLoading(true);
+    // Check cache first
+    const cached = getCache('ideas');
+    if (cached) {
+      setAllIdeas(cached.ideas || []);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
+    // Fetch fresh data
     try {
       const res = await fetch("/api/ideas", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
       setAllIdeas(data.ideas || []);
+      setCache('ideas', { ideas: data.ideas || [] });
     } catch (err) {
       console.error("Failed to load ideas:", err);
     } finally {
@@ -50,9 +61,15 @@ function Ideas() {
   }
 
   function applyFilters(source) {
-    let filtered = source.filter((i) => i.status === filter);
-    if (category !== "all")
+    let filtered = source;
+    
+    // If category is selected, ignore status filter - show all in that category
+    if (category !== "all") {
       filtered = filtered.filter((i) => i.category === category);
+    } else {
+      // Only apply status filter when showing all categories
+      filtered = filtered.filter((i) => i.status === filter);
+    }
 
     if (sortBy === "date_desc")
       filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -184,7 +201,7 @@ function Ideas() {
           {/* Header */}
           <div className="mb-6 flex justify-between items-center gap-3">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
                 💡 Idea Board
               </h1>
               <p className="text-sm text-gray-400">
@@ -656,4 +673,4 @@ function IdeaCardGrid({ idea, onEdit, onDelete }) {
   );
 }
 
-export default withAuth(Ideas);
+export default Ideas;

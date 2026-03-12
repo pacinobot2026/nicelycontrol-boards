@@ -4,7 +4,7 @@ import NavigationSidebar from '../components/NavigationSidebar';
 import withAuth from '../lib/withAuth';
 import { useAuth } from '../lib/authContext';
 
-const ADMIN_EMAIL = 'pranay.8787@gmail.com';
+const ADMIN_EMAILS = ['pranay.8787@gmail.com', 'chad@chadnicely.com'];
 
 function AdminDashboard() {
   const { user, session } = useAuth();
@@ -23,7 +23,7 @@ function AdminDashboard() {
   const [addingMember, setAddingMember] = useState(false);
 
   // Guard: only admin email can see this
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const isAdmin = ADMIN_EMAILS.includes(user?.email);
 
   useEffect(() => {
     if (session && isAdmin) {
@@ -229,7 +229,7 @@ function AdminDashboard() {
                             {u.email?.[0]?.toUpperCase() || '?'}
                           </div>
                           <span className="text-white text-sm font-medium truncate max-w-[180px]">{u.email}</span>
-                          {u.email === ADMIN_EMAIL && (
+                          {ADMIN_EMAILS.includes(u.email) && (
                             <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/40 rounded text-xs text-yellow-400 flex-shrink-0">admin</span>
                           )}
                         </div>

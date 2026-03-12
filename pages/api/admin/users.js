@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const ADMIN_EMAIL = 'pranay.8787@gmail.com';
+const ADMIN_EMAILS = ['pranay.8787@gmail.com', 'chad@chadnicely.com'];
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -17,7 +17,7 @@ async function getRequestingUser(req) {
 export default async function handler(req, res) {
   // Verify the requesting user is the admin
   const requestingUser = await getRequestingUser(req);
-  if (!requestingUser || requestingUser.email !== ADMIN_EMAIL) {
+  if (!requestingUser || !ADMIN_EMAILS.includes(requestingUser.email)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 

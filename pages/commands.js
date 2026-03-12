@@ -5,341 +5,6 @@ import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
 
 
-const COMMANDS_FALLBACK = [
-  {
-    name: "/idea",
-    category: "content",
-    group: "resources",
-    description: "Add idea to Idea Board with suggested category",
-    steps: [
-      "Ask what the idea is",
-      "Suggest the category",
-      "Create idea in board",
-    ],
-  },
-  {
-    name: "/resource",
-    category: "content",
-    group: "resources",
-    description: "Add resource to Resource Library with suggested category",
-    steps: [
-      "Ask what the resource is",
-      "Suggest the category",
-      "Create resource in library",
-    ],
-  },
-  {
-    name: "/create business",
-    category: "business",
-    group: "resources",
-    description:
-      "PRODUCT CREATION ENGINE \u2014 Full 6-stage revenue mode from idea to scale",
-    steps: [
-      "STAGE 1: Generate 10 opportunities with scoring",
-      "STAGE 2: Build business blueprint",
-      "STAGE 3: Build product + sales page + VSL + Stripe",
-      "STAGE 4: Create traffic assets (organic + paid + email)",
-      "STAGE 5: Deploy traffic + launch ads",
-      "STAGE 6: Optimization + scale plan",
-      "\u2705 Updates Business Board throughout process",
-    ],
-    shortcut: 'Type "/create business" to start full product creation',
-  },
-  {
-    name: "/salespage",
-    category: "business",
-    group: "resources",
-    description: "Build professional Next.js sales page and deploy to Vercel",
-    steps: [
-      "Ask for product name and offer details",
-      "Generate sales page structure",
-      "Create with headline, video embed, bullet points, CTA",
-      "Deploy to Vercel",
-      "Return live URL",
-    ],
-  },
-  {
-    name: "/salescopy",
-    category: "business",
-    group: "resources",
-    description: "Generate high-converting sales copy using proven frameworks",
-    steps: [
-      "Ask about product/offer",
-      "Choose framework (PAS, AIDA, etc.)",
-      "Generate headline, subheadline, bullets",
-      "Create CTA and urgency elements",
-      "Deliver formatted copy",
-    ],
-  },
-  {
-    name: "/vsl",
-    category: "business",
-    group: "resources",
-    description:
-      "Create complete VSL - script, audio, and video with text slides",
-    steps: [
-      "Generate VSL script (pattern interrupt \u2192 problem \u2192 solution \u2192 offer)",
-      "Create audio with ElevenLabs (Chad's voice)",
-      "Generate word-level timestamps with Whisper",
-      "Build text slides synced to audio",
-      "Compile final video with FFmpeg",
-      "Upload to Vimeo or return file",
-    ],
-  },
-  {
-    name: "/videoavatar",
-    category: "business",
-    group: "resources",
-    description: "Generate AI avatar video with HeyGen or ElevenLabs",
-    steps: [
-      "Ask for script/message",
-      "Choose avatar style",
-      "Generate with HeyGen or ElevenLabs",
-      "Return video URL or file",
-    ],
-  },
-  {
-    name: "/broadcast",
-    category: "email",
-    group: "titanium",
-    description: "Create and send broadcast email via Global Control",
-    steps: [
-      "Ask what email is about",
-      "Rewrite content + create subject/pre-header",
-      "Create PopLink for URL",
-      "ASK: Re-engage inactives? (YES/NO)",
-      "YES \u2192 Pull from GC segments (Inactive\u2192New\u2192Passive\u2192Dead)",
-      'NO \u2192 Send test \u2192 Wait for "send it"',
-    ],
-    shortcut: 'Type "/broadcast" or say "write me an email"',
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/emailstats",
-    category: "email",
-    group: "titanium",
-    description: "Get email performance stats from Global Control",
-    steps: [
-      "Ask: Broadcast or Workflow?",
-      "Ask for date or date range",
-      "Pull stats from GC API",
-      "Show: Subject, Sent, Opens, Clicks",
-    ],
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/reactivation",
-    category: "email",
-    group: "titanium",
-    description:
-      "Long-term progressive campaign from CSV file (not instant broadcast)",
-    steps: [
-      "Ask how many contacts",
-      "Ask pace (Mild/Normal/Aggressive)",
-      "Upload CSV/XLS file",
-      "Verify emails (EmailListVerify)",
-      "Choose GC tag + workflow",
-      "Progressive daily sending via cron jobs",
-      "Kanban board tracking",
-      "Pause/Resume/Cancel anytime",
-    ],
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/replay",
-    category: "content",
-    group: "titanium",
-    description: "Create Course Sprout lesson from Vimeo video",
-    steps: [
-      "Ask for Vimeo URL",
-      "Ask for lesson title (or auto-generate)",
-      "Download transcript from Vimeo API",
-      "Create lesson with short + long descriptions (NO EMOJIS)",
-      "Add goal block (10 pts, comments, user input)",
-      "Defaults: Course 340, Chapter 958",
-    ],
-    logo: "/logos/coursesprout.png",
-  },
-  {
-    name: "/article",
-    category: "content",
-    group: "titanium",
-    description: "Create Letterman article with full workflow",
-    steps: [
-      "Ask: Blank or AI-generated?",
-      "Ask: Local or Niche?",
-      "Ask: Word count",
-      "Ask: Image URL or generate?",
-      "If AI: Generate content from topic/URL",
-      "If Local: Apply local SEO strategy",
-      "Create as DRAFT with proper formatting",
-      "Update SEO settings",
-      '\u26a0\ufe0f WAIT for "publish" \u2014 never auto-publish',
-    ],
-    logo: "/logos/letterman.png",
-  },
-  {
-    name: "/poplink",
-    category: "links",
-    group: "titanium",
-    description: "Create shortened PopLink (auto-generates slug + domain)",
-    steps: [
-      "User gives destination URL ONLY",
-      "Auto-use chadnicely.com domain (ID: 1977)",
-      "Auto-generate simple slug",
-      "Create via PopLinks API",
-      "\u2705 NEVER ask for domain or slug",
-    ],
-    shortcut: "Just paste the URL you want to shorten",
-    logo: "/logos/mintbird.png",
-  },
-  {
-    name: "/leadstep",
-    category: "links",
-    group: "titanium",
-    description: "Create lead capture page in PopLinks",
-    steps: [
-      "Ask for page name",
-      "Ask for headline/offer",
-      "Ask for domain (default: chadnicely.com)",
-      "Ask for URL slug",
-      "Create via PopLinks API",
-      "Set up confirmation page",
-    ],
-    logo: "/logos/mintbird.png",
-  },
-  {
-    name: "/bridgepage",
-    category: "links",
-    group: "titanium",
-    description: "Create or clone bridge page in PopLinks",
-    steps: [
-      "Ask: Clone existing or create new?",
-      "If clone: Ask for source page ID/name",
-      "Ask for new name",
-      "Ask for destination URL",
-      "Ask for domain + slug",
-      "Create/clone via PopLinks API",
-      "Update headline, video if needed",
-    ],
-    logo: "/logos/mintbird.png",
-  },
-  {
-    name: "/tag",
-    category: "contacts",
-    group: "titanium",
-    description: "Fire a tag on a contact in Global Control",
-    steps: [
-      "Ask for contact name",
-      "Ask for email",
-      "Ask which tag to fire",
-      "Fire tag via GC API",
-      "Confirm success",
-    ],
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/bulkimport",
-    category: "contacts",
-    group: "titanium",
-    description:
-      "Bulk import contacts from CSV and tag them (creates if needed)",
-    steps: [
-      "Ask for CSV file",
-      "Ask for tag name",
-      "For each contact in CSV:",
-      "  - If exists \u2192 Fire tag (update)",
-      "  - If new \u2192 Create contact + fire tag",
-      "Generate detailed report with stats",
-      "CSV format: email, firstName, lastName",
-    ],
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/contact",
-    category: "contacts",
-    group: "titanium",
-    description: "Get contact history from Global Control",
-    steps: [
-      "Ask for contact name",
-      "Ask for email",
-      "Search GC for contact",
-      "Show full history: tags, emails, activity, purchases",
-    ],
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/workflow",
-    category: "contacts",
-    group: "titanium",
-    description:
-      "Create automated workflow in Global Control (email sequences, automations)",
-    steps: [
-      "Ask what the workflow should do",
-      "Define triggers and actions",
-      "Use safe pattern (Kafi-approved):",
-      "  1. POST /workflows (create empty container)",
-      "  2. GET /workflows/{id} (get current state)",
-      "  3. Add flows to existing array",
-      "  4. PUT /workflows/{id} (save complete array)",
-      "\u26a0\ufe0f Critical: PUT APPENDS flows - always get current state first",
-      "Return workflow ID and confirmation",
-    ],
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/sob",
-    category: "contacts",
-    group: "external",
-    description: "Look up user credentials in SaaSOnboard (access management)",
-    steps: [
-      "Ask for name and email",
-      "Ask what product they need",
-      "Search SOB API for email",
-      "Show access details if found",
-      "\u26a0\ufe0f Passwords NOT available via API (security)",
-      "Offer to reset password (with confirmation)",
-    ],
-  },
-  {
-    name: "/makelive",
-    category: "system",
-    group: "external",
-    description: "Deploy any project to Vercel with one command",
-    steps: [
-      "Commit & push to GitHub",
-      "Ensure Vercel project connected",
-      "Trigger Vercel deployment via API",
-      "Return live URL + confirm auto-deploy enabled",
-    ],
-  },
-  {
-    name: "/systemhealth",
-    category: "system",
-    group: "external",
-    description: "Run health check on all APIs and properties",
-    steps: [
-      "Check 5 APIs: GC, PopLinks/MintBird, Course Sprout, Letterman, SOB",
-      "Check 9 URLs: Key properties",
-      "Save results to health-checks/YYYY-MM-DD.json",
-      "Report any failures",
-      "\u23f0 Runs automatically: 10 AM & 4 PM CST",
-    ],
-  },
-  {
-    name: "/teamcall",
-    category: "system",
-    group: "external",
-    description: "Extract assignments from team Zoom call and update dashboard",
-    steps: [
-      "Fetch latest recording (Meeting ID: 82250425529)",
-      "Download and parse transcript",
-      "Extract assignments per team member",
-      "Update TEAM-KANBAN.md",
-      "Post summary to Telegram team room",
-    ],
-  },
-];
 
 const categoryColors = {
   business: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
@@ -365,24 +30,43 @@ const groupLabels = {
   external: "\ud83d\udd0c External Software",
 };
 
+const ALLOWED_EMAIL = 'chad@chadnicely.com';
+
 function CommandsPage() {
-  const { session } = useAuth();
-  const [commands, setCommands] = useState(COMMANDS_FALLBACK);
+  const { session, user } = useAuth();
+  const [commands, setCommands] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCommand, setExpandedCommand] = useState(null);
 
   useEffect(() => {
-    if (!session?.access_token) return;
+    if (!session?.access_token || user?.email !== ALLOWED_EMAIL) return;
     fetch('/api/commands', {
       headers: { Authorization: `Bearer ${session.access_token}` },
     })
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) setCommands(data);
+        if (Array.isArray(data)) setCommands(data);
       })
       .catch(() => {});
-  }, [session]);
+  }, [session, user]);
+
+  // Only Chad can view this page
+  if (user && user.email !== ALLOWED_EMAIL) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+        <Head><title>Command Center</title></Head>
+        <NavigationSidebar />
+        <main className="flex-1 flex items-center justify-center text-white">
+          <div className="text-center p-12">
+            <div className="text-5xl mb-4">🔒</div>
+            <h1 className="text-2xl font-bold mb-2">Access Restricted</h1>
+            <p className="text-gray-400">This page is only available to authorized users.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const filteredCommands = commands.filter((cmd) => {
     const matchesGroup = selectedGroup === "all" || cmd.command_group === selectedGroup;

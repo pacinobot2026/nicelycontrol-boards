@@ -4,7 +4,7 @@ import NavigationSidebar from '../components/NavigationSidebar';
 import withAuth from '../lib/withAuth';
 import { useAuth } from '../lib/authContext';
 
-const ADMIN_EMAILS = ['pranay.8787@gmail.com', 'chad@chadnicely.com'];
+const ADMIN_EMAILS = ['pranay.8787@gmail.com'];
 
 function AdminDashboard() {
   const { user, session } = useAuth();
@@ -228,7 +228,10 @@ function AdminDashboard() {
                           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {u.email?.[0]?.toUpperCase() || '?'}
                           </div>
-                          <span className="text-white text-sm font-medium truncate max-w-[180px]">{u.email}</span>
+                          <div className="min-w-0">
+                            <span className="text-white text-sm font-medium truncate max-w-[180px] block">{u.email}</span>
+                            <span className="text-gray-500 text-xs font-mono">{u.id}</span>
+                          </div>
                           {ADMIN_EMAILS.includes(u.email) && (
                             <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/40 rounded text-xs text-yellow-400 flex-shrink-0">admin</span>
                           )}

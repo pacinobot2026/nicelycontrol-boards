@@ -103,6 +103,21 @@ const spec = {
           updated_at: { type: 'string', format: 'date-time', example: '2026-02-26T12:05:00.000Z' },
         },
       },
+      Command: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', example: 'cmd-uuid-123' },
+          name: { type: 'string', example: '/broadcast' },
+          category: { type: 'string', enum: ['business', 'email', 'content', 'links', 'contacts', 'system'], example: 'email' },
+          command_group: { type: 'string', enum: ['titanium', 'resources', 'external'], example: 'titanium' },
+          description: { type: 'string', example: 'Create and send broadcast email via Global Control' },
+          steps: { type: 'array', items: { type: 'string' }, example: ['Ask what email is about', 'Rewrite content'] },
+          shortcut: { type: 'string', example: 'Type "/broadcast" to start', nullable: true },
+          logo: { type: 'string', example: '/logos/globalcontrol.png', nullable: true },
+          sort_order: { type: 'integer', example: 10 },
+          created_at: { type: 'string', format: 'date-time', example: '2026-02-26T12:00:00.000Z' },
+        },
+      },
       ShoppingItem: {
         type: 'object',
         properties: {
@@ -2082,6 +2097,429 @@ const spec = {
     },
 
     // ─── SYSTEMS ──────────────────────────────────────────────────────────────
+    // ─── COMMANDS ─────────────────────────────────────────────────────────────
+    '/commands': {
+      get: {
+        summary: 'List commands',
+        description: 'Returns all custom commands ordered by sort_order.',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'Array of commands', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Command' } } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      post: {
+        summary: 'Create a command',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['name', 'description'],
+                properties: {
+                  name: { type: 'string', example: '/mycommand' },
+                  category: { type: 'string', enum: ['business', 'email', 'content', 'links', 'contacts', 'system'], example: 'system' },
+                  command_group: { type: 'string', enum: ['titanium', 'resources', 'external'], example: 'resources' },
+                  description: { type: 'string', example: 'Does something useful' },
+                  steps: { type: 'array', items: { type: 'string' }, example: ['Step 1', 'Step 2'] },
+                  shortcut: { type: 'string', example: 'Type "/mycommand" to start', nullable: true },
+                  logo: { type: 'string', example: '/logos/globalcontrol.png', nullable: true },
+                  sort_order: { type: 'integer', example: 10 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Created command', content: { 'application/json': { schema: { $ref: '#/components/schemas/Command' } } } },
+          400: { description: 'name and description are required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      put: {
+        summary: 'Update a command',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                  id: { type: 'string', example: 'cmd-uuid-123' },
+                  name: { type: 'string', example: '/mycommand' },
+                  category: { type: 'string', enum: ['business', 'email', 'content', 'links', 'contacts', 'system'] },
+                  command_group: { type: 'string', enum: ['titanium', 'resources', 'external'] },
+                  description: { type: 'string' },
+                  steps: { type: 'array', items: { type: 'string' } },
+                  shortcut: { type: 'string', nullable: true },
+                  logo: { type: 'string', nullable: true },
+                  sort_order: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Updated command', content: { 'application/json': { schema: { $ref: '#/components/schemas/Command' } } } },
+          400: { description: 'id is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      delete: {
+        summary: 'Delete a command',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'query', required: true, schema: { type: 'string' }, example: 'cmd-uuid-123' }],
+        responses: {
+          200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'id is required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    // ─── KANBAN ───────────────────────────────────────────────────────────────
+    '/kanban/tasks': {
+      get: {
+        summary: 'List kanban tasks',
+        description: 'Returns all kanban tasks ordered by creation date.',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Array of task objects',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'task-1714000000000' },
+                      title: { type: 'string', example: 'Design landing page' },
+                      description: { type: 'string', example: 'Create Figma mockups' },
+                      status: { type: 'string', enum: ['inbox', 'assigned', 'in-progress', 'review', 'done'], example: 'in-progress' },
+                      priority: { type: 'string', enum: ['Low', 'Med', 'High'], example: 'High' },
+                      project: { type: 'string', example: 'mintbird' },
+                      assignee: { type: 'string', example: 'pranay', nullable: true },
+                      progress: { type: 'integer', example: 60, nullable: true },
+                      dueDate: { type: 'string', format: 'date', example: '2026-03-20', nullable: true },
+                      tags: { type: 'array', items: { type: 'string' }, example: ['design', 'urgent'] },
+                      subtasks: { type: 'array', items: { type: 'object' }, nullable: true },
+                      createdAt: { type: 'string', format: 'date-time' },
+                      updatedAt: { type: 'string', format: 'date-time' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      post: {
+        summary: 'Create or bulk-replace kanban tasks',
+        description: 'Creates a new task. Send `{ action: "updateAll", tasks: [...] }` to bulk-replace all tasks.',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                oneOf: [
+                  {
+                    description: 'Create single task',
+                    type: 'object',
+                    required: ['title', 'status', 'project', 'priority'],
+                    properties: {
+                      title: { type: 'string', example: 'Design landing page' },
+                      description: { type: 'string', example: 'Create Figma mockups' },
+                      status: { type: 'string', enum: ['inbox', 'assigned', 'in-progress', 'review', 'done'] },
+                      priority: { type: 'string', enum: ['Low', 'Med', 'High'] },
+                      project: { type: 'string', example: 'mintbird' },
+                      assignee: { type: 'string', example: 'pranay', nullable: true },
+                      dueDate: { type: 'string', format: 'date', nullable: true },
+                      tags: { type: 'array', items: { type: 'string' } },
+                    },
+                  },
+                  {
+                    description: 'Bulk replace all tasks',
+                    type: 'object',
+                    required: ['action', 'tasks'],
+                    properties: {
+                      action: { type: 'string', enum: ['updateAll'] },
+                      tasks: { type: 'array', items: { type: 'object' } },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Task created', content: { 'application/json': { schema: { type: 'object' } } } },
+          200: { description: 'Bulk update success', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, savedTasks: { type: 'integer' } } } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      put: {
+        summary: 'Update (replace) a kanban task',
+        description: 'Replaces an existing task by ID.',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                  id: { type: 'string', example: 'task-1714000000000' },
+                  title: { type: 'string' },
+                  status: { type: 'string' },
+                  priority: { type: 'string' },
+                  project: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Updated task', content: { 'application/json': { schema: { type: 'object' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      patch: {
+        summary: 'Partially update a kanban task',
+        description: 'Merges the provided fields into an existing task.',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                  id: { type: 'string', example: 'task-1714000000000' },
+                  status: { type: 'string', example: 'done' },
+                  progress: { type: 'integer', example: 100 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Updated task', content: { 'application/json': { schema: { type: 'object' } } } },
+          404: { description: 'Task not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      delete: {
+        summary: 'Delete a kanban task',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'query', required: true, schema: { type: 'string' }, example: 'task-1714000000000' }],
+        responses: {
+          200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'ID required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    '/kanban/team-members': {
+      get: {
+        summary: 'List kanban team members',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Array of team member objects',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'pranay' },
+                      name: { type: 'string', example: 'Pranay' },
+                      avatar: { type: 'string', example: '👤' },
+                      created_at: { type: 'string', format: 'date-time' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      post: {
+        summary: 'Add a kanban team member',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['name'],
+                properties: {
+                  name: { type: 'string', example: 'Pranay' },
+                  avatar: { type: 'string', example: '👤' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Created team member', content: { 'application/json': { schema: { type: 'object' } } } },
+          400: { description: 'Name required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      delete: {
+        summary: 'Remove a kanban team member',
+        tags: ['Team'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'query', required: true, schema: { type: 'string' }, example: 'pranay' }],
+        responses: {
+          200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'ID required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    // ─── ADMIN ────────────────────────────────────────────────────────────────
+    '/admin/users': {
+      get: {
+        summary: 'List all users (admin only)',
+        description: 'Returns all Supabase auth users. Requires admin email.',
+        tags: ['Systems'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'User list',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    users: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string', example: '08dee908-d31b-4c19-ae7d-227ccbb068cf' },
+                          email: { type: 'string', example: 'user@example.com' },
+                          email_confirmed_at: { type: 'string', format: 'date-time', nullable: true },
+                          created_at: { type: 'string', format: 'date-time' },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          403: { description: 'Forbidden — admin only', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      post: {
+        summary: 'Reset a user password (admin only)',
+        tags: ['Systems'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['userId', 'newPassword'],
+                properties: {
+                  userId: { type: 'string', example: '08dee908-d31b-4c19-ae7d-227ccbb068cf' },
+                  newPassword: { type: 'string', example: 'NewPass123!', minLength: 6 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Password updated', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'Missing fields or password too short', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          403: { description: 'Forbidden — admin only', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    '/admin/confirm-all': {
+      post: {
+        summary: 'Confirm all unverified emails (admin only)',
+        description: 'Finds all users without a confirmed email and marks them as confirmed.',
+        tags: ['Systems'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Confirmation results',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    confirmed: { type: 'integer', example: 3 },
+                    total: { type: 'integer', example: 3 },
+                  },
+                },
+              },
+            },
+          },
+          403: { description: 'Forbidden — admin only', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
+    '/auth/confirm-email': {
+      post: {
+        summary: 'Confirm a user email',
+        description: 'Marks a specific user\'s email as confirmed. No auth required.',
+        tags: ['Systems'],
+        security: [],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['userId'],
+                properties: {
+                  userId: { type: 'string', example: '08dee908-d31b-4c19-ae7d-227ccbb068cf' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Email confirmed', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'userId required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+
     '/systems': {
       get: {
         summary: 'Get system health status',

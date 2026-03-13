@@ -40,7 +40,7 @@ export default function NavigationSidebar() {
           const isActive = pathname === item.href;
           
           const linkClass = `relative flex items-center justify-center h-12 text-gray-500 hover:text-white hover:bg-gray-900 transition-all group ${
-            isActive ? 'text-purple-400 bg-gray-900' : ''
+            isActive ? 'text-purple-400 bg-gray-800' : ''
           }`;
 
           const content = (

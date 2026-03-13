@@ -175,7 +175,7 @@ function VideoCue() {
 
   useEffect(() => {
     if (session) loadSettings();
-  }, [session]);
+  }, [session?.user?.id]);
 
   // Live countdown to next scheduled post
   useEffect(() => {
@@ -319,10 +319,10 @@ function VideoCue() {
       setCategories(data.categories || []);
       
       // Cache the resolved data
-      setCache(cacheKey, { 
-        clips: clipsData, 
+      setCache(cacheKey, {
+        clips: clipsData,
         stats: data.stats,
-        categories: data.categories 
+        categories: data.categories,
       });
       
       setLoading(false);
@@ -560,7 +560,7 @@ function VideoCue() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
           <title>Video Cue</title>
         </Head>
@@ -573,17 +573,17 @@ function VideoCue() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
         <title>Video Cue</title>
       </Head>
       <NavigationSidebar />
-      <main className="flex-1 p-4 md:p-8 pt-16 md:pt-8">
+      <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-6 flex justify-between items-center gap-3">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+              <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
                 🎬 Video Cue
               </h1>
               <p className="text-sm text-gray-400">
@@ -779,7 +779,7 @@ function VideoCue() {
               <button
                 key={key}
                 onClick={() => setFilter(key)}
-                className={`p-3 md:p-4 rounded-xl border cursor-pointer transition-all text-left ${filter === key ? "bg-purple-600 border-purple-600 scale-105" : "bg-gray-800/50 border-gray-600/50 hover:bg-gray-800"}`}
+                className={`p-3 md:p-4 rounded-xl border cursor-pointer transition-all text-left ${filter === key ? "bg-blue-900/20 border border-blue-800" : "bg-gray-800/50 border-gray-600/50 hover:bg-gray-800"}`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{icon}</span>
@@ -802,12 +802,12 @@ function VideoCue() {
 
           {/* Categories */}
           {categories.length > 0 && (
-            <div className="flex gap-2 flex-wrap mb-4">
+            <div className="w-full overflow-x-auto max-[960px]:pb-4 flex gap-2 min-[960px]:flex-wrap mb-4">
               {["all", ...categories.map((c) => c.name)].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${category === cat ? "bg-purple-600 border-purple-600 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
+                  className={`px-4 shrink-0 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${category === cat ? "bg-blue-900/20 border border-blue-800 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
                 >
                   {cat === "all"
                     ? "All Categories"
@@ -1270,7 +1270,7 @@ function ClipCard({
 
   return (
     <div
-      className={`bg-gray-800/70 rounded-xl border overflow-hidden transition-all ${isHovered ? "border-purple-500/50 -translate-y-1 shadow-lg shadow-purple-900/20" : "border-gray-600/50"}`}
+      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -1291,8 +1291,8 @@ function ClipCard({
             playsInline
             className="w-full h-full object-cover"
             style={{
-              filter: isHovered ? 'grayscale(0%)' : 'grayscale(100%)',
-              transition: 'filter 0.3s ease'
+              filter: isHovered ? "grayscale(0%)" : "grayscale(100%)",
+              transition: "filter 0.3s ease",
             }}
             onError={() => setVideoError(true)}
           />

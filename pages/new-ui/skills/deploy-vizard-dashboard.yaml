@@ -1,0 +1,404 @@
+name: deploy-vizard-dashboard
+version: 1.0.0
+description: >
+  Full deployment guide for the Vizard Clips Dashboard platform.
+  Guides the customer through forking the GitHub repo, creating a Supabase
+  database, running migrations, deploying to Vercel, and wiring all
+  environment variables so the app is live and fully operational.
+category: deployment
+author: OpenClaw
+tags: [vercel, supabase, nextjs, dashboard]
+
+# ─────────────────────────────────────────────
+# SOURCE REPOSITORY
+# ─────────────────────────────────────────────
+source:
+  github: https://github.com/pacinobot2026/vizard-clips-dashboard
+  branch: main
+  framework: nextjs
+  node_version: "18"
+
+# ─────────────────────────────────────────────
+# WHAT THE CUSTOMER NEEDS BEFORE STARTING
+# ─────────────────────────────────────────────
+prerequisites:
+  - A GitHub account (free tier is fine)
+  - A Vercel account — sign up at https://vercel.com (free Hobby plan works)
+  - A Supabase account — sign up at https://supabase.com (free tier works)
+  - API keys for the services this app uses (listed in the env_vars section below)
+  - A Vercel personal access token:
+      how: "Go to https://vercel.com/account/tokens → Create token → copy it"
+  - A Supabase personal access token:
+      how: "Go to https://supabase.com/dashboard/account/tokens → Generate new token → copy it"
+
+# ─────────────────────────────────────────────
+# DEPLOYMENT STEPS
+# ─────────────────────────────────────────────
+steps:
+
+  # ── STEP 1: Fork the GitHub repo ──────────────────────────
+  - id: fork_repo
+    title: "Fork the source repository to the customer's GitHub account"
+    description: >
+      The customer needs a copy of the repo in their own GitHub account
+      so Vercel can deploy it and they can maintain it.
+    action: github_fork
+    params:
+      source_repo: pacinobot2026/vizard-clips-dashboard
+      branch: main
+    collect:
+      - key: github_username
+        prompt: "What is your GitHub username?"
+      - key: github_token
+        prompt: "Paste your GitHub personal access token (needs repo scope):"
+        sensitive: true
+    api_call:
+      method: POST
+      url: https://api.github.com/repos/pacinobot2026/vizard-clips-dashboard/forks
+      headers:
+        Authorization: "Bearer {github_token}"
+        Accept: application/vnd.github+json
+    result_key: forked_repo_url
+    note: "The forked repo will be at https://github.com/{github_username}/vizard-clips-dashboard"
+
+  # ── STEP 2: Create Supabase project ───────────────────────
+  - id: create_supabase_project
+    title: "Create a new Supabase project"
+    description: >
+      A Supabase project provides the PostgreSQL database that stores all
+      clips, ideas, bookmarks, projects, shopping items, and settings.
+    collect:
+      - key: supabase_token
+        prompt: "Paste your Supabase personal access token:"
+        sensitive: true
+      - key: supabase_org_id
+        prompt: >
+          What is your Supabase organisation ID?
+          (Find it at https://supabase.com/dashboard/org → click your org → the ID is in the URL)
+      - key: supabase_db_password
+        prompt: "Choose a strong database password (save this — you will need it later):"
+        sensitive: true
+        generate_if_empty: true
+        generate_hint: "random 24-char alphanumeric"
+    action: supabase_create_project
+    api_call:
+      method: POST
+      url: https://api.supabase.com/v1/projects
+      headers:
+        Authorization: "Bearer {supabase_token}"
+        Content-Type: application/json
+      body:
+        name: vizard-clips-dashboard
+        organization_id: "{supabase_org_id}"
+        plan: free
+        region: us-east-1
+        db_pass: "{supabase_db_password}"
+    result_keys:
+      - supabase_project_ref   # e.g. "abcdefghijklmnop"
+      - supabase_project_url   # e.g. "https://abcdefghijklmnop.supabase.co"
+    wait:
+      message: "Waiting for Supabase project to be ready (usually 30–60 seconds)..."
+      poll:
+        method: GET
+        url: https://api.supabase.com/v1/projects/{supabase_project_ref}
+        headers:
+          Authorization: "Bearer {supabase_token}"
+        until: "response.status == 'ACTIVE_HEALTHY'"
+        interval_seconds: 10
+        timeout_seconds: 120
+
+  # ── STEP 3: Retrieve Supabase API keys ────────────────────
+  - id: get_supabase_keys
+    title: "Retrieve Supabase API keys for the new project"
+    action: supabase_get_keys
+    api_call:
+      method: GET
+      url: https://api.supabase.com/v1/projects/{supabase_project_ref}/api-keys
+      headers:
+        Authorization: "Bearer {supabase_token}"
+    result_keys:
+      - supabase_anon_key          # public anon key
+      - supabase_service_role_key  # secret service role key (never expose client-side)
+
+  # ── STEP 4: Run database migrations ───────────────────────
+  - id: run_migrations
+    title: "Run database migrations via Supabase SQL editor"
+    description: >
+      Three migration files need to be executed in order in the Supabase SQL Editor.
+      OpenClaw will run them via the Supabase Management API.
+    action: supabase_run_sql
+    migrations:
+      - file: migrations/001_create_clips_table.sql
+        description: "Creates the clips table with all required columns and indexes"
+      - file: migrations/002_create_content_tables.sql
+        description: "Creates ideas, bookmarks, projects, shopping_items tables with RLS policies"
+      - file: migrations/003_create_settings_table.sql
+        description: "Creates the per-user settings key/value table"
+    api_call_template:
+      method: POST
+      url: https://api.supabase.com/v1/projects/{supabase_project_ref}/database/query
+      headers:
+        Authorization: "Bearer {supabase_token}"
+        Content-Type: application/json
+      body:
+        query: "{migration_sql}"
+    note: >
+      If any migration fails, copy the SQL from the migrations/ folder and run it
+      manually at https://supabase.com/dashboard/project/{supabase_project_ref}/sql/new
+
+  # ── STEP 5: Create Vercel project ─────────────────────────
+  - id: create_vercel_project
+    title: "Create Vercel project linked to the forked GitHub repo"
+    collect:
+      - key: vercel_token
+        prompt: "Paste your Vercel personal access token:"
+        sensitive: true
+    action: vercel_create_project
+    api_call:
+      method: POST
+      url: https://api.vercel.com/v10/projects
+      headers:
+        Authorization: "Bearer {vercel_token}"
+        Content-Type: application/json
+      body:
+        name: vizard-clips-dashboard
+        framework: nextjs
+        gitRepository:
+          type: github
+          repo: "{github_username}/vizard-clips-dashboard"
+        installCommand: npm install
+        buildCommand: npm run build
+        outputDirectory: .next
+    result_key: vercel_project_id
+
+  # ── STEP 6: Collect customer API keys ─────────────────────
+  - id: collect_api_keys
+    title: "Collect the customer's service API keys"
+    description: >
+      These keys connect the dashboard to external services.
+      All are optional except DASHBOARD_PASSWORD and SESSION_SECRET —
+      features that need a missing key will simply not work.
+    collect:
+      - key: DASHBOARD_PASSWORD
+        prompt: "Choose a login password for the dashboard (customers use this to log in):"
+        sensitive: true
+        required: true
+      - key: SESSION_SECRET
+        prompt: "Choose a session secret (any long random string, at least 32 chars):"
+        sensitive: true
+        required: true
+        generate_if_empty: true
+        generate_hint: "random 48-char hex string"
+      - key: VIMEO_ACCESS_TOKEN
+        prompt: "Vimeo access token (leave blank to skip Vimeo auto-import):"
+        sensitive: true
+        required: false
+      - key: VIMEO_USER_ID
+        prompt: "Vimeo user ID (leave blank to skip Vimeo auto-import):"
+        required: false
+      - key: VIZARD_API_KEY
+        prompt: "Vizard AI API key (leave blank to skip AI clip generation):"
+        sensitive: true
+        required: false
+      - key: POSTBRIDGE_API_KEY
+        prompt: "Post Bridge API key (leave blank to skip social publishing):"
+        sensitive: true
+        required: false
+
+  # ── STEP 7: Set all environment variables in Vercel ───────
+  - id: set_vercel_env_vars
+    title: "Set all environment variables in the Vercel project"
+    description: >
+      All Supabase connection values are set automatically from the project
+      created in Step 2 & 3. Customer API keys collected in Step 6 are added here.
+    action: vercel_set_env
+    api_call_template:
+      method: POST
+      url: https://api.vercel.com/v10/projects/{vercel_project_id}/env
+      headers:
+        Authorization: "Bearer {vercel_token}"
+        Content-Type: application/json
+      body_template:
+        type: encrypted
+        target: [production, preview, development]
+    env_vars:
+      # Supabase — auto-filled from earlier steps
+      - key: SUPABASE_URL
+        value: "{supabase_project_url}"
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: "{supabase_project_url}"
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: "{supabase_service_role_key}"
+      - key: SUPABASE_ANON_KEY
+        value: "{supabase_anon_key}"
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        value: "{supabase_anon_key}"
+      - key: POSTGRES_HOST
+        value: "db.{supabase_project_ref}.supabase.co"
+      - key: POSTGRES_DATABASE
+        value: postgres
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        value: "{supabase_db_password}"
+      - key: POSTGRES_URL
+        value: "postgres://postgres.{supabase_project_ref}:{supabase_db_password}@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x"
+      - key: POSTGRES_URL_NON_POOLING
+        value: "postgres://postgres.{supabase_project_ref}:{supabase_db_password}@db.{supabase_project_ref}.supabase.co:5432/postgres?sslmode=require"
+      - key: POSTGRES_PRISMA_URL
+        value: "postgres://postgres.{supabase_project_ref}:{supabase_db_password}@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
+      # Dashboard auth — collected from customer
+      - key: DASHBOARD_PASSWORD
+        value: "{DASHBOARD_PASSWORD}"
+      - key: SESSION_SECRET
+        value: "{SESSION_SECRET}"
+      # Optional integrations — collected from customer (skipped if blank)
+      - key: VIMEO_ACCESS_TOKEN
+        value: "{VIMEO_ACCESS_TOKEN}"
+        skip_if_empty: true
+      - key: VIMEO_USER_ID
+        value: "{VIMEO_USER_ID}"
+        skip_if_empty: true
+      - key: VIZARD_API_KEY
+        value: "{VIZARD_API_KEY}"
+        skip_if_empty: true
+      - key: POSTBRIDGE_API_KEY
+        value: "{POSTBRIDGE_API_KEY}"
+        skip_if_empty: true
+
+  # ── STEP 8: Trigger first Vercel deployment ────────────────
+  - id: deploy
+    title: "Trigger the first deployment on Vercel"
+    action: vercel_deploy
+    api_call:
+      method: POST
+      url: https://api.vercel.com/v13/deployments
+      headers:
+        Authorization: "Bearer {vercel_token}"
+        Content-Type: application/json
+      body:
+        name: vizard-clips-dashboard
+        gitSource:
+          type: github
+          repo: "{github_username}/vizard-clips-dashboard"
+          ref: main
+        projectId: "{vercel_project_id}"
+    result_key: deployment_url
+    wait:
+      message: "Building and deploying (usually 1–2 minutes)..."
+      poll:
+        method: GET
+        url: https://api.vercel.com/v13/deployments/{deployment_id}
+        headers:
+          Authorization: "Bearer {vercel_token}"
+        until: "response.readyState == 'READY'"
+        interval_seconds: 10
+        timeout_seconds: 300
+
+  # ── STEP 9: Confirm deployment ────────────────────────────
+  - id: confirm
+    title: "Confirm the deployment is live"
+    action: open_url
+    url: "{deployment_url}"
+    message: >
+      🎉 Your Vizard Clips Dashboard is live at {deployment_url}
+
+      Log in with the DASHBOARD_PASSWORD you set in Step 6.
+
+      Next steps:
+        • Add a custom domain in Vercel → Project Settings → Domains
+        • To enable Vimeo auto-import, run the monitor script locally:
+            npm run monitor
+        • Database is managed at https://supabase.com/dashboard/project/{supabase_project_ref}
+
+# ─────────────────────────────────────────────
+# FULL ENV VAR REFERENCE (for manual setup)
+# ─────────────────────────────────────────────
+env_vars_reference:
+  required:
+    SUPABASE_URL:
+      description: "Your Supabase project URL"
+      example: "https://YOUR_PROJECT_REF.supabase.co"
+    SUPABASE_SERVICE_ROLE_KEY:
+      description: "Supabase service role key — keep secret, server-side only"
+      example: "eyJhbGci..."
+    NEXT_PUBLIC_SUPABASE_URL:
+      description: "Same as SUPABASE_URL — exposed to browser"
+      example: "https://YOUR_PROJECT_REF.supabase.co"
+    NEXT_PUBLIC_SUPABASE_ANON_KEY:
+      description: "Supabase anon (public) key"
+      example: "eyJhbGci..."
+    DASHBOARD_PASSWORD:
+      description: "Password customers use to log in to the dashboard"
+      example: "YourStrongPassword123!"
+    SESSION_SECRET:
+      description: "Secret used to sign session cookies — any random string ≥ 32 chars"
+      example: "change_this_to_a_long_random_string"
+    POSTGRES_URL:
+      description: "Pooled Postgres connection string from Supabase"
+      example: "postgres://postgres.REF:PASSWORD@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
+    POSTGRES_URL_NON_POOLING:
+      description: "Direct Postgres connection string (used for migrations)"
+      example: "postgres://postgres.REF:PASSWORD@db.REF.supabase.co:5432/postgres?sslmode=require"
+    POSTGRES_PASSWORD:
+      description: "Your Supabase database password"
+    POSTGRES_USER:
+      description: "Supabase Postgres user"
+      default: "postgres"
+    POSTGRES_HOST:
+      description: "Supabase Postgres host"
+      example: "db.YOUR_PROJECT_REF.supabase.co"
+    POSTGRES_DATABASE:
+      description: "Database name"
+      default: "postgres"
+  optional:
+    VIMEO_ACCESS_TOKEN:
+      description: "Vimeo API token — enables automatic video import from Vimeo"
+      how_to_get: "https://developer.vimeo.com/apps → create app → generate token"
+    VIMEO_USER_ID:
+      description: "Your Vimeo user ID — found in your Vimeo profile URL"
+    VIZARD_API_KEY:
+      description: "Vizard AI API key — enables AI-powered clip generation"
+      how_to_get: "https://app.vizard.ai → Account → API"
+    POSTBRIDGE_API_KEY:
+      description: "Post Bridge API key — enables social media publishing"
+      how_to_get: "https://postbridge.io → Settings → API"
+
+# ─────────────────────────────────────────────
+# DATABASE MIGRATIONS (run in this order)
+# ─────────────────────────────────────────────
+migrations:
+  - order: 1
+    file: migrations/001_create_clips_table.sql
+    description: "clips table — stores video clips from Vizard/Vimeo or manual URLs"
+  - order: 2
+    file: migrations/002_create_content_tables.sql
+    description: "ideas, bookmarks, projects, shopping_items tables with RLS"
+  - order: 3
+    file: migrations/003_create_settings_table.sql
+    description: "per-user settings key/value store"
+
+# ─────────────────────────────────────────────
+# TROUBLESHOOTING
+# ─────────────────────────────────────────────
+troubleshooting:
+  - issue: "Build fails with 'SUPABASE_URL is not defined'"
+    fix: "Check that all env vars were saved in Vercel. Go to Project → Settings → Environment Variables."
+
+  - issue: "Login page shows 'Invalid password'"
+    fix: "The DASHBOARD_PASSWORD env var must match exactly what you type. Check for trailing spaces."
+
+  - issue: "Ideas / Bookmarks show 'Unauthorized'"
+    fix: >
+      These pages use Supabase Auth (email/password). The user must sign up at
+      /api/auth/signup or via the Supabase dashboard under Authentication → Users.
+
+  - issue: "Database tables don't exist"
+    fix: >
+      Open the Supabase SQL Editor for your project and run each migration file
+      in order: 001, 002, 003. Files are in the migrations/ folder of the repo.
+
+  - issue: "Vercel deployment shows 500 errors"
+    fix: >
+      Check Vercel → Deployments → click the deployment → Functions tab for logs.
+      Most errors are missing env vars or a Supabase connection issue.

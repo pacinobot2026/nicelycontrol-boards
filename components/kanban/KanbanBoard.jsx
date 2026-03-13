@@ -8,7 +8,7 @@ import {
   closestCenter,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { COLUMNS, PROJECTS } from './constants';
+import { COLUMNS, PROJECTS, TEAM_MEMBERS } from './constants';
 import Column from './Column';
 import TaskCard from './TaskCard';
 import TaskModal from './TaskModal';
@@ -19,7 +19,6 @@ import ListView from './ListView';
 
 export default function KanbanBoard({ session }) {
   const [tasks, setTasks] = useState([]);
-  const [teamMembers, setTeamMembers] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,9 +33,6 @@ export default function KanbanBoard({ session }) {
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [initialStatus, setInitialStatus] = useState(null);
-  const [showTeamManager, setShowTeamManager] = useState(false);
-  const [newMemberName, setNewMemberName] = useState('');
-  const [newMemberAvatar, setNewMemberAvatar] = useState('👤');
 
   const authHeaders = {
     'Content-Type': 'application/json',
@@ -51,40 +47,7 @@ export default function KanbanBoard({ session }) {
 
   useEffect(() => {
     fetchTasks();
-    fetchTeamMembers();
   }, []);
-
-  const fetchTeamMembers = async () => {
-    try {
-      const res = await fetch('/api/kanban/team-members', {
-        headers: { 'Authorization': 'Bearer ' + (session?.access_token || '') },
-      });
-      const data = await res.json();
-      if (Array.isArray(data)) setTeamMembers(data);
-    } catch (error) {
-      console.error('Failed to fetch team members:', error);
-    }
-  };
-
-  const handleAddMember = async () => {
-    if (!newMemberName.trim()) return;
-    await fetch('/api/kanban/team-members', {
-      method: 'POST',
-      headers: authHeaders,
-      body: JSON.stringify({ name: newMemberName.trim(), avatar: newMemberAvatar }),
-    });
-    setNewMemberName('');
-    setNewMemberAvatar('👤');
-    fetchTeamMembers();
-  };
-
-  const handleDeleteMember = async (id) => {
-    await fetch(`/api/kanban/team-members?id=${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + (session?.access_token || '') },
-    });
-    fetchTeamMembers();
-  };
 
   const fetchTasks = async () => {
     try {
@@ -332,53 +295,32 @@ export default function KanbanBoard({ session }) {
               </div>
             </div>
 
-            {/* Center: Assignee Avatars */}
-            <div className="hidden lg:flex items-center gap-3">
-              {teamMembers.map((member) => {
-                const count = tasks.filter(t => t.assignee === member.id && !t.archived).length;
-                const isActive = selectedAssignee === member.id;
-                return (
-                  <button
-                    key={member.id}
-                    onClick={() => setSelectedAssignee(isActive ? null : member.id)}
-                    className={`flex flex-col items-center gap-1 transition-all group ${isActive ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
-                    title={`${member.name} — ${count} task${count !== 1 ? 's' : ''}`}
-                  >
-                    <div className={`relative w-9 h-9 rounded-full flex items-center justify-center text-lg transition-all ${
-                      isActive
-                        ? 'bg-purple-600 ring-2 ring-purple-400 ring-offset-1 ring-offset-gray-900'
-                        : 'bg-gray-700 hover:bg-gray-600'
-                    }`}>
-                      {member.avatar}
-                      {count > 0 && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
-                          {count > 9 ? '9+' : count}
-                        </span>
-                      )}
-                    </div>
-                    <span className={`text-[10px] font-medium ${isActive ? 'text-purple-400' : 'text-gray-400'}`}>
-                      {member.name}
-                    </span>
-                  </button>
-                );
-              })}
+            {/* Center: Staff Names (like "Jarvis" style) */}
+            <div className="hidden lg:flex items-center gap-6">
+              {TEAM_MEMBERS.map((member) => (
+                <button
+                  key={member.id}
+                  onClick={() => setSelectedAssignee(selectedAssignee === member.name ? null : member.name)}
+                  className={`flex items-center gap-2 transition-colors group ${
+                    selectedAssignee === member.name
+                      ? 'text-purple-400'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  <span className="text-sm font-medium">{member.name}</span>
+                  <div className={`w-2 h-2 rounded-full ${
+                    selectedAssignee === member.name ? 'bg-purple-500' : 'bg-green-500'
+                  }`}></div>
+                </button>
+              ))}
               {selectedAssignee && (
                 <button
                   onClick={() => setSelectedAssignee(null)}
-                  className="text-xs text-gray-500 hover:text-gray-300 ml-1"
+                  className="text-xs text-gray-500 hover:text-gray-300"
                 >
-                  ✕ Clear
+                  Clear
                 </button>
               )}
-              <button
-                onClick={() => setShowTeamManager(true)}
-                className="w-9 h-9 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
-                title="Manage team members"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </button>
             </div>
 
             {/* Right: View Toggle, Bell, Add Task */}
@@ -438,38 +380,6 @@ export default function KanbanBoard({ session }) {
               </button>
             </div>
           </div>
-
-          {/* Mobile: Assignee row */}
-          {teamMembers.length > 0 && (
-            <div className="flex lg:hidden items-center gap-3 mt-3 overflow-x-auto pb-1">
-              {teamMembers.map((member) => {
-                const count = tasks.filter(t => t.assignee === member.id && !t.archived).length;
-                const isActive = selectedAssignee === member.id;
-                return (
-                  <button
-                    key={member.id}
-                    onClick={() => setSelectedAssignee(isActive ? null : member.id)}
-                    className={`flex-shrink-0 flex flex-col items-center gap-1 transition-all ${isActive ? 'opacity-100' : 'opacity-70'}`}
-                  >
-                    <div className={`relative w-8 h-8 rounded-full flex items-center justify-center text-base ${
-                      isActive ? 'bg-purple-600 ring-2 ring-purple-400 ring-offset-1 ring-offset-gray-900' : 'bg-gray-700'
-                    }`}>
-                      {member.avatar}
-                      {count > 0 && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                          {count > 9 ? '9+' : count}
-                        </span>
-                      )}
-                    </div>
-                    <span className={`text-[10px] ${isActive ? 'text-purple-400' : 'text-gray-500'}`}>{member.name}</span>
-                  </button>
-                );
-              })}
-              {selectedAssignee && (
-                <button onClick={() => setSelectedAssignee(null)} className="flex-shrink-0 text-xs text-gray-500 hover:text-gray-300">✕</button>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Board or List View */}
@@ -490,7 +400,6 @@ export default function KanbanBoard({ session }) {
                       id={column.id}
                       title={column.title}
                       tasks={getTasksByStatus(column.id)}
-                      teamMembers={teamMembers}
                       onEditTask={handleEditTask}
                       onToggleSubtask={handleToggleSubtask}
                       onDeleteTask={handleDeleteTask}
@@ -503,7 +412,7 @@ export default function KanbanBoard({ session }) {
 
               <DragOverlay>
                 {activeTask && (
-                  <TaskCard task={activeTask} teamMembers={teamMembers} onEdit={() => {}} onToggleSubtask={handleToggleSubtask} />
+                  <TaskCard task={activeTask} onEdit={() => {}} onToggleSubtask={handleToggleSubtask} />
                 )}
               </DragOverlay>
             </DndContext>
@@ -511,7 +420,6 @@ export default function KanbanBoard({ session }) {
             <div className="h-full overflow-auto p-4 lg:p-6">
               <ListView
                 tasks={filteredTasks}
-                teamMembers={teamMembers}
                 onEditTask={handleEditTask}
                 onToggleSubtask={handleToggleSubtask}
                 onDeleteTask={handleDeleteTask}
@@ -565,61 +473,7 @@ export default function KanbanBoard({ session }) {
                 </button>
               </div>
               <div className="flex-1 overflow-hidden">
-                <ActivityFeed tasks={tasks} teamMembers={teamMembers} />
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Team Manager Modal */}
-      {showTeamManager && (
-        <>
-          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setShowTeamManager(false)} />
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-sm shadow-2xl">
-              <div className="p-5 border-b border-gray-800 flex items-center justify-between">
-                <h2 className="text-white font-bold text-lg">Manage Assignees</h2>
-                <button onClick={() => setShowTeamManager(false)} className="text-gray-400 hover:text-white">✕</button>
-              </div>
-              <div className="p-5 space-y-3">
-                {teamMembers.map(member => (
-                  <div key={member.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{member.avatar}</span>
-                      <span className="text-white text-sm">{member.name}</span>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteMember(member.id)}
-                      className="text-xs text-red-400 hover:text-red-300 px-2 py-1 hover:bg-gray-800 rounded transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <div className="border-t border-gray-800 pt-4 space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      value={newMemberAvatar}
-                      onChange={e => setNewMemberAvatar(e.target.value)}
-                      className="w-12 bg-gray-800 border border-gray-700 rounded-lg text-center text-white px-1 py-2 text-sm"
-                      placeholder="👤"
-                    />
-                    <input
-                      value={newMemberName}
-                      onChange={e => setNewMemberName(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleAddMember()}
-                      className="flex-1 bg-gray-800 border border-gray-700 rounded-lg text-white px-3 py-2 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="Name"
-                    />
-                    <button
-                      onClick={handleAddMember}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
+                <ActivityFeed tasks={tasks} />
               </div>
             </div>
           </div>
@@ -630,7 +484,6 @@ export default function KanbanBoard({ session }) {
         task={editingTask}
         initialStatus={initialStatus}
         isOpen={isModalOpen}
-        teamMembers={teamMembers}
         onClose={() => {
           setIsModalOpen(false);
           setInitialStatus(null);
@@ -641,7 +494,6 @@ export default function KanbanBoard({ session }) {
       <TaskDetail
         task={selectedTask}
         isOpen={showTaskDetail}
-        teamMembers={teamMembers}
         onClose={() => setShowTaskDetail(false)}
         onSave={handleSaveTask}
         onDelete={handleDeleteTask}

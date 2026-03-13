@@ -3,63 +3,491 @@
     {
       "id": "reviewrush-001",
       "name": "ReviewRush",
-      "columns": ["Marketing", "Follow-up", "Research", "Delivery"],
+      "columns": [
+        "Marketing",
+        "Follow-up",
+        "Research",
+        "Delivery"
+      ],
       "createdAt": "2026-02-26T04:00:00.000Z",
       "cards": [
-        {"id": "m1", "title": "VSL Script Written", "description": "3-minute sales video script for ReviewRush", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "m2", "title": "VSL Audio Generated", "description": "ElevenLabs with Chad voice clone", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T02:45:00Z"},
-        {"id": "m3", "title": "VSL Text Slides Built", "description": "120 slides synced to audio timestamps", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T03:30:00Z"},
-        {"id": "m4", "title": "HeyGen Avatar VSL", "description": "Generate avatar video with Chad clone - needs credits", "column": "Marketing", "labels": ["blocked"], "createdAt": "2026-02-26T03:55:00Z"},
-        {"id": "m5", "title": "Sales Page Copy", "description": "Long-form sales copy following directive", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "m6", "title": "Facebook Ad Creative", "description": "3 ad variations for cold traffic", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m7", "title": "Instagram Carousel", "description": "5-slide carousel for organic reach", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m8", "title": "YouTube Short Script", "description": "60-second teaser script", "column": "Marketing", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m9", "title": "Email Swipes for Affiliates", "description": "3 email templates for JV partners", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m10", "title": "Twitter Thread", "description": "Review acquisition tips thread", "column": "Marketing", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m11", "title": "LinkedIn Article", "description": "Why reviews matter for local business", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "m12", "title": "Testimonial Graphics", "description": "Design quote cards from beta users", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-
-        {"id": "f1", "title": "7-Email Non-Buyer Sequence", "description": "Build in Global Control for cart abandoners", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f2", "title": "SMS Follow-up Templates", "description": "3 text message templates for leads", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f3", "title": "Retargeting Pixel Setup", "description": "FB and Google pixels on sales page", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f4", "title": "Abandoned Cart Email", "description": "Trigger email for incomplete checkouts", "column": "Follow-up", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f5", "title": "Buyer Onboarding Sequence", "description": "Welcome emails for new customers", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f6", "title": "Review Request to Buyers", "description": "Ask buyers to review after 7 days", "column": "Follow-up", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f7", "title": "Upsell Sequence", "description": "Offer done-for-you service to buyers", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f8", "title": "Re-engagement Campaign", "description": "Win back cold leads after 30 days", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f9", "title": "Webinar Invite Sequence", "description": "Invite list to live demo", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "f10", "title": "Affiliate Recruitment Email", "description": "Invite past buyers to promote", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-
-        {"id": "r1", "title": "Competitor Analysis", "description": "Review 5 competing products", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:00:00Z"},
-        {"id": "r2", "title": "Pricing Research", "description": "Survey similar products pricing", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:30:00Z"},
-        {"id": "r3", "title": "Target Audience Profile", "description": "Define ideal customer avatar", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:45:00Z"},
-        {"id": "r4", "title": "Keyword Research", "description": "SEO keywords for organic traffic", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "r5", "title": "Ad Targeting Research", "description": "FB interests and lookalikes", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "r6", "title": "Industry Stats", "description": "Review statistics for copy", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "r7", "title": "Objection Mapping", "description": "List all potential objections", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "r8", "title": "Beta User Feedback", "description": "Collect testimonials from testers", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "r9", "title": "Platform Comparison", "description": "Compare Google vs Yelp vs FB reviews", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T01:30:00Z"},
-        {"id": "r10", "title": "Legal Compliance Check", "description": "Review guidelines compliance", "column": "Research", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-
-        {"id": "d1", "title": "Sales Page Deployed", "description": "Live on Vercel", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "d2", "title": "Stripe Checkout Working", "description": "$47 payment processing", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T03:00:00Z"},
-        {"id": "d3", "title": "Product Assets Created", "description": "Email templates, scripts, QR guide", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T02:00:00Z"},
-        {"id": "d4", "title": "VSL Embedded on Page", "description": "Text-slides version live", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T03:45:00Z"},
-        {"id": "d5", "title": "Thank You Page", "description": "Post-purchase redirect page", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d6", "title": "Product Delivery Email", "description": "Auto-send assets on purchase", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d7", "title": "Member Area Setup", "description": "Course Sprout or download page", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d8", "title": "Support Email Setup", "description": "Customer support workflow", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d9", "title": "Refund Policy Page", "description": "Terms and refund policy", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d10", "title": "Analytics Setup", "description": "GA4 + FB Pixel tracking", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d11", "title": "A/B Test Setup", "description": "Headline variations test", "column": "Delivery", "labels": ["draft"], "createdAt": "2026-02-26T04:00:00Z"},
-        {"id": "d12", "title": "Launch Checklist Review", "description": "Final QA before traffic", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T04:00:00Z"}
+        {
+          "id": "m1",
+          "title": "VSL Script Written",
+          "description": "3-minute sales video script for ReviewRush",
+          "column": "Marketing",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:30:00Z"
+        },
+        {
+          "id": "m2",
+          "title": "VSL Audio Generated",
+          "description": "ElevenLabs with Chad voice clone",
+          "column": "Marketing",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:45:00Z"
+        },
+        {
+          "id": "m3",
+          "title": "VSL Text Slides Built",
+          "description": "120 slides synced to audio timestamps",
+          "column": "Marketing",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T03:30:00Z"
+        },
+        {
+          "id": "m4",
+          "title": "HeyGen Avatar VSL",
+          "description": "Generate avatar video with Chad clone - needs credits",
+          "column": "Marketing",
+          "labels": [
+            "blocked"
+          ],
+          "createdAt": "2026-02-26T03:55:00Z"
+        },
+        {
+          "id": "m5",
+          "title": "Sales Page Copy",
+          "description": "Long-form sales copy following directive",
+          "column": "Marketing",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:00:00Z"
+        },
+        {
+          "id": "m6",
+          "title": "Facebook Ad Creative",
+          "description": "3 ad variations for cold traffic",
+          "column": "Marketing",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "m7",
+          "title": "Instagram Carousel",
+          "description": "5-slide carousel for organic reach",
+          "column": "Marketing",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "m8",
+          "title": "YouTube Short Script",
+          "description": "60-second teaser script",
+          "column": "Marketing",
+          "labels": [
+            "draft"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "m9",
+          "title": "Email Swipes for Affiliates",
+          "description": "3 email templates for JV partners",
+          "column": "Marketing",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "m10",
+          "title": "Twitter Thread",
+          "description": "Review acquisition tips thread",
+          "column": "Marketing",
+          "labels": [
+            "draft"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "m11",
+          "title": "LinkedIn Article",
+          "description": "Why reviews matter for local business",
+          "column": "Marketing",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "m12",
+          "title": "Testimonial Graphics",
+          "description": "Design quote cards from beta users",
+          "column": "Marketing",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f1",
+          "title": "7-Email Non-Buyer Sequence",
+          "description": "Build in Global Control for cart abandoners",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f2",
+          "title": "SMS Follow-up Templates",
+          "description": "3 text message templates for leads",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f3",
+          "title": "Retargeting Pixel Setup",
+          "description": "FB and Google pixels on sales page",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f4",
+          "title": "Abandoned Cart Email",
+          "description": "Trigger email for incomplete checkouts",
+          "column": "Follow-up",
+          "labels": [
+            "draft"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f5",
+          "title": "Buyer Onboarding Sequence",
+          "description": "Welcome emails for new customers",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f6",
+          "title": "Review Request to Buyers",
+          "description": "Ask buyers to review after 7 days",
+          "column": "Follow-up",
+          "labels": [
+            "draft"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f7",
+          "title": "Upsell Sequence",
+          "description": "Offer done-for-you service to buyers",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f8",
+          "title": "Re-engagement Campaign",
+          "description": "Win back cold leads after 30 days",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f9",
+          "title": "Webinar Invite Sequence",
+          "description": "Invite list to live demo",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "f10",
+          "title": "Affiliate Recruitment Email",
+          "description": "Invite past buyers to promote",
+          "column": "Follow-up",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "r1",
+          "title": "Competitor Analysis",
+          "description": "Review 5 competing products",
+          "column": "Research",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T01:00:00Z"
+        },
+        {
+          "id": "r2",
+          "title": "Pricing Research",
+          "description": "Survey similar products pricing",
+          "column": "Research",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T01:30:00Z"
+        },
+        {
+          "id": "r3",
+          "title": "Target Audience Profile",
+          "description": "Define ideal customer avatar",
+          "column": "Research",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T01:45:00Z"
+        },
+        {
+          "id": "r4",
+          "title": "Keyword Research",
+          "description": "SEO keywords for organic traffic",
+          "column": "Research",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "r5",
+          "title": "Ad Targeting Research",
+          "description": "FB interests and lookalikes",
+          "column": "Research",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "r6",
+          "title": "Industry Stats",
+          "description": "Review statistics for copy",
+          "column": "Research",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:00:00Z"
+        },
+        {
+          "id": "r7",
+          "title": "Objection Mapping",
+          "description": "List all potential objections",
+          "column": "Research",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:00:00Z"
+        },
+        {
+          "id": "r8",
+          "title": "Beta User Feedback",
+          "description": "Collect testimonials from testers",
+          "column": "Research",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "r9",
+          "title": "Platform Comparison",
+          "description": "Compare Google vs Yelp vs FB reviews",
+          "column": "Research",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T01:30:00Z"
+        },
+        {
+          "id": "r10",
+          "title": "Legal Compliance Check",
+          "description": "Review guidelines compliance",
+          "column": "Research",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d1",
+          "title": "Sales Page Deployed",
+          "description": "Live on Vercel",
+          "column": "Delivery",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:30:00Z"
+        },
+        {
+          "id": "d2",
+          "title": "Stripe Checkout Working",
+          "description": "$47 payment processing",
+          "column": "Delivery",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T03:00:00Z"
+        },
+        {
+          "id": "d3",
+          "title": "Product Assets Created",
+          "description": "Email templates, scripts, QR guide",
+          "column": "Delivery",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T02:00:00Z"
+        },
+        {
+          "id": "d4",
+          "title": "VSL Embedded on Page",
+          "description": "Text-slides version live",
+          "column": "Delivery",
+          "labels": [
+            "done"
+          ],
+          "createdAt": "2026-02-26T03:45:00Z"
+        },
+        {
+          "id": "d5",
+          "title": "Thank You Page",
+          "description": "Post-purchase redirect page",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d6",
+          "title": "Product Delivery Email",
+          "description": "Auto-send assets on purchase",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d7",
+          "title": "Member Area Setup",
+          "description": "Course Sprout or download page",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d8",
+          "title": "Support Email Setup",
+          "description": "Customer support workflow",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d9",
+          "title": "Refund Policy Page",
+          "description": "Terms and refund policy",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d10",
+          "title": "Analytics Setup",
+          "description": "GA4 + FB Pixel tracking",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d11",
+          "title": "A/B Test Setup",
+          "description": "Headline variations test",
+          "column": "Delivery",
+          "labels": [
+            "draft"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        },
+        {
+          "id": "d12",
+          "title": "Launch Checklist Review",
+          "description": "Final QA before traffic",
+          "column": "Delivery",
+          "labels": [
+            "pending"
+          ],
+          "createdAt": "2026-02-26T04:00:00Z"
+        }
       ],
       "resources": [
-        {"id": "res1", "title": "Sales Page (Live)", "url": "https://reviewrush-pacino-bots-projects.vercel.app", "type": "link", "createdAt": "2026-02-26T03:00:00Z"},
-        {"id": "res2", "title": "GitHub Repo", "url": "https://github.com/pacinobot2026/reviewrush", "type": "link", "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "res3", "title": "VSL Video", "url": "https://files.catbox.moe/gitmqs.mp4", "type": "link", "createdAt": "2026-02-26T03:45:00Z"},
-        {"id": "res4", "title": "VSL Script", "url": "", "type": "doc", "createdAt": "2026-02-26T02:30:00Z"},
-        {"id": "res5", "title": "Stripe Product ID", "url": "", "type": "note", "createdAt": "2026-02-26T03:00:00Z"}
+        {
+          "id": "res1",
+          "title": "Sales Page (Live)",
+          "url": "https://reviewrush-pacino-bots-projects.vercel.app",
+          "type": "link",
+          "createdAt": "2026-02-26T03:00:00Z"
+        },
+        {
+          "id": "res2",
+          "title": "GitHub Repo",
+          "url": "https://github.com/pacinobot2026/reviewrush",
+          "type": "link",
+          "createdAt": "2026-02-26T02:30:00Z"
+        },
+        {
+          "id": "res3",
+          "title": "VSL Video",
+          "url": "https://files.catbox.moe/gitmqs.mp4",
+          "type": "link",
+          "createdAt": "2026-02-26T03:45:00Z"
+        },
+        {
+          "id": "res4",
+          "title": "VSL Script",
+          "url": "",
+          "type": "doc",
+          "createdAt": "2026-02-26T02:30:00Z"
+        },
+        {
+          "id": "res5",
+          "title": "Stripe Product ID",
+          "url": "",
+          "type": "note",
+          "createdAt": "2026-02-26T03:00:00Z"
+        }
       ]
     }
   ]

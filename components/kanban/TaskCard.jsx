@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { STATUS_LABEL_COLORS, PRIORITY_COLORS } from './constants';
+import { STATUS_LABEL_COLORS, TEAM_MEMBERS, PRIORITY_COLORS } from './constants';
 
-export default function TaskCard({ task, teamMembers = [], onEdit, onToggleSubtask, onDelete, onArchive }) {
+export default function TaskCard({ task, onEdit, onToggleSubtask, onDelete, onArchive }) {
   const [showMenu, setShowMenu] = useState(false);
   const {
     attributes,
@@ -27,7 +27,7 @@ export default function TaskCard({ task, teamMembers = [], onEdit, onToggleSubta
     });
   };
 
-  const assignee = task.assignee ? teamMembers.find(m => m.id === task.assignee) : null;
+  const assignee = task.assignee ? TEAM_MEMBERS.find(m => m.id === task.assignee) : null;
 
   const completedSubtasks = task.subtasks?.filter(s => s.completed).length || 0;
   const totalSubtasks = task.subtasks?.length || 0;

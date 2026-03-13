@@ -19,7 +19,7 @@ const NAV_ITEMS = [
 
 export default function NavigationSidebar() {
   const { pathname } = useRouter();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [hoveredItem, setHoveredItem] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -127,6 +127,7 @@ export default function NavigationSidebar() {
 
             {!mobileOpen && hoveredItem === "signout" && (
               <div className="absolute left-full ml-2 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-md whitespace-nowrap z-50 shadow-2xl border border-gray-700">
+                {user?.email && <div className="text-gray-400 mb-1">{user.email}</div>}
                 Sign Out
                 <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 border-[5px] border-transparent border-r-gray-900" />
               </div>

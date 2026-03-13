@@ -192,9 +192,9 @@ export default function TaskCard({ task, teamMembers = [], onEdit, onToggleSubta
       )}
 
       {/* Tags */}
-      {task.tags.length > 0 && (
+      {(task.tags || []).length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {task.tags.map(tag => (
+          {(task.tags || []).map(tag => (
             <span key={tag} className="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">
               {tag}
             </span>

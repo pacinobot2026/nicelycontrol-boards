@@ -52,7 +52,7 @@ function Articles() {
         const key = data.settings.letterman_api_key;
         setLettermanKey(key);
         setHasKey(true);
-        loadArticles(key);
+        loadArticles();
       } else {
         setHasKey(false);
         setLoading(false);
@@ -90,7 +90,7 @@ function Articles() {
       setShowKeyInput(false);
       setKeyInput("");
       setPublication("all");
-      loadArticles(savedKey);
+      loadArticles();
     } catch {
       setKeyError("Failed to save key. Please try again.");
     } finally {
@@ -103,7 +103,7 @@ function Articles() {
     setApiError("");
     try {
       const res = await fetch("/api/articles?refresh=true", {
-        headers: { Authorization: `Bearer ${lettermanKey}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
 
@@ -142,7 +142,7 @@ function Articles() {
     }
   }
 
-  async function loadArticles(key) {
+  async function loadArticles() {
     // Check cache first
     const cached = getCache("articles");
     if (cached) {
@@ -167,7 +167,7 @@ function Articles() {
     setApiError("");
     try {
       const res = await fetch("/api/articles", {
-        headers: { Authorization: `Bearer ${key}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
       console.log({ data });
@@ -587,10 +587,10 @@ function ArticleCard({ article, onClick }) {
 
   return (
     <div
-      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative"
+      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 cursor-pointer relative"
       onClick={onClick}
     >
-      <div className="aspect-[4/5] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden grayscale hover:grayscale-0 transition-all">
+      <div className="aspect-[4/5] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden transition-all">
         {imageUrl ? (
           <img
             src={imageUrl}

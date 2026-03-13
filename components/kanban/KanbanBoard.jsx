@@ -92,7 +92,7 @@ export default function KanbanBoard({ session }) {
         headers: { 'Authorization': 'Bearer ' + (session?.access_token || '') },
       });
       const data = await res.json();
-      setTasks(data);
+      setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch tasks:', error);
     } finally {

@@ -30,17 +30,15 @@ const groupLabels = {
   external: "\ud83d\udd0c External Software",
 };
 
-const ALLOWED_EMAIL = 'chad@chadnicely.com';
-
 function CommandsPage() {
-  const { session, user } = useAuth();
+  const { session } = useAuth();
   const [commands, setCommands] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCommand, setExpandedCommand] = useState(null);
 
   useEffect(() => {
-    if (!session?.access_token || user?.email !== ALLOWED_EMAIL) return;
+    if (!session?.access_token) return;
     fetch('/api/commands', {
       headers: { Authorization: `Bearer ${session.access_token}` },
     })
@@ -49,24 +47,7 @@ function CommandsPage() {
         if (Array.isArray(data)) setCommands(data);
       })
       .catch(() => {});
-  }, [session, user]);
-
-  // Only Chad can view this page
-  if (user && user.email !== ALLOWED_EMAIL) {
-    return (
-      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
-        <Head><title>Command Center</title></Head>
-        <NavigationSidebar />
-        <main className="flex-1 flex items-center justify-center text-white">
-          <div className="text-center p-12">
-            <div className="text-5xl mb-4">🔒</div>
-            <h1 className="text-2xl font-bold mb-2">Access Restricted</h1>
-            <p className="text-gray-400">This page is only available to authorized users.</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  }, [session]);
 
   const filteredCommands = commands.filter((cmd) => {
     const matchesGroup = selectedGroup === "all" || cmd.command_group === selectedGroup;

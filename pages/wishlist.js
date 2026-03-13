@@ -34,7 +34,7 @@ function Wishlist() {
 
   useEffect(() => {
     if (session) loadShopping();
-  }, [session]);
+  }, [session?.user?.id]);
   useEffect(() => {
     applyFilters(allShopping);
   }, [allShopping, filter, category, sortBy]);
@@ -170,7 +170,7 @@ function Wishlist() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
           <title>Wish List</title>
         </Head>
@@ -183,17 +183,17 @@ function Wishlist() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
         <title>Wish List</title>
       </Head>
       <NavigationSidebar />
-      <main className="flex-1 p-8 pt-16 md:pt-8">
+      <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+              <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
                 🛒 Wishlist
               </h1>
               <p className="text-sm text-gray-400">
@@ -220,7 +220,7 @@ function Wishlist() {
               <button
                 key={key}
                 onClick={() => setFilter(key)}
-                className={`p-4 rounded-xl border cursor-pointer transition-all text-left ${filter === key ? "bg-purple-600 border-purple-600 scale-105" : "bg-gray-800/50 border-gray-600/50 hover:bg-gray-800"}`}
+                className={`p-4 rounded-xl border cursor-pointer transition-all text-left ${filter === key ? "bg-blue-900/20 border border-blue-800" : "bg-gray-800/50 border-gray-600/50 hover:bg-gray-800"}`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{icon}</span>
@@ -248,7 +248,7 @@ function Wishlist() {
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${category === cat ? "bg-purple-600 border-purple-600 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
+                  className={`px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${category === cat ? "bg-blue-900/20 border border-blue-800 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
                 >
                   {cat === "all"
                     ? "All Categories"
@@ -437,7 +437,7 @@ function Wishlist() {
 
 function ShoppingCard({ item, onEdit, onDelete }) {
   return (
-    <div className="group bg-gray-800/70 rounded-xl border border-gray-600/50 p-4 transition-all hover:border-purple-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-900/20">
+    <div className="group bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative p-4">
       {item.image && (
         <img
           src={item.image}

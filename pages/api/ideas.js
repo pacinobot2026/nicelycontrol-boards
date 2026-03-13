@@ -8,10 +8,14 @@ async function getUser(req) {
 }
 
 export default async function handler(req, res) {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('ideas')
       .select('*')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) return res.status(500).json({ error: error.message });
@@ -24,7 +28,7 @@ export default async function handler(req, res) {
 
     const { data, error } = await supabase
       .from('ideas')
-      .insert([{ title, description, category, status, priority, tags }])
+      .insert([{ title, description, category, status, priority, tags, user_id: user.id }])
       .select()
       .single();
 

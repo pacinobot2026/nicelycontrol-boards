@@ -37,7 +37,7 @@ function Ideas() {
 
   async function loadIdeas() {
     // Check cache first
-    const cached = getCache('ideas');
+    const cached = getCache("ideas");
     if (cached) {
       setAllIdeas(cached.ideas || []);
       setLoading(false);
@@ -47,12 +47,10 @@ function Ideas() {
 
     // Fetch fresh data
     try {
-      const res = await fetch("/api/ideas", {
-        
-      });
+      const res = await fetch("/api/ideas", {});
       const data = await res.json();
       setAllIdeas(data.ideas || []);
-      setCache('ideas', { ideas: data.ideas || [] });
+      setCache("ideas", { ideas: data.ideas || [] });
     } catch (err) {
       console.error("Failed to load ideas:", err);
     } finally {
@@ -62,7 +60,7 @@ function Ideas() {
 
   function applyFilters(source) {
     let filtered = source;
-    
+
     // If category is selected, ignore status filter - show all in that category
     if (category !== "all") {
       filtered = filtered.filter((i) => i.category === category);
@@ -178,7 +176,7 @@ function Ideas() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
           <title>Idea Board</title>
         </Head>
@@ -191,17 +189,17 @@ function Ideas() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
         <title>Idea Board</title>
       </Head>
       <NavigationSidebar />
-      <main className="flex-1 p-4 md:p-8 pt-16 md:pt-8">
+      <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-6 flex justify-between items-center gap-3">
+          <div className="mb-6 flex justify-between items-center gap-3 flex-wrap">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+              <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
                 💡 Idea Board
               </h1>
               <p className="text-sm text-gray-400">
@@ -210,7 +208,7 @@ function Ideas() {
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 md:px-6 py-3 bg-purple-600 rounded-lg text-white text-sm font-semibold cursor-pointer hover:scale-105 transition-transform border-none whitespace-nowrap flex-shrink-0"
+              className="ml-auto px-4 md:px-6 py-3 bg-purple-600 rounded-lg text-white text-sm font-semibold cursor-pointer hover:scale-105 transition-transform border-none whitespace-nowrap flex-shrink-0"
             >
               + New Idea
             </button>
@@ -227,7 +225,7 @@ function Ideas() {
               <button
                 key={key}
                 onClick={() => setFilter(key)}
-                className={`p-3 md:p-4 rounded-xl border cursor-pointer transition-all text-left ${filter === key ? "bg-purple-600 border-purple-600 scale-105" : "bg-gray-800/50 border-gray-600/50 hover:bg-gray-800"}`}
+                className={`p-3 md:p-4 rounded-xl border cursor-pointer transition-all text-left ${filter === key ? "bg-blue-900/20 border border-blue-800" : "bg-gray-800/50 border-gray-600/50 hover:bg-gray-800"}`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{icon}</span>
@@ -250,12 +248,12 @@ function Ideas() {
 
           {/* Categories */}
           {categories.length > 0 && (
-            <div className="flex gap-2 flex-wrap mb-4">
+            <div className="flex gap-2 max-[960px]:overflow-x-auto max-[960px]:pb-4 min-[960px]:flex-wrap mb-4">
               {["all", ...categories.map((c) => c.name)].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${category === cat ? "bg-purple-600 border-purple-600 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
+                  className={`px-4 py-2 shrink-0 rounded-lg border text-sm cursor-pointer transition-colors ${category === cat ? "bg-blue-900/20 border border-blue-800 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
                 >
                   {cat === "all"
                     ? "All Categories"
@@ -274,7 +272,7 @@ function Ideas() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-gray-800/50 border border-gray-600/50 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-purple-500"
             />
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -285,7 +283,7 @@ function Ideas() {
                 <option value="title">Title</option>
                 <option value="priority">Priority</option>
               </select>
-              <div className="flex gap-1 bg-gray-800/50 border border-gray-600/50 rounded-lg p-1">
+              <div className="flex gap-1 bg-gray-800/50 border border-gray-600/50 rounded-lg p-1 ml-auto">
                 <button
                   onClick={() => setViewMode("list")}
                   className={`px-4 py-1.5 rounded-md text-sm font-semibold text-white cursor-pointer border-none transition-colors ${viewMode === "list" ? "bg-purple-600" : "bg-transparent"}`}
@@ -514,7 +512,7 @@ function IdeaCardList({ idea, onEdit, onDelete }) {
 
   return (
     <div
-      className="bg-gray-800/70 rounded-lg border border-gray-600/50 px-4 py-3 cursor-pointer hover:border-purple-500/50 hover:bg-gray-800/90 transition-all"
+      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative px-4 py-3"
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div className="flex items-center gap-3 flex-wrap">
@@ -593,7 +591,7 @@ function IdeaCardList({ idea, onEdit, onDelete }) {
 
 function IdeaCardGrid({ idea, onEdit, onDelete }) {
   return (
-    <div className="bg-gray-800/70 rounded-xl border border-gray-600/50 overflow-hidden transition-all hover:border-purple-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-900/20">
+    <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative">
       <div
         className={`flex items-center justify-center min-h-20 ${priorityHeaderClass[idea.priority] || "bg-gray-700"}`}
       >

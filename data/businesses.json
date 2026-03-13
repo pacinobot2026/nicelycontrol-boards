@@ -1,6 +1,38 @@
 {
   "businesses": [
     {
+      "id": "bookedbot-001",
+      "name": "BookedBot",
+      "columns": ["Marketing", "Follow-up", "Research", "Delivery"],
+      "createdAt": "2026-02-26T21:30:00.000Z",
+      "cards": [
+        {"id": "bb-m1", "title": "VSL Script Written", "description": "3-minute sales video script for BookedBot", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T21:30:00Z"},
+        {"id": "bb-m2", "title": "VSL Audio Generated", "description": "ElevenLabs with Chad voice clone", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T21:35:00Z"},
+        {"id": "bb-m3", "title": "VSL Text Slides Built", "description": "57 slides synced to audio timestamps", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T21:40:00Z"},
+        {"id": "bb-m4", "title": "Sales Page Copy", "description": "Full sales page deployed", "column": "Marketing", "labels": ["done"], "createdAt": "2026-02-26T21:25:00Z"},
+        {"id": "bb-m5", "title": "Facebook Ad Creative", "description": "Ad variations for cold traffic", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T21:45:00Z"},
+        {"id": "bb-m6", "title": "Email Swipes", "description": "Launch emails and affiliate swipes", "column": "Marketing", "labels": ["pending"], "createdAt": "2026-02-26T21:45:00Z"},
+
+        {"id": "bb-f1", "title": "7-Email Non-Buyer Sequence", "description": "Build in Global Control", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T21:45:00Z"},
+        {"id": "bb-f2", "title": "Buyer Onboarding Sequence", "description": "Welcome emails for new customers", "column": "Follow-up", "labels": ["pending"], "createdAt": "2026-02-26T21:45:00Z"},
+
+        {"id": "bb-r1", "title": "Target Audience Profile", "description": "Local service businesses - plumbers, HVAC, dentists", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T21:20:00Z"},
+        {"id": "bb-r2", "title": "Industry Stats", "description": "62% calls unanswered, 78% hire first responder", "column": "Research", "labels": ["done"], "createdAt": "2026-02-26T21:20:00Z"},
+
+        {"id": "bb-d1", "title": "Sales Page Deployed", "description": "Live on Vercel at bookedbot.vercel.app", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T21:30:00Z"},
+        {"id": "bb-d2", "title": "Stripe Checkout Working", "description": "$497 payment processing", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T21:35:00Z"},
+        {"id": "bb-d3", "title": "VSL Embedded on Page", "description": "Text-slides version live", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T21:45:00Z"},
+        {"id": "bb-d4", "title": "Product Assets Created", "description": "AI scripts, training materials needed", "column": "Delivery", "labels": ["pending"], "createdAt": "2026-02-26T21:45:00Z"},
+        {"id": "bb-d5", "title": "Thank You / Success Page", "description": "Post-purchase page exists", "column": "Delivery", "labels": ["done"], "createdAt": "2026-02-26T21:35:00Z"}
+      ],
+      "resources": [
+        {"id": "bb-res1", "title": "Sales Page (Live)", "url": "https://bookedbot.vercel.app", "type": "link", "createdAt": "2026-02-26T21:30:00Z"},
+        {"id": "bb-res2", "title": "GitHub Repo", "url": "https://github.com/pacinobot2026/bookedbot", "type": "link", "createdAt": "2026-02-26T21:25:00Z"},
+        {"id": "bb-res3", "title": "VSL Video", "url": "https://files.catbox.moe/mn9oyf.mp4", "type": "link", "createdAt": "2026-02-26T21:45:00Z"},
+        {"id": "bb-res4", "title": "VSL Audio", "url": "https://files.catbox.moe/j303jt.mp3", "type": "link", "createdAt": "2026-02-26T21:35:00Z"}
+      ]
+    },
+    {
       "id": "reviewrush-001",
       "name": "ReviewRush",
       "columns": ["Marketing", "Follow-up", "Research", "Delivery"],

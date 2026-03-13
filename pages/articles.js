@@ -20,6 +20,7 @@ function Articles() {
 
   // Letterman API key management
   const [hasKey, setHasKey] = useState(false);
+  const [lettermanKey, setLettermanKey] = useState("");
   const [keyInput, setKeyInput] = useState("");
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [savingKey, setSavingKey] = useState(false);
@@ -29,10 +30,9 @@ function Articles() {
 
   useEffect(() => {
     if (session) {
-      loadArticles(); // loadArticles is the sole authority on hasKey
-      loadSettings(); // only pre-fills keyInput panel, does NOT affect hasKey
+      loadSettings();
     }
-  }, [session]);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -43,23 +43,31 @@ function Articles() {
   }, []);
 
   async function loadSettings() {
-    // Only used to pre-fill the key input panel - does NOT control hasKey
     try {
       const res = await fetch("/api/settings", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      console.log(session.access_token);
       const data = await res.json();
       if (data.settings?.letterman_api_key) {
-        setKeyInput(""); // key exists, keep input blank (password masked anyway)
+        const key = data.settings.letterman_api_key;
+        setLettermanKey(key);
+        setHasKey(true);
+        loadArticles();
+      } else {
+        setHasKey(false);
+        setLoading(false);
       }
     } catch {
-      // ignore
+      setHasKey(false);
+      setLoading(false);
     }
   }
 
   async function saveKey() {
     if (!keyInput.trim()) return;
+    if (localStorage.getItem("articles")) {
+      localStorage.removeItem("articles"); // Clear cached articles when key changes
+    }
     setSavingKey(true);
     setKeyError("");
     try {
@@ -76,9 +84,12 @@ function Articles() {
       });
 
       if (!res.ok) throw new Error("Failed to save");
+      const savedKey = keyInput.trim();
+      setLettermanKey(savedKey);
       setHasKey(true);
       setShowKeyInput(false);
       setKeyInput("");
+      setPublication("all");
       loadArticles();
     } catch {
       setKeyError("Failed to save key. Please try again.");
@@ -111,7 +122,7 @@ function Articles() {
       setAllArticles(fetched);
 
       // Update cache
-      setCache('articles', { articles: fetched });
+      setCache("articles", { articles: fetched });
 
       const pubMap = {};
       fetched.forEach((a) => {
@@ -133,7 +144,7 @@ function Articles() {
 
   async function loadArticles() {
     // Check cache first
-    const cached = getCache('articles');
+    const cached = getCache("articles");
     if (cached) {
       setAllArticles(cached.articles || []);
       const pubMap = {};
@@ -159,7 +170,7 @@ function Articles() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
-
+      console.log({ data });
       if (data.noKey) {
         setHasKey(false);
         setLoading(false);
@@ -177,7 +188,7 @@ function Articles() {
       setAllArticles(fetched);
 
       // Update cache
-      setCache('articles', { articles: fetched });
+      setCache("articles", { articles: fetched });
 
       const pubMap = {};
       fetched.forEach((a) => {
@@ -232,7 +243,7 @@ function Articles() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
           <title>Article Cue</title>
         </Head>
@@ -245,17 +256,17 @@ function Articles() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
         <title>Article Cue</title>
       </Head>
       <NavigationSidebar />
-      <main className="flex-1 p-8 pt-16 md:pt-8">
+      <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-6 flex justify-between items-start flex-wrap gap-3">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+              <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
                 📰 Article Cue Board
               </h1>
               <p className="text-sm text-gray-400">
@@ -387,11 +398,11 @@ function Articles() {
               </div>
 
               {/* Publications Filter + View Toggle */}
-              <div className="flex justify-between items-center flex-wrap gap-3 mb-4">
-                <div className="flex gap-2 flex-wrap">
+              <div className="flex justify-between items-center flex-wrap gap-3 mb-4 w-full">
+                <div className="flex gap-2 min-[960px]:flex-wrap  max-[960px]:overflow-x-auto max-[960px]:pb-4">
                   <button
                     onClick={() => setPublication("all")}
-                    className={`px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${publication === "all" ? "bg-purple-600 border-purple-600 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
+                    className={`shrink-0 px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${publication === "all" ? "bg-blue-900/20 border border-blue-800 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
                   >
                     All Publications
                   </button>
@@ -399,13 +410,13 @@ function Articles() {
                     <button
                       key={pub.name}
                       onClick={() => setPublication(pub.name)}
-                      className={`px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${publication === pub.name ? "bg-purple-600 border-purple-600 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
+                      className={`shrink-0 px-4 py-2 rounded-lg border text-sm cursor-pointer transition-colors ${publication === pub.name ? "bg-blue-900/20 border border-blue-800 text-white" : "bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-800"}`}
                     >
                       {pub.name} ({pub.count})
                     </button>
                   ))}
                 </div>
-                <div className="flex gap-1 bg-gray-800/50 border border-gray-600/50 rounded-lg p-1">
+                <div className="flex gap-1 bg-gray-800/50 border border-gray-600/50 rounded-lg p-1 ml-auto">
                   <button
                     onClick={() => setViewMode("list")}
                     className={`px-4 py-1.5 rounded-md text-sm font-semibold text-white cursor-pointer border-none transition-colors ${viewMode === "list" ? "bg-purple-600" : "bg-transparent"}`}
@@ -576,10 +587,10 @@ function ArticleCard({ article, onClick }) {
 
   return (
     <div
-      className="bg-gray-800/70 rounded-xl border border-gray-600/50 overflow-hidden cursor-pointer hover:border-purple-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-900/20 transition-all"
+      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 cursor-pointer relative"
       onClick={onClick}
     >
-      <div className="aspect-[4/5] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden grayscale hover:grayscale-0 transition-all">
+      <div className="aspect-[4/5] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden transition-all">
         {imageUrl ? (
           <img
             src={imageUrl}

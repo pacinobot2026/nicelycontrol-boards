@@ -9,7 +9,7 @@ export default function Home() {
   useEffect(() => {
     if (!loading) {
       if (session) {
-        router.replace('/control');
+        window.location.href = 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app';
       } else {
         router.replace('/login');
       }

@@ -45,20 +45,10 @@ async function getLettermanKey(req) {
   return process.env.LETTERMAN_API_KEY || null;
 }
 
-async function getUserId(req) {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return null;
-  const { data: { user } } = await supabase.auth.getUser(token);
-  return user?.id || null;
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
-  const userId = await getUserId(req);
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
   const LETTERMAN_API_KEY = await getLettermanKey(req);
   if (!LETTERMAN_API_KEY) {
@@ -75,7 +65,6 @@ export default async function handler(req, res) {
       const { data: articles, error } = await supabase
         .from('articles')
         .select('*')
-        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -122,7 +111,6 @@ export default async function handler(req, res) {
 
         const articlesToAdd = (Array.isArray(newsletters) ? newsletters : []).map(article => ({
           id: article._id,
-          user_id: userId,
           title: article.name || article.title || 'Untitled',
           publication: pubName,
           publication_id: pubId,

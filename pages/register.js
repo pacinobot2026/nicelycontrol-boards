@@ -23,20 +23,12 @@ export default function Register() {
 
     setLoading(true);
 
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    const { error } = await supabaseClient.auth.signUp({ email, password });
 
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      // Auto-confirm email so user can sign in immediately without verification
-      if (data?.user?.id) {
-        await fetch('/api/auth/confirm-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: data.user.id }),
-        });
-      }
       router.push('/login');
     }
   }

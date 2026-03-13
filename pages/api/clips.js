@@ -132,11 +132,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
-  const { data: { user } } = await supabase.auth.getUser(token);
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
-  const userId = user.id;
+  // Public access - no auth required
+  const userId = null;
 
   const { filter, category, sortBy } = req.query;
 

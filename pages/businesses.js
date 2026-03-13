@@ -272,17 +272,18 @@ export default function BusinessBoard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+    <div style={{ display: "flex", minHeight: "100vh", background: "#0D1423" }}>
       <Head>
         <title>Business Board</title>
       </Head>
       <NavigationSidebar />
 
       <main
-        className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative"
         style={{
+          flex: 1,
           minWidth: 0,
           overflowX: "auto",
+          padding: isMobile ? "16px" : "24px",
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         }}
@@ -310,8 +311,10 @@ export default function BusinessBoard() {
               }}
             >
               <h1
-                className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text"
                 style={{
+                  fontSize: isMobile ? "22px" : "28px",
+                  fontWeight: "700",
+                  color: "#fff",
                   margin: 0,
                 }}
               >
@@ -653,12 +656,9 @@ export default function BusinessBoard() {
                   style={{
                     background:
                       (activeColumn || columns[0]) === col
-                        ? "rgba(30, 58, 138, 0.2)"
+                        ? "#8b5cf6"
                         : "#1f2937",
-                    border:
-                      (activeColumn || columns[0]) === col
-                        ? "1px solid #1e40af"
-                        : "none",
+                    border: "none",
                     borderRadius: "8px",
                     padding: "10px 16px",
                     color: "#fff",
@@ -805,9 +805,23 @@ export default function BusinessBoard() {
                             draggable
                             onDragStart={(e) => handleDragStart(e, card)}
                             onClick={() => setShowEditCard(card)}
-                            className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative"
                             style={{
+                              background: "#1f2937",
+                              borderRadius: "8px",
                               padding: "14px",
+                              cursor: "pointer",
+                              border: "1px solid #374151",
+                              transition: "transform 0.1s, box-shadow 0.1s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform =
+                                "translateY(-2px)";
+                              e.currentTarget.style.boxShadow =
+                                "0 4px 12px rgba(0,0,0,0.3)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.boxShadow = "none";
                             }}
                           >
                             {/* Labels */}

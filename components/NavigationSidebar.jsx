@@ -23,7 +23,7 @@ export default function NavigationSidebar() {
 
   return (
     <div 
-      className="w-14 h-full bg-[#0a0a0a] border-r border-gray-800 flex flex-col"
+      className="w-14 h-full bg-[#0a0a0a] border-r border-gray-900 flex flex-col"
       style={{ minHeight: '100vh' }}
     >
       {/* Logo */}

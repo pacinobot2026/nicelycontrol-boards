@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
@@ -1264,15 +1264,21 @@ function ClipCard({
   onDelete,
   showActions,
 }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [videoError, setVideoError] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const videoRef = React.useRef(null);
   const embed = getVideoEmbed(clip.clip_url);
+
+  function handlePlayClick(e) {
+    e.stopPropagation();
+    setPlaying(true);
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  }
 
   return (
     <div
-      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all relative"
     >
       {/* Video / thumbnail */}
       <div className="aspect-[4/5] bg-black relative overflow-hidden">
@@ -1283,19 +1289,33 @@ function ClipCard({
             allowFullScreen
             style={{ width: "100%", height: "100%", border: "none" }}
           />
-        ) : embed.type === "video" && !videoError ? (
-          <video
-            src={embed.src}
-            controls
-            preload="metadata"
-            playsInline
-            className="w-full h-full object-cover"
-            style={{
-              filter: isHovered ? "grayscale(0%)" : "grayscale(100%)",
-              transition: "filter 0.3s ease",
-            }}
-            onError={() => setVideoError(true)}
-          />
+        ) : embed.type === "video" ? (
+          <div className="w-full h-full relative">
+            <video
+              ref={videoRef}
+              src={embed.src}
+              controls
+              preload="metadata"
+              playsInline
+              className="w-full h-full object-cover"
+              onPlay={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+            />
+            {!playing && (
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center gap-3 cursor-pointer"
+                style={{ background: "rgba(0,0,0,0.45)" }}
+                onClick={handlePlayClick}
+              >
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center transition-colors"
+                  style={{ background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.4)" }}
+                >
+                  <span style={{ fontSize: "24px", marginLeft: "4px", color: "#fff" }}>▶</span>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex flex-col items-center justify-center gap-2 text-white">
             <span className="text-4xl">📱</span>

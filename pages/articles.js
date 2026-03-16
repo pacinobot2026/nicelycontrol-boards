@@ -20,7 +20,6 @@ function Articles() {
 
   // Letterman API key management
   const [hasKey, setHasKey] = useState(false);
-  const [lettermanKey, setLettermanKey] = useState("");
   const [keyInput, setKeyInput] = useState("");
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [savingKey, setSavingKey] = useState(false);
@@ -49,10 +48,8 @@ function Articles() {
       });
       const data = await res.json();
       if (data.settings?.letterman_api_key) {
-        const key = data.settings.letterman_api_key;
-        setLettermanKey(key);
         setHasKey(true);
-        loadArticles(key);
+        loadArticles();
       } else {
         setHasKey(false);
         setLoading(false);
@@ -84,13 +81,11 @@ function Articles() {
       });
 
       if (!res.ok) throw new Error("Failed to save");
-      const savedKey = keyInput.trim();
-      setLettermanKey(savedKey);
       setHasKey(true);
       setShowKeyInput(false);
       setKeyInput("");
       setPublication("all");
-      loadArticles(savedKey);
+      loadArticles();
     } catch {
       setKeyError("Failed to save key. Please try again.");
     } finally {
@@ -103,7 +98,7 @@ function Articles() {
     setApiError("");
     try {
       const res = await fetch("/api/articles?refresh=true", {
-        headers: { Authorization: `Bearer ${lettermanKey}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
 
@@ -142,7 +137,7 @@ function Articles() {
     }
   }
 
-  async function loadArticles(key) {
+  async function loadArticles() {
     // Check cache first
     const cached = getCache("articles");
     if (cached) {
@@ -167,7 +162,7 @@ function Articles() {
     setApiError("");
     try {
       const res = await fetch("/api/articles", {
-        headers: { Authorization: `Bearer ${key}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
       console.log({ data });

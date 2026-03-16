@@ -106,6 +106,7 @@ function Dashboard() {
   const [nextJob, setNextJob] = useState(null);
   const [data, setData] = useState(null);
   const [dataLoading, setDataLoading] = useState(true);
+  const [tokenCopied, setTokenCopied] = useState(false);
 
   // Fetch real data from /api/control
   useEffect(() => {
@@ -235,6 +236,40 @@ function Dashboard() {
               </div>
             </div>
           )}
+
+          {/* API Access */}
+          <div className={`mb-6 bg-gray-900/50 border border-gray-700/50 rounded-xl p-5 ${loaded ? 'animate-fadeInUp delay-150' : 'opacity-0'}`}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-white font-semibold flex items-center gap-2"><span>🔐</span> API Access</h3>
+              <a href="/api-docs" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
+                View Swagger Docs →
+              </a>
+            </div>
+            <p className="text-gray-400 text-sm mb-3">
+              Copy your bearer token to authenticate requests in Swagger or any API client. Pass it as{' '}
+              <code className="text-cyan-300 bg-gray-800 px-1 rounded text-xs">Authorization: Bearer &lt;token&gt;</code>
+            </p>
+            <div className="flex gap-3 flex-wrap items-center">
+              <input
+                type="text"
+                readOnly
+                value={session?.access_token ? `${session.access_token.slice(0, 20)}••••••••••••••••••••` : '—'}
+                className="flex-1 min-w-48 bg-gray-800/70 border border-gray-700/50 rounded-lg px-4 py-2.5 text-gray-300 text-sm outline-none font-mono cursor-default select-none"
+              />
+              <button
+                onClick={() => {
+                  if (!session?.access_token) return;
+                  navigator.clipboard.writeText(session.access_token);
+                  setTokenCopied(true);
+                  setTimeout(() => setTokenCopied(false), 2000);
+                }}
+                className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold rounded-lg cursor-pointer transition-colors"
+              >
+                {tokenCopied ? '✓ Copied!' : 'Copy Token'}
+              </button>
+            </div>
+            <p className="text-gray-600 text-xs mt-3">Token expires when your session ends. Re-login to get a fresh token.</p>
+          </div>
 
           {/* Stats Bar */}
           <div className={`grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6 ${loaded ? 'animate-fadeInUp delay-200' : 'opacity-0'}`}>

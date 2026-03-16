@@ -41,8 +41,7 @@ async function getLettermanKey(req) {
   } catch (err) {
     console.error('getLettermanKey error:', err.message);
   }
-  // Fall back to environment variable
-  return process.env.LETTERMAN_API_KEY || null;
+  return null;
 }
 
 async function getUserId(req) {
@@ -114,7 +113,7 @@ export default async function handler(req, res) {
       const pubName = pub.name || 'Unknown';
       try {
         const response = await fetch(
-          `${LETTERMAN_BASE}/${pubId}/newsletters`,
+          `${LETTERMAN_BASE}/${pubId}/newsletters?type=ARTICLE`,
           { headers, signal: AbortSignal.timeout(10000) }
         );
         const data = await response.json();

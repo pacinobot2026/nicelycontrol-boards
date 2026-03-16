@@ -4,63 +4,6 @@ import NavigationSidebar from "../components/NavigationSidebar";
 import withAuth from "../lib/withAuth";
 import { useAuth } from "../lib/authContext";
 
-const COMMANDS_FALLBACK = [
-  {
-    name: "/idea",
-    category: "content",
-    command_group: "resources",
-    description: "Add idea to Idea Board with suggested category",
-    steps: ["Ask what the idea is", "Suggest the category", "Create idea in board"],
-  },
-  {
-    name: "/resource",
-    category: "content",
-    command_group: "resources",
-    description: "Add resource to Resource Library with suggested category",
-    steps: ["Ask what the resource is", "Suggest the category", "Create resource in library"],
-  },
-  {
-    name: "/create business",
-    category: "business",
-    command_group: "resources",
-    description: "PRODUCT CREATION ENGINE — Full 6-stage revenue mode from idea to scale",
-    steps: [
-      "STAGE 1: Generate 10 opportunities with scoring",
-      "STAGE 2: Build business blueprint",
-      "STAGE 3: Build product + sales page + VSL + Stripe",
-      "STAGE 4: Create traffic assets (organic + paid + email)",
-      "STAGE 5: Deploy traffic + launch ads",
-      "STAGE 6: Optimization + scale plan",
-      "✅ Updates Business Board throughout process",
-    ],
-    shortcut: 'Type "/create business" to start full product creation',
-  },
-  {
-    name: "/broadcast",
-    category: "email",
-    command_group: "titanium",
-    description: "Create and send broadcast email via Global Control",
-    steps: [
-      "Ask what email is about",
-      "Rewrite content + create subject/pre-header",
-      "Create PopLink for URL",
-      "ASK: Re-engage inactives? (YES/NO)",
-    ],
-    shortcut: 'Type "/broadcast" or say "write me an email"',
-    logo: "/logos/globalcontrol.png",
-  },
-  {
-    name: "/systemhealth",
-    category: "system",
-    command_group: "external",
-    description: "Run health check on all APIs and properties",
-    steps: [
-      "Check 5 APIs: GC, PopLinks/MintBird, Course Sprout, Letterman, SOB",
-      "Check 9 URLs: Key properties",
-      "Report any failures",
-    ],
-  },
-];
 
 const CATEGORIES = ["business", "email", "content", "links", "contacts", "system"];
 const GROUPS = ["titanium", "resources", "external"];
@@ -102,7 +45,7 @@ const EMPTY_FORM = {
 
 function CommandsPage() {
   const { session } = useAuth();
-  const [commands, setCommands] = useState(COMMANDS_FALLBACK);
+  const [commands, setCommands] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCommand, setExpandedCommand] = useState(null);
@@ -119,7 +62,7 @@ function CommandsPage() {
     if (!session?.access_token) return;
     fetch("/api/commands", { headers: { Authorization: `Bearer ${session.access_token}` } })
       .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data) && data.length > 0) setCommands(data); })
+      .then((data) => { setCommands(Array.isArray(data) ? data : []); })
       .catch(() => {});
   }, [session]);
 

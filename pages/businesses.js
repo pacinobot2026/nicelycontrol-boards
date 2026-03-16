@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
 import { getCache, setCache } from "../lib/cache";
+import { useAuth } from "../lib/authContext";
+import withAuth from "../lib/withAuth";
 
 const DEFAULT_COLUMNS = ["Marketing", "Follow-up", "Research", "Delivery"];
 const LABEL_COLORS = {
@@ -13,7 +15,8 @@ const LABEL_COLORS = {
   blocked: { bg: "#ef4444", text: "#fff" },
 };
 
-export default function BusinessBoard() {
+function BusinessBoard() {
+  const { session } = useAuth();
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,8 +49,8 @@ export default function BusinessBoard() {
   }, []);
 
   useEffect(() => {
-    fetchBusinesses();
-  }, []);
+    if (session?.access_token) fetchBusinesses();
+  }, [session?.access_token]);
 
   const fetchBusinesses = async () => {
     // Check cache first
@@ -62,13 +65,19 @@ export default function BusinessBoard() {
 
     // Fetch fresh data
     try {
-      const res = await fetch("/api/businesses");
+      const res = await fetch("/api/businesses", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
       const data = await res.json();
-      setBusinesses(data.businesses || []);
-      if (data.businesses?.length > 0 && !selectedBusiness) {
-        setSelectedBusiness(data.businesses[0]);
+      const mapped = (data.businesses || []).map(b => ({
+        ...b,
+        cards: (b.cards || []).map(c => ({ ...c, column: c.column_name ?? c.column })),
+      }));
+      setBusinesses(mapped);
+      if (mapped.length > 0 && !selectedBusiness) {
+        setSelectedBusiness(mapped[0]);
       }
-      setCache('businesses', { businesses: data.businesses || [] });
+      setCache('businesses', { businesses: mapped });
       setLoading(false);
     } catch (err) {
       console.error("Error fetching businesses:", err);
@@ -80,7 +89,7 @@ export default function BusinessBoard() {
     try {
       await fetch("/api/businesses", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
         body: JSON.stringify({ action: "update", business }),
       });
     } catch (err) {
@@ -105,7 +114,7 @@ export default function BusinessBoard() {
     setShowAddBusiness(false);
     await fetch("/api/businesses", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
       body: JSON.stringify({ action: "add", business: newBiz }),
     });
   };
@@ -1359,3 +1368,5 @@ export default function BusinessBoard() {
     </div>
   );
 }
+
+export default withAuth(BusinessBoard);

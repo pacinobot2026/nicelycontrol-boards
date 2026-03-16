@@ -28,8 +28,8 @@ function Ideas() {
   const [viewMode, setViewMode] = useState("cards");
 
   useEffect(() => {
-    loadIdeas();
-  }, []);
+    if (session?.access_token) loadIdeas();
+  }, [session?.access_token]);
 
   useEffect(() => {
     applyFilters(allIdeas);
@@ -47,7 +47,9 @@ function Ideas() {
 
     // Fetch fresh data
     try {
-      const res = await fetch("/api/ideas", {});
+      const res = await fetch("/api/ideas", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
       const data = await res.json();
       setAllIdeas(data.ideas || []);
       setCache("ideas", { ideas: data.ideas || [] });

@@ -1408,7 +1408,7 @@ const spec = {
         summary: 'List vault items',
         description: 'Returns all items in the Operator Vault (links, files, notes), newest first.',
         tags: ['Vault'],
-        security: [],
+        security: [{ bearerAuth: [] }],
         responses: {
           200: {
             description: 'Vault items',
@@ -1419,7 +1419,74 @@ const spec = {
               },
             },
           },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
           500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      post: {
+        summary: 'Create a vault item',
+        description: 'Creates a new vault item.',
+        tags: ['Vault'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['title'],
+                properties: {
+                  title: { type: 'string', example: 'Brand Guide v1' },
+                  category: { type: 'string', enum: ['Sales Pages', 'Guides', 'Emails', 'Product Templates', 'Landing Pages', 'VSL Scripts', 'Social Media', 'Course Content', 'Ad Copy', 'Webinar Slides'], example: 'Guides' },
+                  type: { type: 'string', enum: ['Image', 'File', 'Screenshot', 'PPT', 'URL', 'Video', 'Text', 'Design Link'], example: 'URL' },
+                  url: { type: 'string', example: 'https://notion.so/brand-guide' },
+                  notes: { type: 'string', example: 'Main brand guidelines doc' },
+                  tags: { type: 'array', items: { type: 'string' }, example: ['brand', 'design'] },
+                },
+              },
+              example: { title: 'Brand Guide v1', category: 'Guides', type: 'URL', url: 'https://notion.so/brand-guide', notes: 'Main brand guidelines', tags: ['brand'] },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Created', content: { 'application/json': { schema: { type: 'object', properties: { item: { $ref: '#/components/schemas/VaultItem' } } } } } },
+          400: { description: 'Missing title', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      put: {
+        summary: 'Update a vault item',
+        description: 'Updates an existing vault item by ID.',
+        tags: ['Vault'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { type: 'object', required: ['id'], properties: { id: { type: 'string', example: '21' }, title: { type: 'string' }, category: { type: 'string' }, type: { type: 'string' }, url: { type: 'string' }, notes: { type: 'string' }, tags: { type: 'array', items: { type: 'string' } } } },
+              example: { id: '21', title: 'Brand Guide v2', notes: 'Updated for 2026' },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Updated', content: { 'application/json': { schema: { type: 'object', properties: { item: { $ref: '#/components/schemas/VaultItem' } } } } } },
+          400: { description: 'id required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      delete: {
+        summary: 'Delete a vault item',
+        description: 'Deletes a vault item by ID.',
+        tags: ['Vault'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', required: ['id'], properties: { id: { type: 'string', example: '21' } } }, example: { id: '21' } } },
+        },
+        responses: {
+          200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'id required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
         },
       },
     },
@@ -1745,6 +1812,79 @@ const spec = {
           },
           401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { error: 'Unauthorized' } } } },
           500: { description: 'Server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      post: {
+        summary: 'Create a Command Center entity',
+        description: 'Creates a new entry in one of the 7 Command Center tables. Use the `entity` field to specify which table.\n\n**entity values:** `api_key`, `model`, `cron_job`, `task`, `channel`, `integration`, `feature`\n\n**Fields by entity:**\n- `api_key`: name, key_masked, status (`connected`|`disconnected`), spent, budget, position\n- `model`: name, provider, status (`active`|`available`|`disabled`), position\n- `cron_job`: name, schedule, status (`active`|`paused`|`warning`), position\n- `task`: title, priority (`high`|`med`|`low`), task_status (`in_progress`|`backlog`|`done`), position\n- `channel`: name, subtitle, type, status (`connected`|`disconnected`), position\n- `integration`: name, key_masked, status, position\n- `feature`: name, position',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['entity'],
+                properties: {
+                  entity: { type: 'string', enum: ['api_key', 'model', 'cron_job', 'task', 'channel', 'integration', 'feature'], example: 'model' },
+                  name: { type: 'string', example: 'GPT-4o' },
+                  provider: { type: 'string', example: 'OpenAI' },
+                  status: { type: 'string', example: 'active' },
+                  position: { type: 'integer', example: 0 },
+                },
+              },
+              examples: {
+                api_key: { summary: 'Add API key', value: { entity: 'api_key', name: 'OpenAI', key_masked: 'sk-••••••Xk9z', status: 'connected', spent: 8.40, budget: 40, position: 0 } },
+                model: { summary: 'Add model', value: { entity: 'model', name: 'GPT-4o', provider: 'OpenAI', status: 'active', position: 0 } },
+                cron_job: { summary: 'Add cron job', value: { entity: 'cron_job', name: 'Daily Digest', schedule: '8:00 AM daily', status: 'active', position: 0 } },
+                task: { summary: 'Add task', value: { entity: 'task', title: 'Set up automations', priority: 'high', task_status: 'backlog', position: 0 } },
+                channel: { summary: 'Add channel', value: { entity: 'channel', name: 'Slack', subtitle: 'Workspace', type: 'messaging', status: 'connected', position: 0 } },
+                integration: { summary: 'Add integration', value: { entity: 'integration', name: 'Zapier', key_masked: 'zap-••••••Kw2', status: 'active', position: 0 } },
+                feature: { summary: 'Add feature', value: { entity: 'feature', name: 'Auto-scheduling', position: 0 } },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: 'Created', content: { 'application/json': { schema: { type: 'object', properties: { item: { type: 'object' } } } } } },
+          400: { description: 'Invalid entity type', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      put: {
+        summary: 'Update a Command Center entity',
+        description: 'Updates an existing Command Center entry. Requires `entity` and `id` plus the fields to update.',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { type: 'object', required: ['entity', 'id'], properties: { entity: { type: 'string', enum: ['api_key', 'model', 'cron_job', 'task', 'channel', 'integration', 'feature'] }, id: { type: 'string', format: 'uuid' } } },
+              example: { entity: 'task', id: 'uuid-here', task_status: 'done' },
+            },
+          },
+        },
+        responses: {
+          200: { description: 'Updated', content: { 'application/json': { schema: { type: 'object', properties: { item: { type: 'object' } } } } } },
+          400: { description: 'Invalid entity or missing id', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      delete: {
+        summary: 'Delete a Command Center entity',
+        description: 'Deletes a Command Center entry by entity type and id.',
+        tags: ['Command Center'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { type: 'object', required: ['entity', 'id'], properties: { entity: { type: 'string', enum: ['api_key', 'model', 'cron_job', 'task', 'channel', 'integration', 'feature'] }, id: { type: 'string', format: 'uuid' } } }, example: { entity: 'feature', id: 'uuid-here' } } },
+        },
+        responses: {
+          200: { description: 'Deleted', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } },
+          400: { description: 'Invalid entity or missing id', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          401: { description: 'Unauthorized', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
         },
       },
     },

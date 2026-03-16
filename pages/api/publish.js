@@ -33,68 +33,55 @@ export default async function handler(req, res) {
         
         const videoBuffer = Buffer.from(videoResponse.data);
         
-        // Step 2: Upload to Post Bridge
-        const formData = new FormData();
-        const blob = new Blob([videoBuffer], { type: 'video/mp4' });
-        formData.append('file', blob, `${clip.clip_id}.mp4`);
-        
-        const uploadResponse = await axios.post(
-          `${POSTBRIDGE_BASE}/media`,
-          formData,
+        // Step 2: Upload to Post Bridge using signed URL flow
+        const filename = `${clip.clip_id}.mp4`;
+        const urlRes = await axios.post(
+          `${POSTBRIDGE_BASE}/media/create-upload-url`,
+          { name: filename, mime_type: 'video/mp4', size_bytes: videoBuffer.length },
+          { headers: { 'Authorization': `Bearer ${POSTBRIDGE_API_KEY}`, 'Content-Type': 'application/json' } }
+        );
+        const { media_id: mediaId, upload_url: uploadUrl } = urlRes.data;
+
+        // PUT the raw file to the signed URL (no auth header needed)
+        await axios.put(uploadUrl, videoBuffer, {
+          headers: { 'Content-Type': 'video/mp4' }
+        });
+
+        // Step 3: Get social accounts (publish to all)
+        const accountsResponse = await axios.get(
+          `${POSTBRIDGE_BASE}/social-accounts?limit=100`,
+          { headers: { 'Authorization': `Bearer ${POSTBRIDGE_API_KEY}` } }
+        );
+
+        const accounts = accountsResponse.data.data || [];
+
+        // Step 4: Create one post for all accounts (immediate publish)
+        await axios.post(
+          `${POSTBRIDGE_BASE}/posts`,
+          {
+            caption: clip.suggested_caption || clip.title,
+            media: [mediaId],
+            social_accounts: accounts.map(a => a.id),
+          },
           {
             headers: {
               'Authorization': `Bearer ${POSTBRIDGE_API_KEY}`,
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'application/json'
             }
           }
         );
-        
-        const mediaId = uploadResponse.data.id;
-        
-        // Step 3: Get social accounts (we'll publish to all active ones)
-        const accountsResponse = await axios.get(
-          `${POSTBRIDGE_BASE}/social-accounts?limit=100`,
-          {
-            headers: {
-              'Authorization': `Bearer ${POSTBRIDGE_API_KEY}`
-            }
-          }
-        );
-        
-        const activeAccounts = accountsResponse.data.data.filter(
-          a => a.status === 'active'
-        );
-        
-        // Step 4: Create post for each active account
-        for (const account of activeAccounts) {
-          await axios.post(
-            `${POSTBRIDGE_BASE}/posts`,
-            {
-              content: clip.suggested_caption || clip.title,
-              media_ids: [mediaId],
-              social_account_ids: [account.id],
-              status: 'published'
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${POSTBRIDGE_API_KEY}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-        }
         
         // Update clip status
         await updateClip(clip.clip_id, {
           post_status: 'published',
           published_at: new Date().toISOString(),
-          published_to_platforms: activeAccounts.map(a => a.platform).join(', ')
+          published_to_platforms: accounts.map(a => a.platform).join(', ')
         });
-        
+
         results.push({
           clip_id: clip.clip_id,
           success: true,
-          platforms: activeAccounts.map(a => a.platform)
+          platforms: accounts.map(a => a.platform)
         });
         
       } catch (error) {

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { COLUMNS, PROJECTS } from './constants';
 
-export default function TaskModal({ task, initialStatus, isOpen, onClose, onSave, teamMembers = [] }) {
+export default function TaskModal({ task, initialStatus, isOpen, onClose, onSave, teamMembers = [], projects: projectsProp }) {
+  const EFFECTIVE_PROJECTS = projectsProp ?? PROJECTS;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Med');
@@ -112,8 +113,8 @@ export default function TaskModal({ task, initialStatus, isOpen, onClose, onSave
                   className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   required
                 >
-                  <option value="">Select project...</option>
-                  {PROJECTS.map(p => (
+                  <option value="">No project</option>
+                  {EFFECTIVE_PROJECTS.map(p => (
                     <option key={p.id} value={p.id}>{p.icon} {p.name}</option>
                   ))}
                 </select>

@@ -1,11 +1,22 @@
-export default function ProjectSidebar({ projects, selectedProject, onSelectProject }) {
+export default function ProjectSidebar({ projects, selectedProject, onSelectProject, onAddProject }) {
   const totalCount = projects.reduce((sum, p) => sum + p.count, 0);
 
   return (
     <div className="w-60 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-gray-800 flex items-center justify-between">
         <h2 className="text-white font-semibold">Projects</h2>
+        {onAddProject && (
+          <button
+            onClick={onAddProject}
+            className="w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+            title="Add project"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Projects List */}

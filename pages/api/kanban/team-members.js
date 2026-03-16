@@ -20,6 +20,7 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: true });
     if (error) return res.status(500).json({ error: error.message });
     return res.json(data);
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
     if (!name?.trim()) return res.status(400).json({ error: 'Name required' });
     const { data, error } = await supabase
       .from('team_members')
-      .insert({ name: name.trim(), avatar: avatar || '👤' })
+      .insert({ name: name.trim(), avatar: avatar || '👤', user_id: user.id })
       .select()
       .single();
     if (error) return res.status(500).json({ error: error.message });
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: 'ID required' });
-    const { error } = await supabase.from('team_members').delete().eq('id', id);
+    const { error } = await supabase.from('team_members').delete().eq('id', id).eq('user_id', user.id);
     if (error) return res.status(500).json({ error: error.message });
     return res.json({ success: true });
   }

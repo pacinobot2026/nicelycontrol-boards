@@ -1,6 +1,16 @@
 -- ============================================================
 -- Full Database Schema
--- Run this once in the Supabase SQL Editor to set up all tables.
+--
+-- SETUP INSTRUCTIONS:
+-- 1. Create a new project at https://supabase.com
+-- 2. Go to SQL Editor in your Supabase dashboard
+-- 3. Paste this entire file and click Run
+-- 4. Copy your Project URL and service_role key from
+--    Settings > API and add them to your .env.local file:
+--      SUPABASE_URL=https://your-project.supabase.co
+--      SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+--
+-- This script is idempotent — safe to run multiple times.
 -- ============================================================
 
 

@@ -2659,62 +2659,6 @@ const spec = {
         },
       },
     },
-
-    '/systems': {
-      get: {
-        summary: 'Get system health status',
-        description: 'Pings configured APIs (MintBird, Global Control, Course Sprout, Letterman, SaaSOnboard) and checks reachability of 7 URLs. Returns online/total counts and per-system status.',
-        tags: ['Systems'],
-        security: [],
-        responses: {
-          200: {
-            description: 'System health results',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    apis: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          name: { type: 'string', example: 'MintBird' },
-                          online: { type: 'boolean', example: true },
-                          latency: { type: 'integer', description: 'Response time in ms', example: 120 },
-                        },
-                      },
-                    },
-                    urls: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          name: { type: 'string', example: 'Sales Page' },
-                          url: { type: 'string', example: 'https://example.com/sales' },
-                          online: { type: 'boolean', example: true },
-                          latency: { type: 'integer', example: 95 },
-                        },
-                      },
-                    },
-                    online: { type: 'integer', example: 11 },
-                    total: { type: 'integer', example: 12 },
-                    allOnline: { type: 'boolean', example: false },
-                    lastCheck: { type: 'string', format: 'date-time', example: '2026-03-12T02:33:35.000Z' },
-                  },
-                },
-                example: {
-                  apis: [{ name: 'MintBird', online: true, latency: 120 }, { name: 'Global Control', online: true, latency: 85 }],
-                  urls: [{ name: 'Sales Page', url: 'https://example.com/sales', online: true, latency: 95 }],
-                  online: 11, total: 12, allOnline: false,
-                  lastCheck: '2026-03-12T02:33:35.000Z',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
   },
 };
 

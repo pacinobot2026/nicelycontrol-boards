@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import NavigationSidebar from "../components/NavigationSidebar";
+import ManageBusinessesModal from "../components/ManageBusinessesModal";
 import { getCache, setCache } from "../lib/cache";
 
 const DEFAULT_COLUMNS = ["Marketing", "Follow-up", "Research", "Delivery"];
@@ -18,6 +19,7 @@ export default function BusinessBoard() {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddBusiness, setShowAddBusiness] = useState(false);
+  const [showManageBusinesses, setShowManageBusinesses] = useState(false);
   const [showAddCard, setShowAddCard] = useState(null); // column name or null
   const [showEditCard, setShowEditCard] = useState(null);
   const [newBusinessName, setNewBusinessName] = useState("");
@@ -73,6 +75,24 @@ export default function BusinessBoard() {
     } catch (err) {
       console.error("Error fetching businesses:", err);
       setLoading(false);
+    }
+  };
+
+  const handleManageRefresh = async () => {
+    const res = await fetch("/api/businesses");
+    const data = await res.json();
+    const newBusinesses = data.businesses || [];
+    setBusinesses(newBusinesses);
+    setCache('businesses', { businesses: newBusinesses });
+    
+    // If currently selected business was deleted, select the first available one
+    if (selectedBusiness) {
+      const stillExists = newBusinesses.find(b => b.id === selectedBusiness.id);
+      if (!stillExists && newBusinesses.length > 0) {
+        setSelectedBusiness(newBusinesses[0]);
+      } else if (!stillExists && newBusinesses.length === 0) {
+        setSelectedBusiness(null);
+      }
     }
   };
 
@@ -364,6 +384,29 @@ export default function BusinessBoard() {
                 }}
               >
                 + Add Business
+              </button>
+
+              <button
+                onClick={() => setShowManageBusinesses(true)}
+                style={{
+                  background: "#374151",
+                  border: "1px solid #4b5563",
+                  borderRadius: "8px",
+                  padding: "10px",
+                  color: "#d1d5db",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+                title="Manage Businesses"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
               </button>
             </div>
 
@@ -1355,6 +1398,15 @@ export default function BusinessBoard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Manage Businesses Modal */}
+      {showManageBusinesses && (
+        <ManageBusinessesModal
+          businesses={businesses}
+          onClose={() => setShowManageBusinesses(false)}
+          onRefresh={handleManageRefresh}
+        />
       )}
     </div>
   );

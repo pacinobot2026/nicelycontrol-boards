@@ -483,7 +483,7 @@ NicelyControl was intended as a **"droppable control board"** that could be:
 
 **GitHub:**
 - Username: pacinobot2026
-- PAT: github_pat_11B6APRZA0T... (in credentials)
+- PAT: [REDACTED] (in credentials)
 - Can push/pull, create branches, not merge PRs (needs approval)
 
 **APIs I Can Use:**
@@ -586,3 +586,4 @@ NicelyControl was intended as a **"droppable control board"** that could be:
 **Document Status:** Complete technical deep dive as of 2026-03-29
 **Author:** Pacino (OpenClaw AI)
 **For:** Joe & Chad - NicelyControl replication planning
+

@@ -74,7 +74,7 @@ function Vault() {
   const handleUpload = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/vault/upload", {
+      const res = await fetch("/api/vault/items", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,7 +5,7 @@ const TASKS_KEY = 'kanban:tasks';
 const CHAD_USER_ID = '08dee908-d31b-4c19-ae7d-227ccbb068cf';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL,
+  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 

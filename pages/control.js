@@ -118,8 +118,11 @@ function Dashboard() {
       const res = await fetch('/api/control', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      const json = await res.json();
-      setData(json);
+      const text = await res.text();
+      const json = JSON.parse(text);
+      if (res.ok) setData(json);
+    } catch (err) {
+      console.error('Control fetch error:', err);
     } finally {
       setDataLoading(false);
     }

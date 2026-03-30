@@ -23,12 +23,20 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { title, url, description, category, status, tags } = req.body;
-    if (!title || !url) return res.status(400).json({ error: 'title and url are required' });
+    const { title, url, description, category, status, tags } = req.body || {};
+    if (!title?.trim()) return res.status(400).json({ error: 'title is required' });
 
     const { data, error } = await supabase
       .from('bookmarks')
-      .insert([{ user_id: user.id, title, url, description, category, status, tags }])
+      .insert([{
+        user_id: user.id,
+        title: title.trim(),
+        url: url || '',
+        description: description || null,
+        category: category || null,
+        status: status || 'read-later',
+        tags: tags || [],
+      }])
       .select()
       .single();
 

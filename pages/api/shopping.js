@@ -23,12 +23,22 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { title, url, description, category, status, price, image, tags } = req.body;
-    if (!title) return res.status(400).json({ error: 'title is required' });
+    const { title, url, description, category, status, price, image, tags } = req.body || {};
+    if (!title?.trim()) return res.status(400).json({ error: 'title is required' });
 
     const { data, error } = await supabase
       .from('shopping_items')
-      .insert([{ user_id: user.id, title, url, description, category, status, price, image, tags }])
+      .insert([{
+        user_id: user.id,
+        title: title.trim(),
+        url: url || null,
+        description: description || null,
+        category: category || null,
+        status: status || 'to-buy',
+        price: price || null,
+        image: image || null,
+        tags: tags || [],
+      }])
       .select()
       .single();
 

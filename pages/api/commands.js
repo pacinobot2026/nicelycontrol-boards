@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL,
+  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { name, category, command_group, description, steps, shortcut, logo } = req.body;
+    const { name, category, command_group, description, steps, shortcut, logo } = req.body || {};
     if (!name?.trim() || !description?.trim()) {
       return res.status(400).json({ error: 'name and description are required' });
     }
@@ -46,12 +46,12 @@ export default async function handler(req, res) {
       .insert({
         user_id: user.id,
         name: name.trim(),
-        category: category || 'system',
-        command_group: command_group || 'resources',
+        category: category?.trim() || 'system',
+        command_group: command_group?.trim() || 'resources',
         description: description.trim(),
-        steps: steps || [],
-        shortcut: shortcut || null,
-        logo: logo || null,
+        steps: Array.isArray(steps) ? steps : [],
+        shortcut: shortcut?.trim() || null,
+        logo: logo?.trim() || null,
         sort_order: newOrder,
       })
       .select()

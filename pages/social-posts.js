@@ -174,7 +174,8 @@ function SocialPosts() {
       <Head><title>Social Posts | NicelyControl</title></Head>
       <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
         <NavigationSidebar />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 pt-16 md:pt-8">
+          <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -278,6 +279,7 @@ function SocialPosts() {
               })}
             </div>
           )}
+          </div>
         </main>
       </div>
 

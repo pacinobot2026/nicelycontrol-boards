@@ -13,10 +13,10 @@ const EMPTY_FORM = {
   tags: "",
 };
 
-function Assets() {
+function assetsList() {
   const { session } = useAuth();
-  const [allassets, setAllassets] = useState([]);
-  const [assets, setassets] = useState([]);
+  const [allAssets, setAllAssets] = useState([]);
+  const [assetsList, setAssetsList] = useState([]);
   const [stats, setStats] = useState({});
   const [categories, setCategories] = useState([]);
   const [filter, setFilter] = useState("active");
@@ -33,14 +33,14 @@ function Assets() {
     if (session) loadAssets();
   }, [session?.user?.id]);
   useEffect(() => {
-    applyFilters(allassets);
-  }, [allassets, filter, category, sortBy]);
+    applyFilters(allAssets);
+  }, [allAssets, filter, category, sortBy]);
 
   async function loadAssets() {
     // Check cache first
     const cached = getCache('assets');
     if (cached) {
-      setAllassets(cached.assets || []);
+      setAllAssets(cached.assetsList || []);
       setLoading(false);
     } else {
       setLoading(true);
@@ -48,14 +48,14 @@ function Assets() {
 
     // Fetch fresh data
     try {
-      const res = await fetch("/api/assets", {
+      const res = await fetch("/api/assetsList", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
-      setAllassets(data.assets || []);
-      setCache('assets', { assets: data.assets || [] });
+      setAllAssets(data.assetsList || []);
+      setCache('assets', { assetsList: data.assetsList || [] });
     } catch (err) {
-      console.error("Failed to load assets:", err);
+      console.error("Failed to load assetsList:", err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ function Assets() {
       }
     });
 
-    setassets(filtered);
+    setAssetsList(filtered);
     setStats(statsCalc);
     setCategories(
       Object.keys(categoryMap).map((name) => ({
@@ -123,7 +123,7 @@ function Assets() {
           .filter(Boolean),
       };
       const isEdit = modal.mode === "edit";
-      const res = await fetch("/api/assets", {
+      const res = await fetch("/api/assetsList", {
         method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +143,7 @@ function Assets() {
   }
 
   async function deleteItem(id) {
-    await fetch("/api/assets", {
+    await fetch("/api/assetsList", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -166,7 +166,7 @@ function Assets() {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
-          <title>assets</title>
+          <title>Asset Library</title>
         </Head>
         <NavigationSidebar />
         <div className="flex-1 flex items-center justify-center text-gray-400">
@@ -179,7 +179,7 @@ function Assets() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
-        <title>assets</title>
+        <title>Asset Library</title>
       </Head>
       <NavigationSidebar />
       <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
@@ -188,10 +188,10 @@ function Assets() {
           <div className="mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
-                📂 assets
+                📂 assetsList
               </h1>
               <p className="text-sm text-gray-400">
-                Track active business assets
+                Store and manage your assetsList
               </p>
             </div>
             <div className="flex justify-end mt-3">
@@ -277,8 +277,8 @@ function Assets() {
             {filteredassets.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
                 {searchTerm
-                  ? `No assets matching "${searchTerm}"`
-                  : `No ${filter} assets`}
+                  ? `No assetsList matching "${searchTerm}"`
+                  : `No ${filter} assetsList`}
               </div>
             ) : (
               <div
@@ -301,7 +301,7 @@ function Assets() {
 
           <div className="mt-4 text-right text-sm text-gray-400">
             {filteredassets.length}{" "}
-            {filteredassets.length === 1 ? "asset" : "assets"}
+            {filteredassets.length === 1 ? "asset" : "assetsList"}
           </div>
         </div>
       </main>
@@ -456,5 +456,7 @@ function ProjectCard({ asset, onEdit, onDelete }) {
   );
 }
 
-export default withAuth(assets);
+export default withAuth(assetsList);
+
+
 

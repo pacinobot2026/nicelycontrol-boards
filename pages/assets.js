@@ -13,10 +13,10 @@ const EMPTY_FORM = {
   tags: "",
 };
 
-function assetsList() {
+function Assets() {
   const { session } = useAuth();
-  const [allAssets, setAllAssets] = useState([]);
-  const [assetsList, setAssetsList] = useState([]);
+  const [allassets, setAllassets] = useState([]);
+  const [assets, setassets] = useState([]);
   const [stats, setStats] = useState({});
   const [categories, setCategories] = useState([]);
   const [filter, setFilter] = useState("active");
@@ -30,17 +30,17 @@ function assetsList() {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    if (session) loadAssets();
+    if (session) loadassets();
   }, [session?.user?.id]);
   useEffect(() => {
-    applyFilters(allAssets);
-  }, [allAssets, filter, category, sortBy]);
+    applyFilters(allassets);
+  }, [allassets, filter, category, sortBy]);
 
-  async function loadAssets() {
+  async function loadassets() {
     // Check cache first
     const cached = getCache('assets');
     if (cached) {
-      setAllAssets(cached.assetsList || []);
+      setAllassets(cached.assets || []);
       setLoading(false);
     } else {
       setLoading(true);
@@ -48,14 +48,14 @@ function assetsList() {
 
     // Fetch fresh data
     try {
-      const res = await fetch("/api/assetsList", {
+      const res = await fetch("/api/assets", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
-      setAllAssets(data.assetsList || []);
-      setCache('assets', { assetsList: data.assetsList || [] });
+      setAllassets(data.assets || []);
+      setCache('assets', { assets: data.assets || [] });
     } catch (err) {
-      console.error("Failed to load assetsList:", err);
+      console.error("Failed to load assets:", err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ function assetsList() {
       }
     });
 
-    setAssetsList(filtered);
+    setassets(filtered);
     setStats(statsCalc);
     setCategories(
       Object.keys(categoryMap).map((name) => ({
@@ -123,7 +123,7 @@ function assetsList() {
           .filter(Boolean),
       };
       const isEdit = modal.mode === "edit";
-      const res = await fetch("/api/assetsList", {
+      const res = await fetch("/api/assets", {
         method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,7 +135,7 @@ function assetsList() {
       });
       if (res.ok) {
         setModal(null);
-        loadAssets();
+        loadassets();
       }
     } finally {
       setSaving(false);
@@ -143,7 +143,7 @@ function assetsList() {
   }
 
   async function deleteItem(id) {
-    await fetch("/api/assetsList", {
+    await fetch("/api/assets", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -152,7 +152,7 @@ function assetsList() {
       body: JSON.stringify({ id }),
     });
     setDeleteId(null);
-    loadAssets();
+    loadassets();
   }
 
   const filteredassets = assets.filter(
@@ -166,11 +166,11 @@ function assetsList() {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
-          <title>Asset Library</title>
+          <title>assets</title>
         </Head>
         <NavigationSidebar />
         <div className="flex-1 flex items-center justify-center text-gray-400">
-          Loading projects…
+          Loading assets…
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ function assetsList() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
-        <title>Asset Library</title>
+        <title>assets</title>
       </Head>
       <NavigationSidebar />
       <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
@@ -188,10 +188,10 @@ function assetsList() {
           <div className="mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
-                📂 assetsList
+                📂 assets
               </h1>
               <p className="text-sm text-gray-400">
-                Store and manage your assetsList
+                Store and manage your assets
               </p>
             </div>
             <div className="flex justify-end mt-3">
@@ -199,7 +199,7 @@ function assetsList() {
                 onClick={openAdd}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                + Add asset
+                + Add Asset
               </button>
             </div>
           </div>
@@ -277,8 +277,8 @@ function assetsList() {
             {filteredassets.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
                 {searchTerm
-                  ? `No assetsList matching "${searchTerm}"`
-                  : `No ${filter} assetsList`}
+                  ? `No assets matching "${searchTerm}"`
+                  : `No ${filter} assets`}
               </div>
             ) : (
               <div
@@ -288,7 +288,7 @@ function assetsList() {
                 }}
               >
                 {filteredassets.map((p) => (
-                  <ProjectCard
+                  <assetCard
                     key={p.id}
                     asset={p}
                     onEdit={() => openEdit(p)}
@@ -301,7 +301,7 @@ function assetsList() {
 
           <div className="mt-4 text-right text-sm text-gray-400">
             {filteredassets.length}{" "}
-            {filteredassets.length === 1 ? "asset" : "assetsList"}
+            {filteredassets.length === 1 ? "asset" : "assets"}
           </div>
         </div>
       </main>
@@ -311,7 +311,7 @@ function assetsList() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-lg">
             <h2 className="text-xl font-bold text-white mb-4">
-              {modal.mode === "add" ? "Add asset" : "Edit asset"}
+              {modal.mode === "add" ? "Add Asset" : "Edit Asset"}
             </h2>
             <div className="flex flex-col gap-3">
               <input
@@ -407,7 +407,7 @@ function assetsList() {
   );
 }
 
-function ProjectCard({ asset, onEdit, onDelete }) {
+function assetCard({ asset, onEdit, onDelete }) {
   return (
     <div className="group bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative p-4">
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -456,7 +456,5 @@ function ProjectCard({ asset, onEdit, onDelete }) {
   );
 }
 
-export default withAuth(assetsList);
-
-
+export default withAuth(Assets);
 

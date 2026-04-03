@@ -7,6 +7,9 @@ import { getCache, setCache } from "../lib/cache";
 
 function Articles() {
   const { session } = useAuth();
+  const [activeTab, setActiveTab] = useState("ideas"); // ideas | letterman
+  const [articleIdeas, setArticleIdeas] = useState([]);
+  const [loadingIdeas, setLoadingIdeas] = useState(true);
   const [allArticles, setAllArticles] = useState([]);
   const [publications, setPublications] = useState([]);
   const [publication, setPublication] = useState("all");
@@ -29,10 +32,45 @@ function Articles() {
 
   useEffect(() => {
     if (session) {
-      loadArticles(); // loadArticles is the sole authority on hasKey
-      loadSettings(); // only pre-fills keyInput panel, does NOT affect hasKey
+      loadArticleIdeas();
+      loadArticles();
+      loadSettings();
     }
   }, [session]);
+
+  async function loadArticleIdeas() {
+    setLoadingIdeas(true);
+    try {
+      const res = await fetch("/api/article-ideas", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const data = await res.json();
+      setArticleIdeas(data.articles || []);
+    } catch (e) {
+      console.error(e);
+    }
+    setLoadingIdeas(false);
+  }
+
+  async function updateIdeaStatus(id, status) {
+    await fetch("/api/article-ideas", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, status }),
+    });
+    setArticleIdeas(articleIdeas.map((a) => a.id === id ? { ...a, status } : a));
+  }
+
+  async function deleteIdea(id) {
+    await fetch(`/api/article-ideas?id=${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    setArticleIdeas(articleIdeas.filter((a) => a.id !== id));
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -287,6 +325,72 @@ function Articles() {
               )}
             </div>
           </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6 border-b border-gray-800">
+            <button
+              onClick={() => setActiveTab("ideas")}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === "ideas" ? "border-orange-500 text-orange-400" : "border-transparent text-gray-500 hover:text-gray-300"}`}
+            >
+              🗞️ Article Ideas ({articleIdeas.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("letterman")}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === "letterman" ? "border-blue-500 text-blue-400" : "border-transparent text-gray-500 hover:text-gray-300"}`}
+            >
+              📨 Letterman Articles ({allArticles.length})
+            </button>
+          </div>
+
+          {/* Article Ideas Tab */}
+          {activeTab === "ideas" && (
+            <div>
+              {loadingIdeas ? (
+                <div className="text-gray-500 text-center py-12">Loading article ideas...</div>
+              ) : articleIdeas.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="text-5xl mb-4">🗞️</div>
+                  <h3 className="text-xl font-semibold text-white mb-2">No article ideas yet</h3>
+                  <p className="text-gray-400">Run <span className="text-orange-400 font-mono">/local article 2</span> to find local news stories</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {articleIdeas.map((idea) => (
+                    <div key={idea.id} className="bg-[#111] border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-colors">
+                      {idea.image && (
+                        <img src={idea.image} alt={idea.title} className="w-full h-40 object-cover" onError={(e) => e.target.style.display='none'} />
+                      )}
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            idea.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                            idea.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
+                            'bg-yellow-500/20 text-yellow-400'
+                          }`}>{idea.status}</span>
+                          {idea.publication && <span className="text-xs text-gray-500">{idea.publication}</span>}
+                        </div>
+                        <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2">{idea.title}</h3>
+                        {idea.description && <p className="text-gray-400 text-xs mb-3 line-clamp-2">{idea.description}</p>}
+                        <div className="flex gap-2 pt-2 border-t border-gray-800">
+                          <a href={idea.url} target="_blank" rel="noreferrer" className="flex-1 text-center text-xs py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition-colors">Source</a>
+                          {idea.status !== 'approved' && (
+                            <button onClick={() => updateIdeaStatus(idea.id, 'approved')} className="flex-1 text-xs py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 transition-colors">Approve</button>
+                          )}
+                          {idea.status !== 'rejected' && (
+                            <button onClick={() => updateIdeaStatus(idea.id, 'rejected')} className="text-xs py-1.5 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">✕</button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Letterman Articles Tab */}
+          {activeTab === "letterman" && (
+          <div>
 
           {/* Letterman API key input panel */}
           {showKeyInput && (

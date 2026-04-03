@@ -32,6 +32,12 @@ const NAV_ITEMS = [
     icon: "🧠",
     href: "/memory-banks",
   },
+  {
+    id: "social-posts",
+    label: "Social Posts",
+    icon: "📲",
+    href: "/social-posts",
+  },
 ];
 
 export default function NavigationSidebar() {

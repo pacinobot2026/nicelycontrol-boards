@@ -615,6 +615,9 @@ function Articles() {
               </div>
             </>
           )}
+          </div>
+          )}
+
         </div>
       </main>
 

@@ -20,6 +20,18 @@ const NAV_ITEMS = [
     icon: "▣",
     href: "/resourcelibrary",
   },
+  {
+    id: "publications",
+    label: "Publications",
+    icon: "📰",
+    href: "/publications",
+  },
+  {
+    id: "memory-banks",
+    label: "Memory Banks",
+    icon: "🧠",
+    href: "/memory-banks",
+  },
 ];
 
 export default function NavigationSidebar() {

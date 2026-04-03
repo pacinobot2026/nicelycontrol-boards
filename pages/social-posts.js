@@ -6,13 +6,11 @@ import { useAuth } from "../lib/authContext";
 
 const PLATFORM_ICONS = {
   instagram: "📸",
-  tiktok: "🎵",
-  linkedin: "💼",
-  twitter: "🐦",
-  facebook: "👥",
   youtube: "📺",
+  tiktok: "🎵",
+  x: "🐦",
   bluesky: "🦋",
-  threads: "🧵",
+  linkedin: "💼",
 };
 
 const STATUS_COLORS = {

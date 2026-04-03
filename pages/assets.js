@@ -15,8 +15,8 @@ const EMPTY_FORM = {
 
 function Assets() {
   const { session } = useAuth();
-  const [allProjects, setAllProjects] = useState([]);
-  const [projects, setProjects] = useState([]);
+  const [allAssets, setAllAssets] = useState([]);
+  const [assets, setAssets] = useState([]);
   const [stats, setStats] = useState({});
   const [categories, setCategories] = useState([]);
   const [filter, setFilter] = useState("active");
@@ -30,17 +30,17 @@ function Assets() {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    if (session) loadProjects();
+    if (session) loadAssets();
   }, [session?.user?.id]);
   useEffect(() => {
-    applyFilters(allProjects);
-  }, [allProjects, filter, category, sortBy]);
+    applyFilters(allAssets);
+  }, [allAssets, filter, category, sortBy]);
 
-  async function loadProjects() {
+  async function loadAssets() {
     // Check cache first
     const cached = getCache('assets');
     if (cached) {
-      setAllProjects(cached.assets || []);
+      setAllAssets(cached.assets || []);
       setLoading(false);
     } else {
       setLoading(true);
@@ -52,10 +52,10 @@ function Assets() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
-      setAllProjects(data.assets || []);
+      setAllAssets(data.assets || []);
       setCache('assets', { assets: data.assets || [] });
     } catch (err) {
-      console.error("Failed to load projects:", err);
+      console.error("Failed to load assets:", err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ function Assets() {
       }
     });
 
-    setProjects(filtered);
+    setAssets(filtered);
     setStats(statsCalc);
     setCategories(
       Object.keys(categoryMap).map((name) => ({
@@ -135,7 +135,7 @@ function Assets() {
       });
       if (res.ok) {
         setModal(null);
-        loadProjects();
+        loadAssets();
       }
     } finally {
       setSaving(false);
@@ -152,10 +152,10 @@ function Assets() {
       body: JSON.stringify({ id }),
     });
     setDeleteId(null);
-    loadProjects();
+    loadAssets();
   }
 
-  const filteredProjects = projects.filter(
+  const filteredAssets = assets.filter(
     (p) =>
       searchTerm === "" ||
       p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -166,7 +166,7 @@ function Assets() {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
-          <title>Projects</title>
+          <title>Asset Library</title>
         </Head>
         <NavigationSidebar />
         <div className="flex-1 flex items-center justify-center text-gray-400">
@@ -179,7 +179,7 @@ function Assets() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
-        <title>Projects</title>
+        <title>Asset Library</title>
       </Head>
       <NavigationSidebar />
       <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
@@ -188,10 +188,10 @@ function Assets() {
           <div className="mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
-                📂 Projects
+                📂 assets
               </h1>
               <p className="text-sm text-gray-400">
-                Track active business projects
+                Store and manage your assets
               </p>
             </div>
             <div className="flex justify-end mt-3">
@@ -199,7 +199,7 @@ function Assets() {
                 onClick={openAdd}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                + Add Project
+                + Add Asset
               </button>
             </div>
           </div>
@@ -256,7 +256,7 @@ function Assets() {
           <div className="flex gap-3 flex-wrap mb-6">
             <input
               type="text"
-              placeholder="🔍 Search projects..."
+              placeholder="🔍 Search assets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 min-w-48 bg-gray-800/50 border border-gray-600/50 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-purple-500"
@@ -274,11 +274,11 @@ function Assets() {
 
           {/* Grid */}
           <div className="glass-card rounded-2xl p-6">
-            {filteredProjects.length === 0 ? (
+            {filteredAssets.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
                 {searchTerm
-                  ? `No projects matching "${searchTerm}"`
-                  : `No ${filter} projects`}
+                  ? `No assets matching "${searchTerm}"`
+                  : `No ${filter} assets`}
               </div>
             ) : (
               <div
@@ -287,7 +287,7 @@ function Assets() {
                   gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
                 }}
               >
-                {filteredProjects.map((p) => (
+                {filteredAssets.map((p) => (
                   <ProjectCard
                     key={p.id}
                     project={p}
@@ -300,8 +300,8 @@ function Assets() {
           </div>
 
           <div className="mt-4 text-right text-sm text-gray-400">
-            {filteredProjects.length}{" "}
-            {filteredProjects.length === 1 ? "project" : "projects"}
+            {filteredAssets.length}{" "}
+            {filteredAssets.length === 1 ? "asset" : "assets"}
           </div>
         </div>
       </main>
@@ -457,4 +457,6 @@ function ProjectCard({ project, onEdit, onDelete }) {
 }
 
 export default withAuth(Assets);
+
+
 

@@ -38,6 +38,12 @@ const NAV_ITEMS = [
     icon: "📲",
     href: "/social-posts",
   },
+  {
+    id: "assets",
+    label: "Asset Library",
+    icon: "🗂️",
+    href: "/assets",
+  },
 ];
 
 export default function NavigationSidebar() {

@@ -13,6 +13,63 @@ const PLATFORM_ICONS = {
   linkedin: "💼",
 };
 
+const PLATFORM_SPECS = {
+  instagram: {
+    ratio: "1:1 or 4:5",
+    size: "1080×1080 / 1080×1350",
+    maxChars: 2200,
+    hashtagLimit: 30,
+    videoMax: "60s (Reels: 90s)",
+    note: "First 125 chars visible before 'more'",
+    color: "from-pink-500 to-orange-400",
+  },
+  youtube: {
+    ratio: "16:9",
+    size: "1280×720 min",
+    maxChars: 5000,
+    hashtagLimit: 15,
+    videoMax: "15 min (unverified)",
+    note: "First 157 chars show in search results",
+    color: "from-red-600 to-red-400",
+  },
+  tiktok: {
+    ratio: "9:16",
+    size: "1080×1920",
+    maxChars: 2200,
+    hashtagLimit: 10,
+    videoMax: "10 min",
+    note: "Hook in first 3 seconds is critical",
+    color: "from-pink-400 to-cyan-400",
+  },
+  x: {
+    ratio: "16:9 or 1:1",
+    size: "1200×675 / 1200×1200",
+    maxChars: 280,
+    hashtagLimit: 2,
+    videoMax: "2m 20s",
+    note: "Keep under 280 characters",
+    color: "from-gray-700 to-gray-500",
+  },
+  bluesky: {
+    ratio: "16:9 or 1:1",
+    size: "1200×675",
+    maxChars: 300,
+    hashtagLimit: 5,
+    videoMax: "60s",
+    note: "300 character limit",
+    color: "from-blue-500 to-cyan-400",
+  },
+  linkedin: {
+    ratio: "1:1 or 1.91:1",
+    size: "1200×1200 / 1200×628",
+    maxChars: 3000,
+    hashtagLimit: 5,
+    videoMax: "10 min",
+    note: "First 140 chars visible in feed",
+    color: "from-blue-700 to-blue-500",
+  },
+};
+
 const STATUS_COLORS = {
   pending: { bg: "bg-yellow-500/20", text: "text-yellow-400", label: "Pending" },
   approved: { bg: "bg-green-500/20", text: "text-green-400", label: "Approved" },
@@ -227,112 +284,12 @@ function SocialPosts() {
       {/* Post Detail Modal */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={(e) => { if (e.target === e.currentTarget) setSelectedPost(null); }}>
-          <div className="bg-[#111] border border-gray-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-800">
-              <h2 className="text-lg font-bold text-white">{selectedPost.title}</h2>
-              <button onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-white text-2xl leading-none">×</button>
-            </div>
-
-            <div className="p-5">
-              {/* Image/Video Preview */}
-              {(selectedPost.image_url || selectedPost.video_url) && (
-                <div className="mb-5 rounded-xl overflow-hidden bg-[#1a1a1a] aspect-square max-w-sm mx-auto">
-                  {selectedPost.video_url ? (
-                    <video src={selectedPost.video_url} controls className="w-full h-full object-contain" />
-                  ) : (
-                    <img src={selectedPost.image_url} alt={selectedPost.title} className="w-full h-full object-contain" />
-                  )}
-                </div>
-              )}
-
-              {/* Status + Viral Score */}
-              <div className="flex items-center gap-3 mb-4">
-                {(() => { const s = STATUS_COLORS[selectedPost.status] || STATUS_COLORS.pending; return (
-                  <span className={`text-sm px-3 py-1 rounded-full font-medium ${s.bg} ${s.text}`}>{s.label}</span>
-                ); })()}
-                {selectedPost.viral_score && (
-                  <span className="text-sm px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 font-bold">🔥 Viral Score: {selectedPost.viral_score}</span>
-                )}
-                <span className="text-sm px-3 py-1 rounded-full bg-gray-800 text-gray-400 capitalize">{selectedPost.format}</span>
-              </div>
-
-              {/* Platforms */}
-              {selectedPost.platforms?.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-gray-400 text-xs mb-2 uppercase tracking-wider">Platforms</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {selectedPost.platforms.map(p => (
-                      <span key={p} className="flex items-center gap-1 text-sm px-3 py-1 rounded-full bg-gray-800 text-gray-300 capitalize">
-                        {PLATFORM_ICONS[p]} {p}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Caption */}
-              {selectedPost.caption && (
-                <div className="mb-4">
-                  <p className="text-gray-400 text-xs mb-2 uppercase tracking-wider">Caption</p>
-                  <div className="bg-[#1a1a1a] rounded-xl p-4 text-gray-200 text-sm whitespace-pre-wrap">{selectedPost.caption}</div>
-                </div>
-              )}
-
-              {/* Platform-specific captions */}
-              {selectedPost.platform_captions && Object.keys(selectedPost.platform_captions).length > 0 && (
-                <div className="mb-4">
-                  <p className="text-gray-400 text-xs mb-2 uppercase tracking-wider">Platform Captions</p>
-                  <div className="space-y-2">
-                    {Object.entries(selectedPost.platform_captions).map(([platform, caption]) => (
-                      <div key={platform} className="bg-[#1a1a1a] rounded-xl p-3">
-                        <p className="text-orange-400 text-xs font-semibold mb-1 capitalize">{PLATFORM_ICONS[platform]} {platform}</p>
-                        <p className="text-gray-300 text-sm">{caption}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Description */}
-              {selectedPost.description && (
-                <div className="mb-4">
-                  <p className="text-gray-400 text-xs mb-2 uppercase tracking-wider">Description</p>
-                  <p className="text-gray-300 text-sm">{selectedPost.description}</p>
-                </div>
-              )}
-
-              {/* Source */}
-              {selectedPost.source && (
-                <div className="mb-5">
-                  <p className="text-gray-400 text-xs mb-1 uppercase tracking-wider">Source</p>
-                  <p className="text-gray-500 text-xs">{selectedPost.source}</p>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex gap-2 pt-4 border-t border-gray-800">
-                {selectedPost.status === "pending" && (
-                  <>
-                    <button onClick={() => updatePost(selectedPost.id, "approve")} className="flex-1 py-2.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 font-semibold text-sm transition-colors">
-                      ✅ Approve
-                    </button>
-                    <button onClick={() => updatePost(selectedPost.id, "reject")} className="py-2.5 px-4 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold text-sm transition-colors">
-                      ✕ Reject
-                    </button>
-                  </>
-                )}
-                {selectedPost.status === "approved" && (
-                  <button onClick={() => updatePost(selectedPost.id, "publish")} className="flex-1 py-2.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-semibold text-sm transition-colors">
-                    🚀 Send to Post Stream
-                  </button>
-                )}
-                <button onClick={() => deletePost(selectedPost.id)} className="py-2.5 px-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 text-sm transition-colors">
-                  🗑️
-                </button>
-              </div>
-            </div>
-          </div>
+          <PostModal
+            post={selectedPost}
+            onClose={() => setSelectedPost(null)}
+            onUpdate={updatePost}
+            onDelete={deletePost}
+          />
         </div>
       )}
 
@@ -386,6 +343,144 @@ function SocialPosts() {
         </div>
       )}
     </>
+  );
+}
+
+function PostModal({ post, onClose, onUpdate, onDelete }) {
+  const [activeTab, setActiveTab] = useState(post.platforms?.[0] || "instagram");
+  const platforms = post.platforms?.length > 0 ? post.platforms : Object.keys(PLATFORM_ICONS);
+  const spec = PLATFORM_SPECS[activeTab] || {};
+  const caption = post.platform_captions?.[activeTab] || post.caption || "";
+  const charCount = caption.length;
+  const overLimit = charCount > (spec.maxChars || 9999);
+  const statusStyle = STATUS_COLORS[post.status] || STATUS_COLORS.pending;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="bg-[#111] border border-gray-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-800">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold text-white line-clamp-1">{post.title}</h2>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusStyle.bg} ${statusStyle.text}`}>{statusStyle.label}</span>
+            {post.viral_score && <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 font-bold">🔥 {post.viral_score}</span>}
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl leading-none flex-shrink-0">×</button>
+        </div>
+
+        {/* Platform Tabs */}
+        <div className="flex gap-1 px-5 pt-4 border-b border-gray-800 overflow-x-auto">
+          {platforms.map(p => (
+            <button
+              key={p}
+              onClick={() => setActiveTab(p)}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-t-lg whitespace-nowrap transition-colors border-b-2 ${
+                activeTab === p
+                  ? "border-orange-500 text-white bg-orange-500/10"
+                  : "border-transparent text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              <span>{PLATFORM_ICONS[p]}</span>
+              <span className="capitalize">{p === "x" ? "X (Twitter)" : p}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="p-5">
+          {/* Platform Specs Banner */}
+          {spec.ratio && (
+            <div className={`bg-gradient-to-r ${spec.color || "from-gray-700 to-gray-600"} rounded-xl p-4 mb-5`}>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{PLATFORM_ICONS[activeTab]}</span>
+                  <div>
+                    <p className="text-white font-bold capitalize">{activeTab === "x" ? "X (Twitter)" : activeTab}</p>
+                    <p className="text-white/70 text-xs">{spec.note}</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 text-right">
+                  <div>
+                    <p className="text-white/60 text-xs">Ratio</p>
+                    <p className="text-white font-semibold text-sm">{spec.ratio}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/60 text-xs">Size</p>
+                    <p className="text-white font-semibold text-sm">{spec.size}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/60 text-xs">Video Max</p>
+                    <p className="text-white font-semibold text-sm">{spec.videoMax}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/60 text-xs">Hashtags</p>
+                    <p className="text-white font-semibold text-sm">Max {spec.hashtagLimit}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Image Preview */}
+          {post.image_url && (
+            <div className="mb-5 rounded-xl overflow-hidden bg-[#1a1a1a] max-w-xs mx-auto" style={{
+              aspectRatio: activeTab === "tiktok" ? "9/16" : activeTab === "youtube" ? "16/9" : "1/1",
+              maxHeight: "300px"
+            }}>
+              <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
+            </div>
+          )}
+
+          {/* Caption for this platform */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-400 text-xs uppercase tracking-wider">Caption for {activeTab === "x" ? "X (Twitter)" : activeTab}</p>
+              <span className={`text-xs font-mono ${overLimit ? "text-red-400" : charCount > spec.maxChars * 0.8 ? "text-yellow-400" : "text-gray-500"}`}>
+                {charCount} / {spec.maxChars}
+              </span>
+            </div>
+            <div className={`bg-[#1a1a1a] rounded-xl p-4 text-gray-200 text-sm whitespace-pre-wrap border ${overLimit ? "border-red-500/50" : "border-gray-800"}`}>
+              {caption || <span className="text-gray-600 italic">No caption for this platform yet</span>}
+            </div>
+            {overLimit && (
+              <p className="text-red-400 text-xs mt-1">⚠️ Caption exceeds {spec.maxChars} character limit for {activeTab}</p>
+            )}
+          </div>
+
+          {/* Source */}
+          {post.source && (
+            <p className="text-gray-600 text-xs mb-5">Source: {post.source}</p>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 pt-4 border-t border-gray-800">
+            {post.status === "pending" && (
+              <>
+                <button onClick={() => onUpdate(post.id, "approve")} className="flex-1 py-2.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 font-semibold text-sm transition-colors">
+                  ✅ Approve
+                </button>
+                <button onClick={() => onUpdate(post.id, "reject")} className="py-2.5 px-4 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold text-sm transition-colors">
+                  ✕ Reject
+                </button>
+              </>
+            )}
+            {post.status === "approved" && (
+              <button onClick={() => onUpdate(post.id, "publish")} className="flex-1 py-2.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 font-semibold text-sm transition-colors">
+                🚀 Send to Post Stream
+              </button>
+            )}
+            {post.status === "rejected" && (
+              <button onClick={() => onUpdate(post.id, "approve")} className="flex-1 py-2.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 font-semibold text-sm transition-colors">
+                ↩️ Re-approve
+              </button>
+            )}
+            <button onClick={() => onDelete(post.id)} className="py-2.5 px-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 text-sm transition-colors">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

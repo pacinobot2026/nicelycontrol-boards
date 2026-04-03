@@ -15,8 +15,8 @@ const EMPTY_FORM = {
 
 function Assets() {
   const { session } = useAuth();
-  const [allassets, setAllassets] = useState([]);
-  const [assets, setassets] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [stats, setStats] = useState({});
   const [categories, setCategories] = useState([]);
   const [filter, setFilter] = useState("active");
@@ -30,17 +30,17 @@ function Assets() {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    if (session) loadassets();
+    if (session) loadProjects();
   }, [session?.user?.id]);
   useEffect(() => {
-    applyFilters(allassets);
-  }, [allassets, filter, category, sortBy]);
+    applyFilters(allProjects);
+  }, [allProjects, filter, category, sortBy]);
 
-  async function loadassets() {
+  async function loadProjects() {
     // Check cache first
     const cached = getCache('assets');
     if (cached) {
-      setAllassets(cached.assets || []);
+      setAllProjects(cached.assets || []);
       setLoading(false);
     } else {
       setLoading(true);
@@ -52,10 +52,10 @@ function Assets() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
-      setAllassets(data.assets || []);
+      setAllProjects(data.assets || []);
       setCache('assets', { assets: data.assets || [] });
     } catch (err) {
-      console.error("Failed to load assets:", err);
+      console.error("Failed to load projects:", err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ function Assets() {
       }
     });
 
-    setassets(filtered);
+    setProjects(filtered);
     setStats(statsCalc);
     setCategories(
       Object.keys(categoryMap).map((name) => ({
@@ -135,7 +135,7 @@ function Assets() {
       });
       if (res.ok) {
         setModal(null);
-        loadassets();
+        loadProjects();
       }
     } finally {
       setSaving(false);
@@ -152,10 +152,10 @@ function Assets() {
       body: JSON.stringify({ id }),
     });
     setDeleteId(null);
-    loadassets();
+    loadProjects();
   }
 
-  const filteredassets = assets.filter(
+  const filteredProjects = projects.filter(
     (p) =>
       searchTerm === "" ||
       p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -166,11 +166,11 @@ function Assets() {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <Head>
-          <title>assets</title>
+          <title>Projects</title>
         </Head>
         <NavigationSidebar />
         <div className="flex-1 flex items-center justify-center text-gray-400">
-          Loading assets…
+          Loading projects…
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ function Assets() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       <Head>
-        <title>assets</title>
+        <title>Projects</title>
       </Head>
       <NavigationSidebar />
       <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
@@ -188,10 +188,10 @@ function Assets() {
           <div className="mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
-                📂 assets
+                📂 Projects
               </h1>
               <p className="text-sm text-gray-400">
-                Store and manage your assets
+                Track active business projects
               </p>
             </div>
             <div className="flex justify-end mt-3">
@@ -199,7 +199,7 @@ function Assets() {
                 onClick={openAdd}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
-                + Add Asset
+                + Add Project
               </button>
             </div>
           </div>
@@ -256,7 +256,7 @@ function Assets() {
           <div className="flex gap-3 flex-wrap mb-6">
             <input
               type="text"
-              placeholder="🔍 Search assets..."
+              placeholder="🔍 Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 min-w-48 bg-gray-800/50 border border-gray-600/50 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-purple-500"
@@ -274,11 +274,11 @@ function Assets() {
 
           {/* Grid */}
           <div className="glass-card rounded-2xl p-6">
-            {filteredassets.length === 0 ? (
+            {filteredProjects.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
                 {searchTerm
-                  ? `No assets matching "${searchTerm}"`
-                  : `No ${filter} assets`}
+                  ? `No projects matching "${searchTerm}"`
+                  : `No ${filter} projects`}
               </div>
             ) : (
               <div
@@ -287,10 +287,10 @@ function Assets() {
                   gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
                 }}
               >
-                {filteredassets.map((p) => (
-                  <assetCard
+                {filteredProjects.map((p) => (
+                  <ProjectCard
                     key={p.id}
-                    asset={p}
+                    project={p}
                     onEdit={() => openEdit(p)}
                     onDelete={() => setDeleteId(p.id)}
                   />
@@ -300,8 +300,8 @@ function Assets() {
           </div>
 
           <div className="mt-4 text-right text-sm text-gray-400">
-            {filteredassets.length}{" "}
-            {filteredassets.length === 1 ? "asset" : "assets"}
+            {filteredProjects.length}{" "}
+            {filteredProjects.length === 1 ? "project" : "projects"}
           </div>
         </div>
       </main>
@@ -383,7 +383,7 @@ function Assets() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm">
             <h2 className="text-lg font-bold text-white mb-2">
-              Delete asset?
+              Delete Project?
             </h2>
             <p className="text-gray-400 text-sm mb-5">This cannot be undone.</p>
             <div className="flex justify-end gap-3">
@@ -407,12 +407,12 @@ function Assets() {
   );
 }
 
-function assetCard({ asset, onEdit, onDelete }) {
+function ProjectCard({ project, onEdit, onDelete }) {
   return (
     <div className="group bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative p-4">
       <div className="flex items-start justify-between gap-2 mb-2">
         <h3 className="text-white font-semibold text-base leading-snug">
-          {asset.title}
+          {project.title}
         </h3>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
           <button
@@ -430,20 +430,20 @@ function assetCard({ asset, onEdit, onDelete }) {
         </div>
       </div>
       <p className="text-gray-400 text-sm mb-3 leading-relaxed">
-        {asset.description}
+        {project.description}
       </p>
       <div className="flex gap-2 flex-wrap mb-3">
-        {asset.category && (
+        {project.category && (
           <span className="px-2 py-1 bg-gray-900 rounded text-xs text-gray-400">
-            {asset.category}
+            {project.category}
           </span>
         )}
         <span className="px-2 py-1 bg-gray-900 rounded text-xs text-gray-400">
-          {new Date(asset.created_at).toLocaleDateString()}
+          {new Date(project.created_at).toLocaleDateString()}
         </span>
       </div>
       <div className="flex gap-1.5 flex-wrap">
-        {(asset.tags || []).map((tag) => (
+        {(project.tags || []).map((tag) => (
           <span
             key={tag}
             className="px-2 py-0.5 bg-purple-900/30 border border-purple-700/40 rounded text-xs text-purple-300"

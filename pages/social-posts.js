@@ -172,17 +172,19 @@ function SocialPosts() {
   return (
     <>
       <Head><title>Social Posts | NicelyControl</title></Head>
-      <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
         <NavigationSidebar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 pt-16 md:pt-8">
+        <main className="flex-1 text-white p-4 md:p-8 md:pt-8 pt-16 overflow-hidden relative">
           <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex justify-between items-center gap-3 flex-wrap">
             <div>
-              <h1 className="text-2xl font-bold text-white">Social Posts</h1>
-              <p className="text-gray-400 text-sm mt-1">Manage and approve posts for all platforms</p>
+              <h1 className="text-2xl md:text-3xl 2xl:text-4xl font-bold gradient-text mb-1">
+                📲 Social Posts
+              </h1>
+              <p className="text-sm text-gray-400">Manage and approve posts for all platforms</p>
             </div>
-            <button onClick={() => setShowAddModal(true)} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors">
+            <button onClick={() => setShowAddModal(true)} className="ml-auto px-4 md:px-6 py-3 bg-purple-600 rounded-lg text-white text-sm font-semibold cursor-pointer hover:scale-105 transition-transform border-none whitespace-nowrap flex-shrink-0">
               + New Post
             </button>
           </div>
@@ -195,7 +197,7 @@ function SocialPosts() {
               { label: "Approved", value: stats.approved, color: "text-green-400" },
               { label: "Published", value: stats.published, color: "text-purple-400" },
             ].map(s => (
-              <div key={s.label} className="bg-[#111] border border-gray-800 rounded-xl p-4">
+              <div key={s.label} className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-4 backdrop-blur-sm">
                 <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
                 <div className="text-gray-400 text-sm">{s.label}</div>
               </div>
@@ -203,12 +205,12 @@ function SocialPosts() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-gray-800">
+          <div className="flex gap-2 mb-6 border-b border-gray-700/50">
             {["all", "pending", "approved", "scheduled", "published", "rejected"].map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 text-sm font-semibold border-b-2 capitalize transition-colors ${filter === f ? "border-orange-500 text-orange-400" : "border-transparent text-gray-500 hover:text-gray-300"}`}
+                className={`px-4 py-2 text-sm font-semibold border-b-2 capitalize transition-colors ${filter === f ? "border-purple-500 text-purple-400" : "border-transparent text-gray-500 hover:text-gray-300"}`}
               >
                 {f}
               </button>
@@ -223,7 +225,7 @@ function SocialPosts() {
               <div className="text-5xl mb-4">📲</div>
               <h3 className="text-xl font-semibold text-white mb-2">No posts yet</h3>
               <p className="text-gray-400 mb-6">Create your first social post or run /vizard to generate clips</p>
-              <button onClick={() => setShowAddModal(true)} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+              <button onClick={() => setShowAddModal(true)} className="px-6 py-3 bg-purple-600 rounded-lg text-white font-semibold cursor-pointer hover:scale-105 transition-transform">
                 Create Post
               </button>
             </div>
@@ -235,7 +237,7 @@ function SocialPosts() {
                   <div
                     key={post.id}
                     onClick={() => setSelectedPost(post)}
-                    className="bg-[#111] border border-gray-800 rounded-xl overflow-hidden cursor-pointer hover:border-gray-600 transition-all hover:scale-[1.02]"
+                    className="bg-gray-900/60 border border-gray-700/50 rounded-xl overflow-hidden cursor-pointer hover:border-purple-500/50 transition-all hover:scale-[1.02] backdrop-blur-sm"
                   >
                     {/* Thumbnail */}
                     <div className="relative aspect-square bg-[#1a1a1a]">
@@ -359,7 +361,7 @@ function PostModal({ post, onClose, onUpdate, onDelete }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bg-[#111] border border-gray-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-900 border border-gray-700/50 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto backdrop-blur-xl">
 
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-800">

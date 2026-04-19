@@ -613,6 +613,17 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Task Detail Modal -->
+        <div id="task-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: linear-gradient(135deg, #1a1a2e, #0f1729); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; width: 90%; max-width: 380px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 1.1rem;">Task Details</h3>
+                    <button onclick="closeTaskModal()" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button>
+                </div>
+                <div id="task-modal-content"></div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -884,8 +895,8 @@
                     </div>
                 `;
             } else {
-                openList.innerHTML = openTasks.map(task => `
-                    <div class="task-item">
+                openList.innerHTML = openTasks.map((task, index) => `
+                    <div class="task-item" onclick="openTaskModal(${index}, 'open')" style="cursor: pointer;">
                         <div class="task-avatar ${task.agentType}">${task.agentEmoji}</div>
                         <div class="task-content">
                             <div class="task-name">${task.name}</div>
@@ -907,8 +918,8 @@
                     </div>
                 `;
             } else {
-                completedList.innerHTML = completedTasks.slice(0, 10).map(task => `
-                    <div class="task-item completed">
+                completedList.innerHTML = completedTasks.slice(0, 10).map((task, index) => `
+                    <div class="task-item completed" onclick="openTaskModal(${index}, 'completed')" style="cursor: pointer;">
                         <div class="task-avatar ${task.agentType}">${task.agentEmoji}</div>
                         <div class="task-content">
                             <div class="task-name">${task.name}</div>
@@ -953,6 +964,37 @@
         
         function closeIconModal() {
             document.getElementById('icon-modal').style.display = 'none';
+        }
+        
+        // Task Modal Functions
+        function openTaskModal(index, type) {
+            const task = type === 'open' ? openTasks[index] : completedTasks[index];
+            if (!task) return;
+            
+            const modalContent = document.getElementById('task-modal-content');
+            modalContent.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: rgba(0,212,255,0.2); border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 10px;">${task.agentEmoji}</div>
+                    <div style="font-size: 1rem; font-weight: 600; margin-bottom: 5px;">${task.name}</div>
+                    <div style="font-size: 0.8rem; color: #888;">Assigned to ${task.agentName}</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Status</div>
+                    <div style="font-size: 0.9rem; color: ${type === 'completed' ? '#00ff88' : '#ffd700'};">
+                        ${type === 'completed' ? '✓ Completed ' + task.completedTime : '⏳ In Progress'}
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px;">
+                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Created</div>
+                    <div style="font-size: 0.9rem; color: #aaa;">${new Date(task.createdAt).toLocaleString()}</div>
+                </div>
+            `;
+            
+            document.getElementById('task-modal').style.display = 'flex';
+        }
+        
+        function closeTaskModal() {
+            document.getElementById('task-modal').style.display = 'none';
         }
         
         function changeAgentIcon(emoji) {

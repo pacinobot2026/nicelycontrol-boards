@@ -11,12 +11,5 @@ module.exports = {
     VIZARD_API_KEY: process.env.VIZARD_API_KEY,
     POSTBRIDGE_API_KEY: process.env.POSTBRIDGE_API_KEY,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/agents',
-        destination: '/agents-dashboard-final.html',
-      },
-    ];
-  },
+
 };

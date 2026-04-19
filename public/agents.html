@@ -128,152 +128,91 @@
         .agent-status-text.online { color: #00ff88; }
         .agent-status-text.working { color: #ffd700; }
         
-        /* Center Panel */
+        /* Center Panel - Agent Grid */
         .center-panel {
             flex: 1;
-            padding: 40px;
+            padding: 30px;
             overflow-y: auto;
         }
         
-        .center-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-        
-        .agent-profile {
-            display: flex;
-            align-items: center;
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
         
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-        
-        .profile-info h2 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-        
-        .profile-info p {
-            color: #888;
-            font-size: 0.9rem;
-        }
-        
-        .stats-grid {
-            display: flex;
-            gap: 40px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00d4ff;
-        }
-        
-        .stat-value.completed { color: #888; }
-        .stat-value.online { color: #a855f7; }
-        
-        .stat-label {
-            font-size: 0.7rem;
-            color: #666;
-            text-transform: uppercase;
-            margin-top: 5px;
-        }
-        
-        .working-section {
-            background: rgba(255,215,0,0.05);
-            border: 2px solid #ffd700;
+        .agent-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 25px;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .section-label {
-            font-size: 0.75rem;
-            color: #888;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            align-self: flex-start;
+        .agent-card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.2);
         }
         
-        .working-agent {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+        .agent-card.working {
+            background: rgba(255,215,0,0.1);
+            border: 2px solid #ffd700;
         }
         
-        .working-avatar {
-            width: 100px;
-            height: 100px;
-            background: rgba(168,85,247,0.2);
-            border: 2px solid #a855f7;
-            border-radius: 20px;
+        .agent-card.online {
+            border: 1px solid rgba(0,255,136,0.3);
+        }
+        
+        .card-avatar {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+            font-size: 35px;
+            margin: 0 auto 15px;
         }
         
-        .working-details h3 {
-            font-size: 1.1rem;
-            margin-bottom: 5px;
+        .agent-card.article .card-avatar { background: rgba(0,212,255,0.15); }
+        .agent-card.funnel .card-avatar { background: rgba(255,107,107,0.15); }
+        .agent-card.video .card-avatar { background: rgba(168,85,247,0.15); }
+        .agent-card.research .card-avatar { background: rgba(255,193,7,0.15); }
+        .agent-card.code .card-avatar { background: rgba(0,230,118,0.15); }
+        .agent-card.design .card-avatar { background: rgba(233,30,99,0.15); }
+        .agent-card.social .card-avatar { background: rgba(33,150,243,0.15); }
+        .agent-card.email .card-avatar { background: rgba(255,87,34,0.15); }
+        .agent-card.analytics .card-avatar { background: rgba(156,39,176,0.15); }
+        
+        .card-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
         
-        .working-details p {
-            color: #888;
-            font-size: 0.85rem;
+        .card-status {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
         }
         
-        .progress-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            margin-top: 10px;
-            overflow: hidden;
+        .card-status.online {
+            background: rgba(0,255,136,0.15);
+            color: #00ff88;
         }
         
-        .progress-fill {
-            height: 100%;
-            width: 60%;
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            border-radius: 2px;
-            animation: progressPulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes progressPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .active-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,215,0,0.2);
+        .card-status.working {
+            background: rgba(255,215,0,0.15);
             color: #ffd700;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.8rem;
+        }
+        
+        .card-status.idle {
+            background: rgba(255,255,255,0.05);
+            color: #666;
         }
         
         /* Right Panel */
@@ -359,47 +298,9 @@
             <div class="agent-list" id="agent-list"></div>
         </div>
         
-        <!-- Center Panel -->
+        <!-- Center Panel - Agent Grid -->
         <div class="center-panel">
-            <div class="center-header">
-                <div class="agent-profile">
-                    <div class="profile-avatar">🎬</div>
-                    <div class="profile-info">
-                        <h2>Pacino (Lead Agent)</h2>
-                        <p>Coordinating agent fleet and task delegation</p>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value" id="active-count">1</div>
-                        <div class="stat-label">Active</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value completed">0</div>
-                        <div class="stat-label">Completed</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value online" id="online-count">3</div>
-                        <div class="stat-label">Online</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="working-section" id="working-section" style="position: relative;">
-                <div class="active-badge">1 ACTIVE</div>
-                <div class="section-label">Currently Working</div>
-                <div class="working-agent">
-                    <div class="working-avatar">🎬</div>
-                    <div class="working-details">
-                        <h3>Video Agent</h3>
-                        <p>Create clips</p>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="agents-grid" id="agents-grid"></div>
         </div>
         
         <!-- Right Panel - Main Menu -->
@@ -474,12 +375,38 @@
             });
         }
         
+        function renderAgentGrid() {
+            const grid = document.getElementById('agents-grid');
+            grid.innerHTML = '';
+            
+            Object.values(agents).forEach(agent => {
+                const card = document.createElement('div');
+                card.className = `agent-card ${agent.type} ${agent.status} ${selectedAgent === agent.id ? 'active' : ''}`;
+                card.onclick = () => selectAgent(agent.id);
+                
+                const statusText = agent.status === 'working' ? 'Working' : 
+                                  agent.status === 'online' ? 'Online' : 'Idle';
+                
+                card.innerHTML = `
+                    <div class="card-avatar">${agent.emoji}</div>
+                    <div class="card-name">${agent.name}</div>
+                    <div class="card-status ${agent.status}">${statusText}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
         function selectAgent(agentId) {
             selectedAgent = agentId;
             renderAgentList();
+            renderAgentGrid();
         }
         
-        document.addEventListener('DOMContentLoaded', renderAgentList);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAgentList();
+            renderAgentGrid();
+        });
     </script>
 </body>
 </html>

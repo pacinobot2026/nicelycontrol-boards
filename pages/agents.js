@@ -1,222 +1,1011 @@
-import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import NavigationSidebar from '../components/NavigationSidebar';
-import withAuth from '../lib/withAuth';
 
-function AgentCommandCenter() {
-  const [selectedAgent, setSelectedAgent] = useState(null);
-  const [agents, setAgents] = useState({
-    article: { id: 'article', name: 'Article Agent', emoji: '📝', type: 'article', status: 'online', currentTask: null },
-    funnel: { id: 'funnel', name: 'Funnel Agent', emoji: '🏗️', type: 'funnel', status: 'online', currentTask: null },
-    video: { id: 'video', name: 'Video Agent', emoji: '🎬', type: 'video', status: 'working', currentTask: 'Create clips' },
-    research: { id: 'research', name: 'Research Agent', emoji: '🔍', type: 'research', status: 'idle', currentTask: null },
-    code: { id: 'code', name: 'Code Agent', emoji: '💻', type: 'code', status: 'idle', currentTask: null },
-    design: { id: 'design', name: 'Design Agent', emoji: '🎨', type: 'design', status: 'idle', currentTask: null },
-    social: { id: 'social', name: 'Social Agent', emoji: '📱', type: 'social', status: 'idle', currentTask: null },
-    email: { id: 'email', name: 'Email Agent', emoji: '📧', type: 'email', status: 'idle', currentTask: null },
-    analytics: { id: 'analytics', name: 'Analytics Agent', emoji: '📊', type: 'analytics', status: 'idle', currentTask: null }
-  });
-
-  const activeCount = Object.values(agents).filter(a => a.status === 'online' || a.status === 'working').length;
-  const workingAgents = Object.values(agents).filter(a => a.status === 'working');
-
+export default function AgentCommandCenter() {
   return (
-    <div className="flex min-h-screen bg-[#0a0a1a] text-white">
+    <>
       <Head>
-        <title>AI Agent Command Center - NicelyControl</title>
+        <title>AI Agent Command Center</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-
-      <NavigationSidebar />
-
-      <main className="flex-1 flex">
-        {/* Left Panel - Agent Fleet */}
-        <div className="w-64 bg-black/30 border-r border-white/10 p-5 overflow-y-auto">
-          <div className="flex justify-between items-center mb-4 text-xs text-gray-400 uppercase tracking-wide">
+      
+      <style jsx global>{`
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0f1729 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #00d4ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        .fleet-panel {
+            width: 280px;
+            background: rgba(0,0,0,0.3);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .fleet-header {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .fleet-count {
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        
+        .agent-list { display: flex; flex-direction: column; gap: 10px; }
+        
+        .agent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .agent-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+        .agent-item.active { background: rgba(0,212,255,0.1); border-color: #00d4ff; }
+        .agent-item.working { background: rgba(255,215,0,0.1); border-color: #ffd700; }
+        
+        .online-indicator {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: #00ff88;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .agent-avatar.article { background: rgba(0,212,255,0.15); }
+        .agent-avatar.funnel { background: rgba(255,107,107,0.15); }
+        .agent-avatar.video { background: rgba(168,85,247,0.15); }
+        .agent-avatar.research { background: rgba(255,193,7,0.15); }
+        .agent-avatar.code { background: rgba(0,230,118,0.15); }
+        .agent-avatar.design { background: rgba(233,30,99,0.15); }
+        .agent-avatar.social { background: rgba(33,150,243,0.15); }
+        .agent-avatar.email { background: rgba(255,87,34,0.15); }
+        .agent-avatar.analytics { background: rgba(156,39,176,0.15); }
+        
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
+        .agent-status-text { font-size: 0.7rem; color: #666; }
+        .agent-status-text.online { color: #00ff88; }
+        .agent-status-text.working { color: #ffd700; }
+        
+        .viz-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .orbit-container {
+            width: 500px;
+            height: 500px;
+            position: relative;
+        }
+        
+        .center-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0,212,255,0.3), transparent);
+            border: 2px solid rgba(0,212,255,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: hubPulse 2s ease infinite;
+            z-index: 10;
+        }
+        
+        @keyframes hubPulse {
+            0%, 100% { 
+                box-shadow: 0 0 30px rgba(0,212,255,0.4), 0 0 60px rgba(0,212,255,0.2);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 60px rgba(0,212,255,0.8), 0 0 100px rgba(0,212,255,0.4);
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+        
+        .orbit-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .orbit-ring.ring-1 { width: 200px; height: 200px; }
+        .orbit-ring.ring-2 { width: 320px; height: 320px; }
+        .orbit-ring.ring-3 { width: 440px; height: 440px; }
+        
+        .orbit-agent {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+        
+        .orbit-agent:hover { transform: scale(1.15); z-index: 30; }
+        .orbit-agent.active { box-shadow: 0 0 50px currentColor; z-index: 30; }
+        
+        .orbit-agent.online { 
+            opacity: 0.8; 
+            animation: orbit linear infinite, idleGlow 3s ease infinite;
+        }
+        .orbit-agent.working { 
+            opacity: 1; 
+            animation: orbit linear infinite, workingGlow 0.8s ease infinite;
+        }
+        
+        @keyframes idleGlow {
+            0%, 100% { box-shadow: 0 0 15px currentColor; }
+            50% { box-shadow: 0 0 30px currentColor, 0 0 45px currentColor; }
+        }
+        
+        @keyframes workingGlow {
+            0%, 100% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+            50% { box-shadow: 0 0 40px currentColor, 0 0 80px currentColor, 0 0 120px currentColor; }
+        }
+        
+        .orbit-agent.article { background: rgba(0,212,255,0.3); border: 2px solid #00d4ff; color: #00d4ff; animation-duration: 20s; }
+        .orbit-agent.funnel { background: rgba(255,107,107,0.3); border: 2px solid #ff6b6b; color: #ff6b6b; animation-duration: 25s; animation-delay: -5s; }
+        .orbit-agent.video { background: rgba(168,85,247,0.3); border: 2px solid #a855f7; color: #a855f7; animation-duration: 22s; animation-delay: -10s; }
+        .orbit-agent.research { background: rgba(255,193,7,0.3); border: 2px solid #ffc107; color: #ffc107; animation-duration: 28s; animation-delay: -15s; }
+        .orbit-agent.code { background: rgba(0,230,118,0.3); border: 2px solid #00e676; color: #00e676; animation-duration: 18s; animation-delay: -8s; }
+        .orbit-agent.design { background: rgba(233,30,99,0.3); border: 2px solid #e91e63; color: #e91e63; animation-duration: 24s; animation-delay: -12s; }
+        .orbit-agent.social { background: rgba(33,150,243,0.3); border: 2px solid #2196f3; color: #2196f3; animation-duration: 26s; animation-delay: -18s; }
+        .orbit-agent.email { background: rgba(255,87,34,0.3); border: 2px solid #ff5722; color: #ff5722; animation-duration: 21s; animation-delay: -3s; }
+        .orbit-agent.analytics { background: rgba(156,39,176,0.3); border: 2px solid #9c27b0; color: #9c27b0; animation-duration: 23s; animation-delay: -7s; }
+        
+        @keyframes orbit {
+            from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+        }
+        
+        .right-panel {
+            width: 380px;
+            background: rgba(0,0,0,0.3);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .view-section {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .view-section.active {
+            display: flex !important;
+        }
+        
+        .menu-header, .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .menu-header h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        
+        .detail-header { display: flex; align-items: center; gap: 15px; }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+        
+        .detail-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .detail-avatar.article { background: rgba(0,212,255,0.2); }
+        .detail-avatar.funnel { background: rgba(255,107,107,0.2); }
+        .detail-avatar.video { background: rgba(168,85,247,0.2); }
+        .detail-avatar.research { background: rgba(255,193,7,0.2); }
+        .detail-avatar.code { background: rgba(0,230,118,0.2); }
+        .detail-avatar.design { background: rgba(233,30,99,0.2); }
+        .detail-avatar.social { background: rgba(33,150,243,0.2); }
+        .detail-avatar.email { background: rgba(255,87,34,0.2); }
+        .detail-avatar.analytics { background: rgba(156,39,176,0.2); }
+        
+        .detail-title h2 { font-size: 1.2rem; margin-bottom: 4px; }
+        
+        .detail-status {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .detail-status.online { color: #00ff88; }
+        .detail-status.working { color: #ffd700; }
+        .detail-status.idle { color: #666; }
+        
+        .detail-id {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        
+        .detail-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .detail-section { margin-bottom: 25px; }
+        
+        .detail-section-title {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .detail-description {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .capabilities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .capability-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        
+        .capability-item::before {
+            content: '✓';
+            width: 18px;
+            height: 18px;
+            background: rgba(0,255,136,0.15);
+            color: #00ff88;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        .current-activity {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .current-activity.working {
+            border-left-color: #ffd700;
+            animation: activityPulse 2s infinite;
+        }
+        
+        @keyframes activityPulse {
+            0%, 100% { background: rgba(255,215,0,0.05); }
+            50% { background: rgba(255,215,0,0.1); }
+        }
+        
+        .activity-label { font-size: 0.75rem; color: #888; margin-bottom: 5px; }
+        .activity-task { font-size: 0.95rem; font-weight: 500; }
+        
+        .activity-progress {
+            margin-top: 10px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .activity-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #a855f7);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .chat-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            max-height: 280px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chat-message {
+            max-width: 90%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .chat-message.user {
+            align-self: flex-end;
+            background: rgba(0,212,255,0.2);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-message.agent {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.08);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-message.system {
+            align-self: center;
+            background: rgba(255,215,0,0.1);
+            color: #ffd700;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+        }
+        
+        .chat-input-area {
+            padding: 12px 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        
+        .chat-input:focus { border-color: #00d4ff; }
+        
+        .chat-send {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00d4ff, #a855f7);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-send:hover { transform: scale(1.05); }
+        
+        .open-tasks-section, .completed-tasks-section {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .open-tasks-section {
+            max-height: 45%;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section-count {
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .open-tasks-section .section-count { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+        .completed-tasks-section .section-count { background: rgba(0,255,136,0.2); color: #00ff88; }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .task-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item:hover { background: rgba(255,255,255,0.06); }
+        .task-item.completed { border-left: 3px solid #00ff88; opacity: 0.8; }
+        
+        .task-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .task-avatar.article { background: rgba(0,212,255,0.15); }
+        .task-avatar.funnel { background: rgba(255,107,107,0.15); }
+        .task-avatar.video { background: rgba(168,85,247,0.15); }
+        
+        .task-content { flex: 1; }
+        .task-name { font-size: 0.85rem; margin-bottom: 3px; }
+        .task-meta { font-size: 0.7rem; color: #666; }
+        .completion-time { font-size: 0.7rem; color: #00ff88; margin-top: 3px; }
+        
+        .task-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffd700;
+            animation: statusPulse 2s infinite;
+        }
+        
+        .task-item.completed .task-status { background: #00ff88; animation: none; }
+        
+        @keyframes statusPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        
+        .empty-state-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+      `}</style>
+      
+      <div className="bg-grid"></div>
+      
+      <div className="header">
+        <h1>🎬 AI Agent Command Center</h1>
+      </div>
+      
+      <div className="main-container">
+        <div className="fleet-panel">
+          <div className="fleet-header">
             <span>Agent Fleet</span>
-            <span className="bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full text-xs">
-              {Object.keys(agents).length} Total
-            </span>
+            <span className="fleet-count">9 Total</span>
           </div>
-
-          <div className="space-y-2">
-            {Object.values(agents).map(agent => (
-              <div
-                key={agent.id}
-                onClick={() => setSelectedAgent(agent.id)}
-                className={`relative flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                  selectedAgent === agent.id
-                    ? 'bg-cyan-500/10 border-cyan-500'
-                    : agent.status === 'working'
-                    ? 'bg-yellow-500/10 border-yellow-500/50'
-                    : 'bg-white/5 border-white/5 hover:bg-white/10'
-                }`}
-              >
-                {agent.status !== 'idle' && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/5 bg-green-400 rounded-r shadow-lg shadow-green-400/50" />
-                )}
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl ${
-                  agent.type === 'article' ? 'bg-cyan-500/15' :
-                  agent.type === 'funnel' ? 'bg-red-500/15' :
-                  agent.type === 'video' ? 'bg-purple-500/15' :
-                  agent.type === 'research' ? 'bg-yellow-500/15' :
-                  agent.type === 'code' ? 'bg-green-500/15' :
-                  agent.type === 'design' ? 'bg-pink-500/15' :
-                  agent.type === 'social' ? 'bg-blue-500/15' :
-                  agent.type === 'email' ? 'bg-orange-500/15' :
-                  'bg-purple-500/15'
-                }`}>
-                  {agent.emoji}
+          <div className="agent-list" id="agent-list"></div>
+        </div>
+        
+        <div className="viz-panel">
+          <div className="orbit-container" id="orbit-container">
+            <div className="orbit-ring ring-1"></div>
+            <div className="orbit-ring ring-2"></div>
+            <div className="orbit-ring ring-3"></div>
+            <div className="center-hub">🎬</div>
+          </div>
+        </div>
+        
+        <div className="right-panel" id="right-panel">
+          <div className="view-section" id="menu-view">
+            <div className="menu-header">
+              <h2>📋 Main Menu</h2>
+            </div>
+            
+            <div className="open-tasks-section">
+              <div className="section-header">
+                <span className="section-title">Open Tasks</span>
+                <span className="section-count" id="open-count">0</span>
+              </div>
+              <div className="task-list" id="open-tasks"></div>
+            </div>
+            
+            <div className="completed-tasks-section">
+              <div className="section-header">
+                <span className="section-title">Recently Completed</span>
+                <span className="section-count" id="completed-count">0</span>
+              </div>
+              <div className="task-list" id="completed-tasks"></div>
+            </div>
+          </div>
+          
+          <div className="view-section" id="agent-detail-view">
+            <div className="detail-header">
+              <button className="back-btn" onClick={() => typeof window !== 'undefined' && window.showMenu()}>← Back</button>
+              <div className="detail-avatar" id="detail-avatar">🤖</div>
+              <div>
+                <div className="detail-title">
+                  <h2 id="detail-name">Agent Name</h2>
                 </div>
-                <div className="flex-1">
-                  <div className="font-medium text-sm">{agent.name}</div>
-                  <div className={`text-xs ${
-                    agent.status === 'working' ? 'text-yellow-400' :
-                    agent.status === 'online' ? 'text-green-400' :
-                    'text-gray-600'
-                  }`}>
-                    {agent.status === 'working' ? '⟳ Working' :
-                     agent.status === 'online' ? '● Online' :
-                     '○ Idle'}
+                <div className="detail-status" id="detail-status">
+                  <span>●</span> <span id="detail-status-text">Online</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="detail-content">
+              <div className="detail-id" id="detail-id">Session: ...</div>
+              
+              <div className="detail-section">
+                <div className="detail-section-title">Job Description</div>
+                <div className="detail-description" id="detail-description">...</div>
+              </div>
+              
+              <div className="detail-section">
+                <div className="detail-section-title">Capabilities</div>
+                <div className="capabilities-list" id="detail-capabilities"></div>
+              </div>
+              
+              <div className="detail-section">
+                <div className="detail-section-title">Current Activity</div>
+                <div className="current-activity" id="detail-activity">
+                  <div className="activity-label">Status</div>
+                  <div className="activity-task" id="detail-activity-text">Waiting...</div>
+                  <div className="activity-progress" id="detail-progress" style={{display: 'none'}}>
+                    <div className="activity-progress-bar" id="detail-progress-bar" style={{width: '0%'}}></div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Center Panel - Agent Detail */}
-        <div className="flex-1 p-8">
-          {selectedAgent ? (
-            <>
-              {/* Agent Header */}
-              <div className="flex items-center gap-4 mb-8 pb-6 border-b border-white/10">
-                <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${
-                  agents[selectedAgent].type === 'article' ? 'bg-cyan-500/15' :
-                  agents[selectedAgent].type === 'funnel' ? 'bg-red-500/15' :
-                  agents[selectedAgent].type === 'video' ? 'bg-purple-500/15' :
-                  agents[selectedAgent].type === 'research' ? 'bg-yellow-500/15' :
-                  agents[selectedAgent].type === 'code' ? 'bg-green-500/15' :
-                  agents[selectedAgent].type === 'design' ? 'bg-pink-500/15' :
-                  agents[selectedAgent].type === 'social' ? 'bg-blue-500/15' :
-                  agents[selectedAgent].type === 'email' ? 'bg-orange-500/15' :
-                  'bg-purple-500/15'
-                }`}>
-                  {agents[selectedAgent].emoji}
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold">{agents[selectedAgent].name}</h1>
-                  <div className={`text-sm flex items-center gap-2 ${
-                    agents[selectedAgent].status === 'working' ? 'text-yellow-400' :
-                    agents[selectedAgent].status === 'online' ? 'text-green-400' :
-                    'text-gray-400'
-                  }`}>
-                    <span>●</span>
-                    <span>{agents[selectedAgent].status === 'working' ? 'Working' :
-                           agents[selectedAgent].status === 'online' ? 'Online' : 'Idle'}</span>
-                  </div>
-                </div>
+            </div>
+            
+            <div className="chat-section">
+              <div className="chat-messages" id="chat-messages">
+                <div className="chat-message system">💬 Send a message to assign tasks</div>
               </div>
-
-              {/* Current Task */}
-              {agents[selectedAgent].status === 'working' && agents[selectedAgent].currentTask && (
-                <div className="bg-yellow-500/10 border-l-4 border-yellow-500 rounded-lg p-6 mb-6">
-                  <div className="text-xs text-gray-400 uppercase mb-2">Currently Working</div>
-                  <div className="text-lg font-semibold">{agents[selectedAgent].currentTask}</div>
-                </div>
-              )}
-
-              {agents[selectedAgent].status === 'online' && (
-                <div className="bg-green-500/10 border-l-4 border-green-500 rounded-lg p-6 mb-6">
-                  <div className="text-xs text-gray-400 uppercase mb-2">Status</div>
-                  <div className="text-lg font-semibold">Ready for tasks</div>
-                </div>
-              )}
-
-              {agents[selectedAgent].status === 'idle' && (
-                <div className="bg-gray-500/10 border-l-4 border-gray-500 rounded-lg p-6 mb-6">
-                  <div className="text-xs text-gray-400 uppercase mb-2">Status</div>
-                  <div className="text-lg font-semibold">Idle - Spawn session to activate</div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-gray-500">
-                <div className="text-6xl mb-4">🤖</div>
-                <div className="text-xl font-bold">Select an agent to view details</div>
+              <div className="chat-input-area">
+                <input 
+                  type="text" 
+                  className="chat-input" 
+                  id="chat-input" 
+                  placeholder="Type a message..." 
+                  onKeyPress={(e) => e.key === 'Enter' && typeof window !== 'undefined' && window.sendMessage()}
+                />
+                <button className="chat-send" onClick={() => typeof window !== 'undefined' && window.sendMessage()}>➤</button>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Right Panel - Main Menu */}
-        <div className="w-96 bg-black/30 border-l border-white/10 flex flex-col">
-          <div className="p-5 border-b border-white/10">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              📋 Main Menu
-            </h2>
-          </div>
-
-          {/* Stats */}
-          <div className="p-5 grid grid-cols-3 gap-3 border-b border-white/10">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-cyan-400">{activeCount}</div>
-              <div className="text-xs text-gray-400">ACTIVE</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-400">0</div>
-              <div className="text-xs text-gray-400">COMPLETED</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">{workingAgents.length}</div>
-              <div className="text-xs text-gray-400">ONLINE</div>
-            </div>
-          </div>
-
-          {/* Open Tasks */}
-          <div className="flex-1 overflow-y-auto p-5">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-xs text-gray-400 uppercase tracking-wide">Open Tasks</span>
-              <span className="bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full text-xs">0</span>
-            </div>
-            <div className="text-center py-8 text-gray-600">
-              <div className="text-3xl mb-2 opacity-50">📭</div>
-              <p className="text-sm">No open tasks</p>
-            </div>
-          </div>
-
-          {/* Completed Tasks */}
-          <div className="flex-1 overflow-y-auto p-5 border-t border-white/10">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-xs text-gray-400 uppercase tracking-wide">Recently Completed</span>
-              <span className="bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full text-xs">0</span>
-            </div>
-            <div className="text-center py-8 text-gray-600">
-              <div className="text-3xl mb-2 opacity-50">🎯</div>
-              <p className="text-sm">No completed tasks yet</p>
-            </div>
           </div>
         </div>
-      </main>
-
-      {/* Currently Working Section */}
-      {workingAgents.length > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-yellow-500/10 border border-yellow-500/50 rounded-2xl p-4 backdrop-blur-xl max-w-md">
-          <div className="text-xs text-gray-400 uppercase mb-2">Currently Working</div>
-          <div className="flex items-center gap-3">
-            <div className="text-2xl">{workingAgents[0].emoji}</div>
-            <div>
-              <div className="font-semibold">{workingAgents[0].name}</div>
-              <div className="text-sm text-gray-400">{workingAgents[0].currentTask}</div>
-            </div>
-            <div className="ml-auto bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs font-bold">
-              1 ACTIVE
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </div>
+      
+      <script dangerouslySetInnerHTML={{__html: `
+        const agents = {
+          article: { id: 'article', name: 'Article Agent', emoji: '📝', type: 'article', status: 'online', currentTask: null,
+            description: 'Specializes in content creation, local news articles, blog posts, and newsletter management.',
+            capabilities: ['Create local news articles', 'Write WordPress posts', 'Process Supabase queue', 'Generate SEO content', 'Auto-publish content'],
+            sessionId: '91e452b5-775b-49cc-85ff-05608c7937e4' },
+          funnel: { id: 'funnel', name: 'Funnel Agent', emoji: '🏗️', type: 'funnel', status: 'online', currentTask: null,
+            description: 'Builds sales pages, funnels, lead pages, and bridge pages using MintBird and PopLinks APIs.',
+            capabilities: ['AI sales pages (MintBird)', 'Lead & bridge pages', 'Complete funnel builds', 'Product linking', 'Clone pages'],
+            sessionId: 'b5107f48-bee4-4357-b779-9839b69602f6' },
+          video: { id: 'video', name: 'Video Agent', emoji: '🎬', type: 'video', status: 'online', currentTask: null,
+            description: 'Handles video processing, short-form clip creation, and transcript management.',
+            capabilities: ['Send to Vizard.ai', 'Process transcripts', 'Short-form workflow', 'Frame extraction', 'Auto-publish clips'],
+            sessionId: '1309876d-0e6d-4cd3-bbd0-4e17a7e33507' },
+          research: { id: 'research', name: 'Research Agent', emoji: '🔍', type: 'research', status: 'idle', currentTask: null,
+            description: 'Gathers market research, competitor analysis, and trend monitoring.',
+            capabilities: ['Market trend analysis', 'Competitor research', 'Keyword research', 'Content gap analysis', 'Industry reports'],
+            sessionId: null },
+          code: { id: 'code', name: 'Code Agent', emoji: '💻', type: 'code', status: 'idle', currentTask: null,
+            description: 'Handles coding tasks, API integrations, and automation scripts.',
+            capabilities: ['API integration', 'Automation scripts', 'Code review', 'Database management', 'Webhook setup'],
+            sessionId: null },
+          design: { id: 'design', name: 'Design Agent', emoji: '🎨', type: 'design', status: 'idle', currentTask: null,
+            description: 'Creates visual assets, graphics, and UI/UX designs.',
+            capabilities: ['Social media graphics', 'Landing page designs', 'Logo & branding', 'Image editing', 'Design systems'],
+            sessionId: null },
+          social: { id: 'social', name: 'Social Agent', emoji: '📱', type: 'social', status: 'idle', currentTask: null,
+            description: 'Manages social media posting, scheduling, and engagement.',
+            capabilities: ['Post scheduling', 'Content calendar', 'Engagement monitoring', 'Hashtag research', 'Analytics'],
+            sessionId: null },
+          email: { id: 'email', name: 'Email Agent', emoji: '📧', type: 'email', status: 'idle', currentTask: null,
+            description: 'Handles email marketing, broadcasts, and automation workflows.',
+            capabilities: ['Broadcast emails', 'Email sequences', 'List segmentation', 'A/B testing', 'Deliverability'],
+            sessionId: null },
+          analytics: { id: 'analytics', name: 'Analytics Agent', emoji: '📊', type: 'analytics', status: 'idle', currentTask: null,
+            description: 'Tracks metrics, generates reports, and provides insights.',
+            capabilities: ['Traffic tracking', 'Dashboard creation', 'Performance reports', 'Goal tracking', 'Data visualization'],
+            sessionId: null }
+        };
+        
+        let selectedAgent = null;
+        let openTasks = [];
+        let completedTasks = [];
+        let taskIdCounter = 1;
+        let chatHistory = {};
+        
+        function init() {
+          renderAgentList();
+          renderOrbitView();
+          renderTasks();
+          simulateActivity();
+          showMenu();
+        }
+        
+        function renderAgentList() {
+          const list = document.getElementById('agent-list');
+          if (!list) return;
+          list.innerHTML = '';
+          
+          Object.values(agents).forEach(agent => {
+            const item = document.createElement('div');
+            item.className = \`agent-item \${agent.status} \${selectedAgent === agent.id ? 'active' : ''}\`;
+            item.onclick = function() { selectAgent(agent.id); };
+            
+            const onlineIndicator = agent.status !== 'idle' ? '<div class="online-indicator"></div>' : '';
+            
+            item.innerHTML = \`
+              \${onlineIndicator}
+              <div class="agent-avatar \${agent.type}">\${agent.emoji}</div>
+              <div class="agent-info">
+                <div class="agent-name">\${agent.name}</div>
+                <div class="agent-status-text \${agent.status}">
+                  \${agent.status === 'working' ? '⟳ Working' : agent.status === 'online' ? '● Online' : '○ Idle'}
+                </div>
+              </div>
+            \`;
+            
+            list.appendChild(item);
+          });
+        }
+        
+        function renderOrbitView() {
+          const container = document.getElementById('orbit-container');
+          if (!container) return;
+          
+          container.querySelectorAll('.orbit-agent').forEach(el => el.remove());
+          
+          Object.values(agents).forEach((agent, index) => {
+            const orbit = document.createElement('div');
+            orbit.className = \`orbit-agent \${agent.type} \${agent.status} \${selectedAgent === agent.id ? 'active' : ''}\`;
+            orbit.id = \`orbit-\${agent.id}\`;
+            orbit.innerHTML = agent.emoji;
+            orbit.style.animationDelay = \`\${-index * 3}s\`;
+            
+            orbit.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              selectAgent(agent.id);
+            });
+            
+            container.appendChild(orbit);
+          });
+        }
+        
+        function selectAgent(agentId) {
+          selectedAgent = agentId;
+          renderAgentList();
+          renderOrbitView();
+          showAgentDetail(agentId);
+        }
+        
+        function showAgentDetail(agentId) {
+          const agent = agents[agentId];
+          if (!agent) return;
+          
+          const menuView = document.getElementById('menu-view');
+          const detailView = document.getElementById('agent-detail-view');
+          
+          menuView.classList.remove('active');
+          menuView.style.display = 'none';
+          
+          detailView.classList.add('active');
+          detailView.style.display = 'flex';
+          
+          document.getElementById('detail-avatar').textContent = agent.emoji;
+          document.getElementById('detail-avatar').className = \`detail-avatar \${agent.type}\`;
+          document.getElementById('detail-name').textContent = agent.name;
+          
+          const statusEl = document.getElementById('detail-status');
+          statusEl.className = \`detail-status \${agent.status}\`;
+          document.getElementById('detail-status-text').textContent = 
+            agent.status === 'working' ? 'Working' : agent.status === 'online' ? 'Online' : 'Idle';
+          
+          document.getElementById('detail-id').textContent = \`Session: \${agent.sessionId || 'Not connected'}\`;
+          document.getElementById('detail-description').textContent = agent.description;
+          document.getElementById('detail-capabilities').innerHTML = 
+            agent.capabilities.map(cap => \`<div class="capability-item">\${cap}</div>\`).join('');
+          
+          const activityEl = document.getElementById('detail-activity');
+          activityEl.className = \`current-activity \${agent.status}\`;
+          document.getElementById('detail-activity-text').textContent = agent.currentTask || 'Waiting for assignment...';
+          document.getElementById('detail-progress').style.display = agent.status === 'working' ? 'block' : 'none';
+          
+          renderChat(agentId);
+        }
+        
+        function showMenu() {
+          selectedAgent = null;
+          
+          const menuView = document.getElementById('menu-view');
+          const detailView = document.getElementById('agent-detail-view');
+          
+          menuView.classList.add('active');
+          menuView.style.display = 'flex';
+          
+          detailView.classList.remove('active');
+          detailView.style.display = 'none';
+          
+          renderAgentList();
+          renderOrbitView();
+        }
+        
+        window.showMenu = showMenu;
+        
+        function renderChat(agentId) {
+          const chat = chatHistory[agentId] || [];
+          const container = document.getElementById('chat-messages');
+          
+          if (chat.length === 0) {
+            container.innerHTML = \`<div class="chat-message system">💬 Send a message to assign tasks</div>\`;
+          } else {
+            container.innerHTML = chat.map(msg => \`<div class="chat-message \${msg.type}">\${msg.text}</div>\`).join('');
+          }
+          
+          container.scrollTop = container.scrollHeight;
+        }
+        
+        function sendMessage() {
+          const input = document.getElementById('chat-input');
+          const text = input.value.trim();
+          if (!text || !selectedAgent) return;
+          
+          if (!chatHistory[selectedAgent]) chatHistory[selectedAgent] = [];
+          chatHistory[selectedAgent].push({ type: 'user', text });
+          renderChat(selectedAgent);
+          
+          setTimeout(() => {
+            const agent = agents[selectedAgent];
+            let response = agent.status === 'idle' 
+              ? \`I'm currently idle. To activate me, you'll need to spawn my session first.\`
+              : \`I'll handle that for you. Starting task: "\${text}"\`;
+            
+            if (agent.status !== 'idle') {
+              agent.status = 'working';
+              agent.currentTask = text;
+              renderAgentList();
+              renderOrbitView();
+              showAgentDetail(selectedAgent);
+              
+              setTimeout(() => {
+                agent.status = 'online';
+                agent.currentTask = null;
+                chatHistory[selectedAgent].push({ type: 'agent', text: \`✅ Task completed! "\${text}" is done.\` });
+                renderAgentList();
+                renderOrbitView();
+                if (selectedAgent) showAgentDetail(selectedAgent);
+              }, 4000);
+            }
+            
+            chatHistory[selectedAgent].push({ type: 'agent', text: response });
+            renderChat(selectedAgent);
+          }, 500);
+          
+          input.value = '';
+        }
+        
+        window.sendMessage = sendMessage;
+        
+        function renderTasks() {
+          const openList = document.getElementById('open-tasks');
+          document.getElementById('open-count').textContent = openTasks.length;
+          
+          if (openTasks.length === 0) {
+            openList.innerHTML = \`<div class="empty-state"><div class="empty-state-icon">📭</div><p>No open tasks</p></div>\`;
+          } else {
+            openList.innerHTML = openTasks.map(task => \`
+              <div class="task-item">
+                <div class="task-avatar \${task.agentType}">\${task.agentEmoji}</div>
+                <div class="task-content">
+                  <div class="task-name">\${task.name}</div>
+                  <div class="task-meta">Assigned to \${task.agentName}</div>
+                </div>
+                <div class="task-status"></div>
+              </div>
+            \`).join('');
+          }
+          
+          const completedList = document.getElementById('completed-tasks');
+          document.getElementById('completed-count').textContent = completedTasks.length;
+          
+          if (completedTasks.length === 0) {
+            completedList.innerHTML = \`<div class="empty-state"><div class="empty-state-icon">🎯</div><p>No completed tasks yet</p></div>\`;
+          } else {
+            completedList.innerHTML = completedTasks.slice(0, 10).map(task => \`
+              <div class="task-item completed">
+                <div class="task-avatar \${task.agentType}">\${task.agentEmoji}</div>
+                <div class="task-content">
+                  <div class="task-name">\${task.name}</div>
+                  <div class="completion-time">✓ Completed \${task.completedTime}</div>
+                </div>
+                <div class="task-status"></div>
+              </div>
+            \`).join('');
+          }
+        }
+        
+        function simulateActivity() {
+          const activeAgents = ['article', 'funnel', 'video'];
+          const taskTemplates = {
+            article: ['Create local article', 'Process Supabase queue', 'Generate SEO content'],
+            funnel: ['Build sales page', 'Create lead page', 'Setup funnel'],
+            video: ['Send to Vizard', 'Process transcript', 'Create clips']
+          };
+          
+          setInterval(() => {
+            if (openTasks.length < 2 && Math.random() > 0.6) {
+              const agentId = activeAgents[Math.floor(Math.random() * activeAgents.length)];
+              const agent = agents[agentId];
+              const taskName = taskTemplates[agentId][Math.floor(Math.random() * taskTemplates[agentId].length)];
+              
+              const task = {
+                id: taskIdCounter++,
+                name: taskName,
+                agentId: agentId,
+                agentName: agent.name,
+                agentEmoji: agent.emoji,
+                agentType: agent.type
+              };
+              
+              openTasks.push(task);
+              renderTasks();
+              setTimeout(() => assignTask(task), 1500);
+            }
+          }, 6000);
+        }
+        
+        function assignTask(task) {
+          const agent = agents[task.agentId];
+          if (agent.status === 'working') return;
+          
+          openTasks = openTasks.filter(t => t.id !== task.id);
+          
+          agent.status = 'working';
+          agent.currentTask = task.name;
+          
+          renderAgentList();
+          renderOrbitView();
+          renderTasks();
+          
+          if (selectedAgent === task.agentId) showAgentDetail(selectedAgent);
+          
+          setTimeout(() => {
+            agent.status = 'online';
+            agent.currentTask = null;
+            
+            const completedTask = { ...task, completedTime: 'just now' };
+            completedTasks.unshift(completedTask);
+            if (completedTasks.length > 15) completedTasks.pop();
+            
+            renderAgentList();
+            renderOrbitView();
+            renderTasks();
+            
+            if (selectedAgent === task.agentId) showAgentDetail(selectedAgent);
+          }, 4000);
+        }
+        
+        if (typeof document !== 'undefined') {
+          document.addEventListener('DOMContentLoaded', init);
+        }
+      `}} />
+    </>
   );
 }
-
-export default withAuth(AgentCommandCenter);

@@ -680,13 +680,11 @@
             document.getElementById('working-count').textContent = `${workingAgents.length} Active`;
             
             if (workingAgents.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-tasks" style="grid-column: 1/-1;">
-                        <div class="empty-tasks-icon">😴</div>
-                        <p>No agents currently working</p>
-                    </div>
-                `;
+                grid.innerHTML = '';
+                document.querySelector('.working-header span:first-child').textContent = 'No Agents Working';
                 return;
+            } else {
+                document.querySelector('.working-header span:first-child').textContent = 'Currently Working';
             }
             
             grid.innerHTML = workingAgents.map(agent => `

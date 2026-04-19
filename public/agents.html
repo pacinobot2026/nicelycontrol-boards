@@ -691,27 +691,19 @@
             
             const infoContent = document.getElementById('agent-info-content');
             const avatarHtml = agent.imageUrl ?
-                `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 100px; height: 100px; font-size: 50px; margin: 0 auto 15px; background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
-                `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 100px; height: 100px; font-size: 50px; margin: 0 auto 15px;">${agent.emoji}</div>`;
+                `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 70px; height: 70px; font-size: 35px; margin: 0 auto 10px; background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
+                `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 70px; height: 70px; font-size: 35px; margin: 0 auto 10px;">${agent.emoji}</div>`;
             infoContent.innerHTML = `
                 <div style="text-align: center; margin-bottom: 15px;">
                     ${avatarHtml}
                 </div>
                 <div class="detail-name">${agent.name}</div>
-                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">${agent.tagline || agent.type + ' Specialist'}</div>
-                ${agent.status !== 'idle' ? `
-                <div class="detail-status" style="margin-bottom: 15px;">
-                    ${agent.status === 'online' ? `
-                        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #00ff88;">
-                            <span style="width: 8px; height: 8px; background: #00ff88; border-radius: 50%;"></span>
-                            Online
-                        </span>
-                    ` : `
-                        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #ffd700;">
-                            <span style="width: 8px; height: 8px; background: #ffd700; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
-                            Working
-                        </span>
-                    `}
+                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px; text-align: center;">${agent.tagline || agent.type + ' Specialist'}</div>
+                ${agent.status === 'working' ? `
+                <div class="detail-status" style="margin-bottom: 15px; text-align: center;">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #ffd700;">
+                        <span style="width: 8px; height: 8px; background: #ffd700; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
+                    </span>
                 </div>
                 ` : ''}
                 <div class="detail-stats">

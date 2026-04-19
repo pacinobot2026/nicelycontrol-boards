@@ -506,8 +506,76 @@
                 </div>
                 <div class="detail-tab-content active" id="tab-agent">
                     <div class="detail-content">
-                        <button class="detail-close" onclick="closeAgentDetail()">Close</button>
+                        <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 10px;">
+                            <button class="detail-close" onclick="openEditPopup()" style="position: static; font-size: 1rem;" title="Edit">✏️</button>
+                            <button class="detail-close" onclick="closeAgentDetail()" style="position: static;">Close</button>
+                        </div>
                         <div id="agent-info-content"></div>
+                    </div>
+                </div>
+                
+                <!-- Edit Popup -->
+                <div id="edit-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+                    <div style="background: linear-gradient(135deg, #1a1a2e, #0f1729); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; width: 90%; max-width: 350px; max-height: 85vh; overflow-y: auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 1.1rem;">Edit Agent</h3>
+                            <button onclick="closeEditPopup()" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button>
+                        </div>
+                        
+                        <!-- Icon -->
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div id="edit-popup-avatar" style="width: 70px; height: 70px; border-radius: 16px; background: rgba(0,212,255,0.2); border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 8px; cursor: pointer;" onclick="toggleEmojiPicker()">📝</div>
+                            <div style="font-size: 0.7rem; color: #888;">Click to change icon</div>
+                            
+                            <!-- Emoji Picker -->
+                            <div id="edit-emoji-picker" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px;">
+                                    <span onclick="selectEditEmoji('📝')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📝</span>
+                                    <span onclick="selectEditEmoji('🏗️')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🏗️</span>
+                                    <span onclick="selectEditEmoji('🎬')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🎬</span>
+                                    <span onclick="selectEditEmoji('🎨')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🎨</span>
+                                    <span onclick="selectEditEmoji('🔍')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🔍</span>
+                                    <span onclick="selectEditEmoji('💻')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">💻</span>
+                                    <span onclick="selectEditEmoji('📱')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📱</span>
+                                    <span onclick="selectEditEmoji('📧')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📧</span>
+                                    <span onclick="selectEditEmoji('📊')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📊</span>
+                                    <span onclick="selectEditEmoji('🤖')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🤖</span>
+                                    <span onclick="selectEditEmoji('⚡')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">⚡</span>
+                                    <span onclick="selectEditEmoji('🚀')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🚀</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Name -->
+                        <div style="margin-bottom: 15px;">
+                            <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px;">Name</div>
+                            <input type="text" id="edit-popup-name" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; color: #fff; font-size: 0.95rem;">
+                        </div>
+                        
+                        <!-- Description -->
+                        <div style="margin-bottom: 15px;">
+                            <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px;">Description</div>
+                            <input type="text" id="edit-popup-desc" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; color: #fff; font-size: 0.9rem;">
+                        </div>
+                        
+                        <!-- About -->
+                        <div style="margin-bottom: 15px;">
+                            <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px;">About</div>
+                            <textarea id="edit-popup-about" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; color: #fff; font-size: 0.85rem; min-height: 60px; resize: vertical;"></textarea>
+                        </div>
+                        
+                        <!-- Capabilities -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Capabilities</div>
+                            <div id="edit-popup-caps" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;"></div>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="edit-popup-new-cap" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; color: #fff; font-size: 0.85rem;" placeholder="Add new...">
+                                <button onclick="addEditCap()" style="padding: 8px 15px; background: rgba(0,212,255,0.1); border: 1px solid #00d4ff; border-radius: 6px; color: #00d4ff; cursor: pointer; font-size: 0.8rem;">Add</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Save Button -->
+                        <button onclick="saveEditPopup()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #00d4ff, #a855f7); border: none; border-radius: 8px; color: #fff; cursor: pointer; font-size: 0.95rem; font-weight: 500;">Save Changes</button>
                     </div>
                 </div>
                 <div class="detail-tab-content" id="tab-chat">
@@ -636,6 +704,89 @@
             document.getElementById('agent-detail-panel').classList.remove('active');
             document.getElementById('main-menu-view').style.display = 'flex';
             selectedAgentId = null;
+        }
+        
+        // Edit Popup Functions
+        let tempEditEmoji = '';
+        let tempEditCaps = [];
+        
+        function openEditPopup() {
+            if (!selectedAgentId) return;
+            
+            const agent = agents[selectedAgentId];
+            agent.tagline = agent.tagline || `${agent.type} Specialist`;
+            agent.about = agent.about || `Specialized in ${agent.type} tasks and workflows.`;
+            agent.capabilities = agent.capabilities || ['Task 1', 'Task 2', 'Task 3'];
+            
+            tempEditEmoji = agent.emoji;
+            tempEditCaps = [...agent.capabilities];
+            
+            document.getElementById('edit-popup-avatar').textContent = agent.emoji;
+            document.getElementById('edit-popup-name').value = agent.name;
+            document.getElementById('edit-popup-desc').value = agent.tagline;
+            document.getElementById('edit-popup-about').value = agent.about;
+            document.getElementById('edit-emoji-picker').style.display = 'none';
+            
+            renderEditCaps();
+            
+            document.getElementById('edit-popup').style.display = 'flex';
+        }
+        
+        function closeEditPopup() {
+            document.getElementById('edit-popup').style.display = 'none';
+        }
+        
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('edit-emoji-picker');
+            picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function selectEditEmoji(emoji) {
+            tempEditEmoji = emoji;
+            document.getElementById('edit-popup-avatar').textContent = emoji;
+            document.getElementById('edit-emoji-picker').style.display = 'none';
+        }
+        
+        function renderEditCaps() {
+            const container = document.getElementById('edit-popup-caps');
+            container.innerHTML = tempEditCaps.map((cap, i) => `
+                <span style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 4px 10px; font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 6px;">
+                    ${cap}
+                    <button onclick="removeEditCap(${i})" style="background: transparent; border: none; color: #ff6b6b; cursor: pointer; font-size: 0.7rem; padding: 0;">✕</button>
+                </span>
+            `).join('');
+        }
+        
+        function addEditCap() {
+            const input = document.getElementById('edit-popup-new-cap');
+            const cap = input.value.trim();
+            if (!cap) return;
+            tempEditCaps.push(cap);
+            input.value = '';
+            renderEditCaps();
+        }
+        
+        function removeEditCap(index) {
+            tempEditCaps.splice(index, 1);
+            renderEditCaps();
+        }
+        
+        function saveEditPopup() {
+            if (!selectedAgentId) return;
+            
+            const agent = agents[selectedAgentId];
+            agent.emoji = tempEditEmoji;
+            agent.name = document.getElementById('edit-popup-name').value || agent.name;
+            agent.tagline = document.getElementById('edit-popup-desc').value || agent.tagline;
+            agent.about = document.getElementById('edit-popup-about').value || agent.about;
+            agent.capabilities = tempEditCaps;
+            
+            closeEditPopup();
+            
+            // Refresh all views
+            showAgentDetail(selectedAgentId);
+            renderAgentList();
+            renderWorkingArea();
         }
         
         function switchDetailTab(tabName) {

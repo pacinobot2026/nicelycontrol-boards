@@ -571,6 +571,43 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Icon Change Modal -->
+        <div id="icon-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: linear-gradient(135deg, #1a1a2e, #0f1729); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; width: 90%; max-width: 320px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 1.1rem;">Change Icon</h3>
+                    <button onclick="closeIconModal()" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button>
+                </div>
+                
+                <!-- Option 1: Choose Different Icon -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 10px;">Choose Icon</div>
+                    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;">
+                        <span onclick="changeAgentIcon('📝')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">📝</span>
+                        <span onclick="changeAgentIcon('🏗️')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">🏗️</span>
+                        <span onclick="changeAgentIcon('🎬')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">🎬</span>
+                        <span onclick="changeAgentIcon('🎨')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">🎨</span>
+                        <span onclick="changeAgentIcon('🔍')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">🔍</span>
+                        <span onclick="changeAgentIcon('💻')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">💻</span>
+                        <span onclick="changeAgentIcon('📱')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">📱</span>
+                        <span onclick="changeAgentIcon('📧')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">📧</span>
+                        <span onclick="changeAgentIcon('📊')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">📊</span>
+                        <span onclick="changeAgentIcon('🤖')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">🤖</span>
+                        <span onclick="changeAgentIcon('⚡')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">⚡</span>
+                        <span onclick="changeAgentIcon('🚀')" style="cursor: pointer; font-size: 22px; padding: 8px; text-align: center; border-radius: 6px; background: rgba(255,255,255,0.03);">🚀</span>
+                    </div>
+                </div>
+                
+                <!-- Option 2: Upload Image -->
+                <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 10px;">Or Upload Image</div>
+                    <input type="file" id="icon-image-upload" accept="image/*" style="display: none;" onchange="handleIconImageUpload(event)">
+                    <button onclick="document.getElementById('icon-image-upload').click()" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; cursor: pointer; font-size: 0.9rem;">📁 Choose Image</button>
+                    <div id="icon-upload-filename" style="margin-top: 8px; font-size: 0.8rem; color: #888; text-align: center;"></div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -608,9 +645,13 @@
                 
                 const onlineIndicator = agent.status !== 'idle' ? '<div class="online-indicator"></div>' : '';
                 
+                const avatarHtml = agent.imageUrl ?
+                    `<div class="agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
+                    `<div class="agent-avatar ${agent.type}">${agent.emoji}</div>`;
+                
                 item.innerHTML = `
                     ${onlineIndicator}
-                    <div class="agent-avatar ${agent.type}">${agent.emoji}</div>
+                    ${avatarHtml}
                     <div class="agent-info">
                         <div class="agent-name">${agent.name}</div>
                         <div class="agent-status-text ${agent.status}">
@@ -639,8 +680,14 @@
             switchDetailTab('agent');
             
             const infoContent = document.getElementById('agent-info-content');
+            const avatarHtml = agent.imageUrl ?
+                `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 60px; height: 60px; margin: 0 auto 5px; background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
+                `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 60px; height: 60px; font-size: 28px; margin: 0 auto 5px;">${agent.emoji}</div>`;
             infoContent.innerHTML = `
-                <div class="detail-avatar-large ${agent.type}">${agent.emoji}</div>
+                <div style="text-align: center; margin-bottom: 15px;">
+                    ${avatarHtml}
+                    <div style="font-size: 0.7rem; color: #888;">Click to change</div>
+                </div>
                 <div class="detail-name">${agent.name}</div>
                 <div class="detail-role">${agent.type} Specialist</div>
                 <div class="detail-status">
@@ -798,16 +845,20 @@
                 document.querySelector('.working-header span:first-child').textContent = 'Currently Working';
             }
             
-            grid.innerHTML = workingAgents.map(agent => `
+            grid.innerHTML = workingAgents.map(agent => {
+                const avatarHtml = agent.imageUrl ?
+                    `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
+                    `<div class="working-agent-avatar ${agent.type}">${agent.emoji}</div>`;
+                return `
                 <div class="working-agent" id="working-${agent.id}">
-                    <div class="working-agent-avatar ${agent.type}">${agent.emoji}</div>
+                    ${avatarHtml}
                     <div class="working-agent-name">${agent.name}</div>
                     <div class="working-agent-task">${agent.currentTask}</div>
                     <div class="working-progress">
                         <div class="working-progress-bar" id="progress-${agent.id}" style="width: 0%"></div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
         
         function renderTasks() {
@@ -881,6 +932,51 @@
             
             workingArea.appendChild(popup);
             setTimeout(() => popup.remove(), 3500);
+        }
+        
+        // Icon Modal Functions
+        function openIconModal() {
+            document.getElementById('icon-modal').style.display = 'flex';
+            document.getElementById('icon-upload-filename').textContent = '';
+        }
+        
+        function closeIconModal() {
+            document.getElementById('icon-modal').style.display = 'none';
+        }
+        
+        function changeAgentIcon(emoji) {
+            if (!selectedAgentId) return;
+            
+            agents[selectedAgentId].emoji = emoji;
+            agents[selectedAgentId].imageUrl = null;
+            
+            closeIconModal();
+            
+            // Refresh all views
+            showAgentDetail(selectedAgentId);
+            renderAgentList();
+            renderWorkingArea();
+        }
+        
+        function handleIconImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !selectedAgentId) return;
+            
+            document.getElementById('icon-upload-filename').textContent = file.name;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                agents[selectedAgentId].imageUrl = e.target.result;
+                agents[selectedAgentId].emoji = null;
+                
+                closeIconModal();
+                
+                // Refresh all views
+                showAgentDetail(selectedAgentId);
+                renderAgentList();
+                renderWorkingArea();
+            };
+            reader.readAsDataURL(file);
         }
         
         function simulateActivity() {

@@ -227,6 +227,11 @@
         }
         
         .working-agent-avatar.article { background: rgba(0,212,255,0.2); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
         .working-agent-avatar.funnel { background: rgba(255,107,107,0.2); }
         .working-agent-avatar.video { background: rgba(168,85,247,0.2); }
         
@@ -649,8 +654,14 @@
                     `<div class="agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
                     `<div class="agent-avatar ${agent.type}">${agent.emoji}</div>`;
                 
+                const statusDot = agent.status === 'online' ? 
+                    `<div style="position: absolute; top: 10px; right: 10px; width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 4px #00ff88;"></div>` :
+                    agent.status === 'working' ?
+                    `<div style="position: absolute; top: 10px; right: 10px; width: 6px; height: 6px; background: #ffd700; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; box-shadow: 0 0 4px #ffd700;"></div>` :
+                    '';
+                
+                item.style.position = 'relative';
                 item.innerHTML = `
-                    ${onlineIndicator}
                     ${avatarHtml}
                     <div class="agent-info">
                         <div class="agent-name">${agent.name}</div>
@@ -658,6 +669,7 @@
                             ${agent.status === 'working' ? '⟳ Working' : agent.status === 'online' ? '● Online' : '○ Idle'}
                         </div>
                     </div>
+                    ${statusDot}
                 `;
                 
                 // Add click handler
@@ -688,12 +700,20 @@
                     ${avatarHtml}
                 </div>
                 <div class="detail-name">${agent.name}</div>
-                <div class="detail-role">${agent.tagline || agent.type + ' Specialist'}</div>
+                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">${agent.tagline || agent.type + ' Specialist'}</div>
                 ${agent.status !== 'idle' ? `
-                <div class="detail-status">
-                    <span class="detail-status-badge ${agent.status}">
-                        ${agent.status === 'online' ? '● Online' : '⟳ Working'}
-                    </span>
+                <div class="detail-status" style="margin-bottom: 15px;">
+                    ${agent.status === 'online' ? `
+                        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #00ff88;">
+                            <span style="width: 8px; height: 8px; background: #00ff88; border-radius: 50%;"></span>
+                            Online
+                        </span>
+                    ` : `
+                        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #ffd700;">
+                            <span style="width: 8px; height: 8px; background: #ffd700; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
+                            Working
+                        </span>
+                    `}
                 </div>
                 ` : ''}
                 <div class="detail-stats">

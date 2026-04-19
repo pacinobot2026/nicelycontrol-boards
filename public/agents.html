@@ -522,30 +522,6 @@
                             <button onclick="closeEditPopup()" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button>
                         </div>
                         
-                        <!-- Icon -->
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <div id="edit-popup-avatar" style="width: 70px; height: 70px; border-radius: 16px; background: rgba(0,212,255,0.2); border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 8px; cursor: pointer;" onclick="toggleEmojiPicker()">📝</div>
-                            <div style="font-size: 0.7rem; color: #888;">Click to change icon</div>
-                            
-                            <!-- Emoji Picker -->
-                            <div id="edit-emoji-picker" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px;">
-                                    <span onclick="selectEditEmoji('📝')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📝</span>
-                                    <span onclick="selectEditEmoji('🏗️')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🏗️</span>
-                                    <span onclick="selectEditEmoji('🎬')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🎬</span>
-                                    <span onclick="selectEditEmoji('🎨')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🎨</span>
-                                    <span onclick="selectEditEmoji('🔍')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🔍</span>
-                                    <span onclick="selectEditEmoji('💻')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">💻</span>
-                                    <span onclick="selectEditEmoji('📱')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📱</span>
-                                    <span onclick="selectEditEmoji('📧')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📧</span>
-                                    <span onclick="selectEditEmoji('📊')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">📊</span>
-                                    <span onclick="selectEditEmoji('🤖')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🤖</span>
-                                    <span onclick="selectEditEmoji('⚡')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">⚡</span>
-                                    <span onclick="selectEditEmoji('🚀')" style="cursor: pointer; font-size: 18px; padding: 5px; text-align: center;">🚀</span>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Name -->
                         <div style="margin-bottom: 15px;">
                             <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px;">Name</div>
@@ -707,7 +683,6 @@
         }
         
         // Edit Popup Functions
-        let tempEditEmoji = '';
         let tempEditCaps = [];
         
         function openEditPopup() {
@@ -718,14 +693,11 @@
             agent.about = agent.about || `Specialized in ${agent.type} tasks and workflows.`;
             agent.capabilities = agent.capabilities || ['Task 1', 'Task 2', 'Task 3'];
             
-            tempEditEmoji = agent.emoji;
             tempEditCaps = [...agent.capabilities];
             
-            document.getElementById('edit-popup-avatar').textContent = agent.emoji;
             document.getElementById('edit-popup-name').value = agent.name;
             document.getElementById('edit-popup-desc').value = agent.tagline;
             document.getElementById('edit-popup-about').value = agent.about;
-            document.getElementById('edit-emoji-picker').style.display = 'none';
             
             renderEditCaps();
             
@@ -734,17 +706,6 @@
         
         function closeEditPopup() {
             document.getElementById('edit-popup').style.display = 'none';
-        }
-        
-        function toggleEmojiPicker() {
-            const picker = document.getElementById('edit-emoji-picker');
-            picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        function selectEditEmoji(emoji) {
-            tempEditEmoji = emoji;
-            document.getElementById('edit-popup-avatar').textContent = emoji;
-            document.getElementById('edit-emoji-picker').style.display = 'none';
         }
         
         function renderEditCaps() {
@@ -775,7 +736,6 @@
             if (!selectedAgentId) return;
             
             const agent = agents[selectedAgentId];
-            agent.emoji = tempEditEmoji;
             agent.name = document.getElementById('edit-popup-name').value || agent.name;
             agent.tagline = document.getElementById('edit-popup-desc').value || agent.tagline;
             agent.about = document.getElementById('edit-popup-about').value || agent.about;

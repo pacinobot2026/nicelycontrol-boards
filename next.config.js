@@ -15,7 +15,7 @@ module.exports = {
     return [
       {
         source: '/agents',
-        destination: '/agents-clean.html',
+        destination: '/agents-dashboard-final.html',
       },
     ];
   },

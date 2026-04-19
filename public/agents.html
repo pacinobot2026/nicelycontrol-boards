@@ -974,19 +974,13 @@
             const modalContent = document.getElementById('task-modal-content');
             modalContent.innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="width: 60px; height: 60px; border-radius: 12px; background: rgba(0,212,255,0.2); border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 10px;">${task.agentEmoji}</div>
-                    <div style="font-size: 1rem; font-weight: 600; margin-bottom: 5px;">${task.name}</div>
-                    <div style="font-size: 0.8rem; color: #888;">Assigned to ${task.agentName}</div>
-                </div>
-                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Status</div>
-                    <div style="font-size: 0.9rem; color: ${type === 'completed' ? '#00ff88' : '#ffd700'};">
-                        ${type === 'completed' ? '✓ Completed ' + task.completedTime : '⏳ In Progress'}
-                    </div>
+                    <div style="width: 50px; height: 50px; border-radius: 10px; background: rgba(0,212,255,0.2); border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 10px;">${task.agentEmoji}</div>
+                    <div style="font-size: 1rem; font-weight: 600; margin-bottom: 3px;">${task.name}</div>
+                    <div style="font-size: 0.75rem; color: #888;">${task.agentName} • ${type === 'completed' ? '✓ Done' : '⏳ Active'} • ${new Date(task.createdAt).toLocaleDateString()}</div>
                 </div>
                 <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px;">
-                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Created</div>
-                    <div style="font-size: 0.9rem; color: #aaa;">${new Date(task.createdAt).toLocaleString()}</div>
+                    <div style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Description</div>
+                    <div style="font-size: 0.9rem; color: #aaa; line-height: 1.5;">${task.description || 'No description provided for this task.'}</div>
                 </div>
             `;
             
@@ -1049,6 +1043,7 @@
                     const task = {
                         id: taskIdCounter++,
                         name: taskName,
+                        description: `This task involves ${taskName.toLowerCase()} for the agent. It requires attention to detail and should be completed efficiently.`,
                         agentId: agentId,
                         agentName: agent.name,
                         agentEmoji: agent.emoji,
@@ -1060,7 +1055,7 @@
                     renderTasks();
                     setTimeout(() => assignTask(task), 1000);
                 }
-            }, 5000);
+            }, 2000);
         }
         
         function assignTask(task) {
@@ -1089,7 +1084,7 @@
                     clearInterval(progressInterval);
                     completeTask(task, agent);
                 }
-            }, 500);
+            }, 300);
         }
         
         function completeTask(task, agent) {

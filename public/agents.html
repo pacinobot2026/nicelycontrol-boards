@@ -688,7 +688,7 @@
                     ${avatarHtml}
                 </div>
                 <div class="detail-name">${agent.name}</div>
-                <div class="detail-role">${agent.type} Specialist</div>
+                <div class="detail-role">${agent.tagline || agent.type + ' Specialist'}</div>
                 ${agent.status !== 'idle' ? `
                 <div class="detail-status">
                     <span class="detail-status-badge ${agent.status}">
@@ -703,11 +703,11 @@
                 </div>
                 <div class="detail-section">
                     <div class="detail-section-title">Capabilities</div>
-                    <div class="capability-tags"><span class="capability-tag">Task 1</span><span class="capability-tag">Task 2</span><span class="capability-tag">Task 3</span></div>
+                    <div class="capability-tags">${(agent.capabilities || ['Task 1', 'Task 2', 'Task 3']).map(cap => `<span class="capability-tag">${cap}</span>`).join('')}</div>
                 </div>
                 <div class="detail-section">
                     <div class="detail-section-title">About</div>
-                    <p class="detail-description">Specialized in ${agent.type} tasks and workflows.</p>
+                    <p class="detail-description">${agent.about || 'Specialized in ' + agent.type + ' tasks and workflows.'}</p>
                 </div>
             `;
             

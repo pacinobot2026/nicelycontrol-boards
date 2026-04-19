@@ -665,9 +665,7 @@
                     ${avatarHtml}
                     <div class="agent-info">
                         <div class="agent-name">${agent.name}</div>
-                        <div class="agent-status-text ${agent.status}">
-                            ${agent.status === 'working' ? '⟳ Working' : agent.status === 'online' ? '● Online' : '○ Idle'}
-                        </div>
+                        <div style="font-size: 0.75rem; color: #888;">${agent.tagline || agent.type + ' Specialist'}</div>
                     </div>
                     ${statusDot}
                 `;

@@ -278,6 +278,12 @@
             to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
         
+        @keyframes orbit1 { from { transform: rotate(0deg) translateX(125px) rotate(0deg); } to { transform: rotate(360deg) translateX(125px) rotate(-360deg); } }
+        @keyframes orbit2 { from { transform: rotate(90deg) translateX(175px) rotate(-90deg); } to { transform: rotate(450deg) translateX(175px) rotate(-450deg); } }
+        @keyframes orbit3 { from { transform: rotate(180deg) translateX(75px) rotate(-180deg); } to { transform: rotate(540deg) translateX(75px) rotate(-540deg); } }
+        @keyframes orbit4 { from { transform: rotate(270deg) translateX(150px) rotate(-270deg); } to { transform: rotate(630deg) translateX(150px) rotate(-630deg); } }
+        .orbit-agent:hover { transform: scale(1.2) !important; }
+        
         .checkin-icon { font-size: 24px; }
         .checkin-text { font-size: 0.85rem; }
         .checkin-text strong { color: #00ff88; }
@@ -474,6 +480,26 @@
                     <span class="working-count" id="working-count">0 Active</span>
                 </div>
                 <div class="working-grid" id="working-grid"></div>
+            </div>
+            
+            <!-- Orbit View -->
+            <div id="orbit-view" style="display: none; flex: 1; align-items: center; justify-content: center; position: relative;">
+                <div style="position: relative; width: 400px; height: 400px;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150px; height: 150px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 250px; height: 250px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; height: 350px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(0,212,255,0.3), rgba(168,85,247,0.3)); border: 2px solid rgba(0,212,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 40px; z-index: 10; box-shadow: 0 0 40px rgba(0,212,255,0.4);">🎬</div>
+                    <div class="orbit-agent" style="position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; margin: -25px; border-radius: 50%; background: rgba(0,212,255,0.2); border: 2px solid #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; animation: orbit1 15s linear infinite; box-shadow: 0 0 20px rgba(0,212,255,0.4);" onclick="showAgentDetail('article')">📝</div>
+                    <div class="orbit-agent" style="position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; margin: -25px; border-radius: 50%; background: rgba(255,107,107,0.2); border: 2px solid #ff6b6b; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; animation: orbit2 20s linear infinite; box-shadow: 0 0 20px rgba(255,107,107,0.4);" onclick="showAgentDetail('funnel')">🏗️</div>
+                    <div class="orbit-agent" style="position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; margin: -25px; border-radius: 50%; background: rgba(168,85,247,0.2); border: 2px solid #a855f7; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; animation: orbit3 25s linear infinite; box-shadow: 0 0 20px rgba(168,85,247,0.4);" onclick="showAgentDetail('video')">🎬</div>
+                    <div class="orbit-agent" style="position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; margin: -25px; border-radius: 50%; background: rgba(233,30,99,0.2); border: 2px solid #e91e63; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; animation: orbit4 18s linear infinite; box-shadow: 0 0 20px rgba(233,30,99,0.4);" onclick="showAgentDetail('design')">🎨</div>
+                </div>
+            </div>
+            
+            <!-- View Toggle -->
+            <div style="text-align: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                <button onclick="switchCenterView('card')" id="btn-card" style="padding: 6px 16px; background: rgba(0,212,255,0.1); border: 1px solid #00d4ff; border-radius: 6px 0 0 6px; color: #fff; cursor: pointer; font-size: 0.8rem;">Card View</button>
+                <button onclick="switchCenterView('orbit')" id="btn-orbit" style="padding: 6px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 6px 6px 0; color: #888; cursor: pointer; font-size: 0.8rem; margin-left: -1px;">Orbit View</button>
             </div>
         </div>
         
@@ -1105,6 +1131,33 @@
             renderWorkingArea();
             renderTasks();
             updateStats();
+        }
+        
+        function switchCenterView(view) {
+            const workingArea = document.getElementById('working-area');
+            const orbitView = document.getElementById('orbit-view');
+            const btnCard = document.getElementById('btn-card');
+            const btnOrbit = document.getElementById('btn-orbit');
+            
+            if (view === 'card') {
+                workingArea.style.display = 'block';
+                orbitView.style.display = 'none';
+                btnCard.style.background = 'rgba(0,212,255,0.1)';
+                btnCard.style.borderColor = '#00d4ff';
+                btnCard.style.color = '#fff';
+                btnOrbit.style.background = 'rgba(255,255,255,0.05)';
+                btnOrbit.style.borderColor = 'rgba(255,255,255,0.1)';
+                btnOrbit.style.color = '#888';
+            } else {
+                workingArea.style.display = 'none';
+                orbitView.style.display = 'flex';
+                btnOrbit.style.background = 'rgba(0,212,255,0.1)';
+                btnOrbit.style.borderColor = '#00d4ff';
+                btnOrbit.style.color = '#fff';
+                btnCard.style.background = 'rgba(255,255,255,0.05)';
+                btnCard.style.borderColor = 'rgba(255,255,255,0.1)';
+                btnCard.style.color = '#888';
+            }
         }
         
         document.addEventListener('DOMContentLoaded', init);

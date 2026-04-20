@@ -470,6 +470,22 @@
             }
         }
         
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { 
+                box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 40px currentColor, 0 0 80px currentColor;
+                transform: scale(1.1);
+            }
+        }
+        
         /* Agent glow - static, no pulse */
         .agent-glow-idle {
             box-shadow: 0 0 15px currentColor;
@@ -667,6 +683,19 @@
             <div class="setting-item" style="padding-left: 15px;">
                 <span class="setting-label">Task Complete</span>
                 <div class="toggle-switch" id="sound-complete-toggle" onclick="toggleSoundType('complete')"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: #666; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px;">Visual Effects</div>
+            <div class="setting-item">
+                <span class="setting-label">Starfield Background</span>
+                <div class="toggle-switch" id="starfield-toggle" onclick="toggleStarfield()"></div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Pulsing Glow</span>
+                <div class="toggle-switch" id="pulse-toggle" onclick="togglePulseGlow()"></div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Hover Tooltips</span>
+                <div class="toggle-switch active" id="tooltip-toggle" onclick="toggleTooltips()"></div>
             </div>
         </div>
     </div>
@@ -1142,8 +1171,8 @@
             
             grid.innerHTML = workingAgents.map(agent => {
                 const avatarHtml = agent.imageUrl ?
-                    `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
-                    `<div class="working-agent-avatar ${agent.type}">${agent.emoji}</div>`;
+                    `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}"></div>` :
+                    `<div class="working-agent-avatar ${agent.type}" style="${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}">${agent.emoji}</div>`;
                 return `
                 <div class="working-agent" id="working-${agent.id}">
                     ${avatarHtml}
@@ -1257,7 +1286,7 @@
             trailsEnabled = !trailsEnabled;
             toggle.classList.toggle('active');
             
-            // Add/remove trail effect using CSS filter
+            // Add/remove trail effect using CSS filter on orbit agents
             orbitAgentsData.forEach(({ element }) => {
                 if (trailsEnabled) {
                     element.style.filter = 'drop-shadow(0 0 8px currentColor)';
@@ -1265,6 +1294,9 @@
                     element.style.filter = 'none';
                 }
             });
+            
+            // Re-render card view to apply/remove trails
+            renderWorkingArea();
         }
         
         let soundEnabled = {
@@ -1277,6 +1309,78 @@
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById(`sound-${type}-toggle`);
             soundEnabled[type] = !soundEnabled[type];
+            toggle.classList.toggle('active');
+        }
+        
+        let starfieldEnabled = false;
+        let pulseGlowEnabled = false;
+        let tooltipsEnabled = true;
+        
+        function toggleStarfield() {
+            if (soundEnabled.click) playClickSound();
+            const toggle = document.getElementById('starfield-toggle');
+            starfieldEnabled = !starfieldEnabled;
+            toggle.classList.toggle('active');
+            
+            const orbitView = document.getElementById('orbit-view');
+            let starfield = document.getElementById('starfield-bg');
+            
+            if (starfieldEnabled) {
+                if (!starfield) {
+                    starfield = document.createElement('div');
+                    starfield.id = 'starfield-bg';
+                    starfield.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; background: transparent;';
+                    // Create 50 random stars
+                    for (let i = 0; i < 50; i++) {
+                        const star = document.createElement('div');
+                        const size = Math.random() * 2 + 1;
+                        star.style.cssText = `
+                            position: absolute;
+                            width: ${size}px;
+                            height: ${size}px;
+                            background: rgba(255,255,255,${Math.random() * 0.5 + 0.3});
+                            border-radius: 50%;
+                            left: ${Math.random() * 100}%;
+                            top: ${Math.random() * 100}%;
+                            animation: twinkle ${2 + Math.random() * 3}s ease-in-out infinite;
+                            animation-delay: ${Math.random() * 2}s;
+                        `;
+                        starfield.appendChild(star);
+                    }
+                    orbitView.appendChild(starfield);
+                }
+                starfield.style.display = 'block';
+            } else if (starfield) {
+                starfield.style.display = 'none';
+            }
+        }
+        
+        function togglePulseGlow() {
+            if (soundEnabled.click) playClickSound();
+            const toggle = document.getElementById('pulse-toggle');
+            pulseGlowEnabled = !pulseGlowEnabled;
+            toggle.classList.toggle('active');
+            
+            // Add/remove pulsing animation to working agents in orbit view
+            orbitAgentsData.forEach(({ element, agentId }) => {
+                const agent = agents[agentId];
+                if (agent.status === 'working') {
+                    if (pulseGlowEnabled) {
+                        element.style.animation = 'pulseGlow 2s ease-in-out infinite';
+                    } else {
+                        element.style.animation = 'none';
+                    }
+                }
+            });
+            
+            // Re-render card view to apply/remove pulse glow
+            renderWorkingArea();
+        }
+        
+        function toggleTooltips() {
+            if (soundEnabled.click) playClickSound();
+            const toggle = document.getElementById('tooltip-toggle');
+            tooltipsEnabled = !tooltipsEnabled;
             toggle.classList.toggle('active');
         }
         
@@ -1738,9 +1842,11 @@
                 }
             }
             
-            // Show info panel
-            orbitHoverAgentId = agentId;
-            updateOrbitInfoPanel();
+            // Show info panel only if tooltips enabled
+            if (tooltipsEnabled) {
+                orbitHoverAgentId = agentId;
+                updateOrbitInfoPanel();
+            }
         }
         
         function resumeOrbitAgent(wrapper, element) {

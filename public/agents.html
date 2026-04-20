@@ -2229,13 +2229,11 @@
             element.style.transform = 'scale(1.15)';
             wrapper.style.zIndex = '100';
 
-            // Enhance glow (only if enabled)
-            if (glowEnabled) {
-                const agent = agents[agentId];
-                if (agent) {
-                    const color = orbitColors[agent.type] || '#00d4ff';
-                    element.style.boxShadow = `0 0 50px ${color}, 0 0 80px ${color}60`;
-                }
+            // Enhance glow
+            const agent = agents[agentId];
+            if (agent) {
+                const color = orbitColors[agent.type] || '#00d4ff';
+                element.style.boxShadow = `0 0 50px ${color}, 0 0 80px ${color}60`;
             }
 
             // Show info panel only if tooltips enabled
@@ -2253,15 +2251,11 @@
             element.style.transform = 'scale(1)';
             wrapper.style.zIndex = '';
 
-            // Restore glow (only if enabled)
-            if (glowEnabled) {
-                const agent = agents[element.dataset.agentId];
-                if (agent) {
-                    const color = orbitColors[agent.type] || '#00d4ff';
-                    element.style.boxShadow = `0 0 30px ${color}60, 0 0 60px ${color}30`;
-                }
-            } else {
-                element.style.boxShadow = 'none';
+            // Restore glow
+            const agent = agents[element.dataset.agentId];
+            if (agent) {
+                const color = orbitColors[agent.type] || '#00d4ff';
+                element.style.boxShadow = `0 0 30px ${color}60, 0 0 60px ${color}30`;
             }
 
             // Hide info panel
@@ -2307,17 +2301,13 @@
                     wrapper.style.animationPlayState = 'paused';
                 }
 
-                // Update glow based on status (only if enabled) - static glow, no pulse
-                if (glowEnabled) {
-                    if (isWorking) {
-                        element.className = `orbit-agent ${agent.type} working`;
-                        element.style.boxShadow = '0 0 20px currentColor, 0 0 40px currentColor';
-                    } else {
-                        element.className = `orbit-agent ${agent.type} online`;
-                        element.style.boxShadow = '0 0 15px currentColor';
-                    }
+                // Update glow based on status - always show glow
+                if (isWorking) {
+                    element.className = `orbit-agent ${agent.type} working`;
+                    element.style.boxShadow = '0 0 20px currentColor, 0 0 40px currentColor';
                 } else {
-                    element.style.boxShadow = 'none';
+                    element.className = `orbit-agent ${agent.type} online`;
+                    element.style.boxShadow = '0 0 15px currentColor';
                 }
             });
         }

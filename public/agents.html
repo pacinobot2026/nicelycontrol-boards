@@ -503,6 +503,23 @@
             100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); }
         }
         
+        @keyframes waveMove {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(20px); }
+        }
+        
+        @keyframes matrixDrop {
+            0% { transform: translateY(-20px); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(0) translateX(20px); }
+            75% { transform: translateY(20px) translateX(10px); }
+        }
+        
         /* Agent glow - static, no pulse */
         .agent-glow-idle {
             box-shadow: 0 0 15px currentColor;
@@ -722,6 +739,10 @@
             <div class="setting-item" style="cursor: pointer;" onclick="changeLeadAgentIcon()">
                 <span class="setting-label">Lead Agent Icon</span>
                 <span id="lead-icon-preview" style="font-size: 24px;">◎</span>
+            </div>
+            <div class="setting-item" style="cursor: pointer;" onclick="changeBackgroundTheme()">
+                <span class="setting-label">Background Theme</span>
+                <span id="bg-theme-preview" style="font-size: 14px; color: #00d4ff;">Clean</span>
             </div>
         </div>
     </div>
@@ -978,6 +999,18 @@
             simulateActivity();
         }
         
+        const agentColors = {
+            article: '#00d4ff',
+            funnel: '#ff6b6b',
+            video: '#a855f7',
+            research: '#ffc107',
+            code: '#00e676',
+            design: '#e91e63',
+            social: '#2196f3',
+            email: '#ff5722',
+            analytics: '#9c27b0'
+        };
+        
         function renderAgentList() {
             const list = document.getElementById('agent-list');
             list.innerHTML = '';
@@ -986,7 +1019,18 @@
                 const item = document.createElement('div');
                 item.className = `agent-item ${agent.status}`;
                 
-                const onlineIndicator = agent.status !== 'idle' ? '<div class="online-indicator"></div>' : '';
+                // Grey out idle agents
+                if (agent.status === 'idle') {
+                    item.style.opacity = '0.4';
+                    item.style.filter = 'grayscale(100%)';
+                }
+                
+                // Add colored border for active agents
+                if (agent.status === 'working') {
+                    const color = agentColors[agent.type] || '#00d4ff';
+                    item.style.borderColor = color;
+                    item.style.boxShadow = `0 0 10px ${color}40`;
+                }
                 
                 const avatarHtml = agent.imageUrl ?
                     `<div class="agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
@@ -1000,6 +1044,7 @@
                 
                 item.style.position = 'relative';
                 item.innerHTML = `
+                    ${statusDot}
                     ${avatarHtml}
                     <div class="agent-info">
                         <div class="agent-name">${agent.name}</div>
@@ -1008,8 +1053,23 @@
                     ${statusDot}
                 `;
                 
-                // Add click handler
-                item.addEventListener('click', () => showAgentDetail(agent.id));
+                // Add click handler for the whole item
+                item.addEventListener('click', (e) => {
+                    // If clicked on avatar, open icon modal
+                    if (e.target.closest('.agent-avatar')) {
+                        selectedAgentId = agent.id;
+                        openIconModal();
+                    } else {
+                        showAgentDetail(agent.id);
+                    }
+                });
+                
+                // Make avatar cursor indicate it's clickable
+                const avatar = item.querySelector('.agent-avatar');
+                if (avatar) {
+                    avatar.style.cursor = 'pointer';
+                    avatar.title = 'Click to change icon';
+                }
                 
                 list.appendChild(item);
             });
@@ -1198,11 +1258,12 @@
             }
             
             grid.innerHTML = workingAgents.map(agent => {
+                const color = agentColors[agent.type] || '#00d4ff';
                 const avatarHtml = agent.imageUrl ?
-                    `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}"></div>` :
-                    `<div class="working-agent-avatar ${agent.type}" style="${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}">${agent.emoji}</div>`;
+                    `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center; border-color: ${color}; box-shadow: 0 0 15px ${color}; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}"></div>` :
+                    `<div class="working-agent-avatar ${agent.type}" style="border-color: ${color}; box-shadow: 0 0 15px ${color}; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}">${agent.emoji}</div>`;
                 return `
-                <div class="working-agent" id="working-${agent.id}">
+                <div class="working-agent" id="working-${agent.id}" style="border-color: ${color}; box-shadow: 0 0 10px ${color}30;">
                     ${avatarHtml}
                     <div class="working-agent-name">${agent.name}</div>
                     <div class="working-agent-task">${agent.currentTask}</div>
@@ -1403,6 +1464,30 @@
             return starfield;
         }
         
+        function createStarfieldTheme(container) {
+            const starfield = document.createElement('div');
+            starfield.className = 'bg-effect';
+            starfield.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; background: transparent;';
+            // Create 50 random stars with twinkle
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() * 2 + 1;
+                star.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: rgba(255,255,255,${Math.random() * 0.5 + 0.3});
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: twinkle ${2 + Math.random() * 3}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 2}s;
+                `;
+                starfield.appendChild(star);
+            }
+            container.appendChild(starfield);
+        }
+        
         function togglePulseGlow() {
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById('pulse-toggle');
@@ -1486,6 +1571,150 @@
             if (hubIcon) {
                 hubIcon.textContent = newIcon;
             }
+        }
+        
+        const backgroundThemes = ['Clean', 'Starfield', 'Grid', 'Particles', 'Waves', 'Matrix'];
+        let currentBgThemeIndex = 0;
+        
+        function changeBackgroundTheme() {
+            if (soundEnabled.click) playClickSound();
+            currentBgThemeIndex = (currentBgThemeIndex + 1) % backgroundThemes.length;
+            const newTheme = backgroundThemes[currentBgThemeIndex];
+            
+            // Update preview in settings
+            document.getElementById('bg-theme-preview').textContent = newTheme;
+            
+            // Apply theme
+            applyBackgroundTheme(newTheme);
+        }
+        
+        function applyBackgroundTheme(theme) {
+            // Remove existing background effects
+            document.querySelectorAll('.bg-effect').forEach(el => el.remove());
+            
+            const orbitView = document.getElementById('orbit-view');
+            const workingArea = document.getElementById('working-area');
+            
+            switch(theme) {
+                case 'Starfield':
+                    // Create starfield directly for theme
+                    createStarfieldTheme(orbitView);
+                    createStarfieldTheme(workingArea);
+                    break;
+                    
+                case 'Grid':
+                    createGridBackground(orbitView);
+                    createGridBackground(workingArea);
+                    break;
+                    
+                case 'Particles':
+                    createParticlesBackground(orbitView);
+                    createParticlesBackground(workingArea);
+                    break;
+                    
+                case 'Waves':
+                    createWavesBackground(orbitView);
+                    createWavesBackground(workingArea);
+                    break;
+                    
+                case 'Matrix':
+                    createMatrixBackground(orbitView);
+                    createMatrixBackground(workingArea);
+                    break;
+                    
+                case 'Clean':
+                    // No background effects
+                    break;
+            }
+        }
+        
+        function createGridBackground(container) {
+            const grid = document.createElement('div');
+            grid.className = 'bg-effect';
+            grid.style.cssText = `
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background-image: 
+                    linear-gradient(rgba(0,212,255,0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,212,255,0.1) 1px, transparent 1px);
+                background-size: 50px 50px;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0.5;
+            `;
+            container.appendChild(grid);
+        }
+        
+        function createParticlesBackground(container) {
+            const particles = document.createElement('div');
+            particles.className = 'bg-effect';
+            particles.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;';
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 4 + 2;
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: rgba(0,212,255,${Math.random() * 0.4 + 0.2});
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: float ${5 + Math.random() * 10}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 5}s;
+                `;
+                particles.appendChild(particle);
+            }
+            container.appendChild(particles);
+        }
+        
+        function createWavesBackground(container) {
+            const waves = document.createElement('div');
+            waves.className = 'bg-effect';
+            waves.style.cssText = `
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: linear-gradient(180deg, 
+                    transparent 0%, 
+                    rgba(0,212,255,0.1) 50%, 
+                    transparent 100%);
+                pointer-events: none;
+                z-index: 1;
+                animation: waveMove 4s ease-in-out infinite;
+            `;
+            container.appendChild(waves);
+        }
+        
+        function createMatrixBackground(container) {
+            const matrix = document.createElement('div');
+            matrix.className = 'bg-effect';
+            matrix.style.cssText = `
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                overflow: hidden;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0.3;
+            `;
+            
+            const chars = '01アイウエオカキクケコ';
+            for (let i = 0; i < 20; i++) {
+                const drop = document.createElement('div');
+                drop.textContent = chars[Math.floor(Math.random() * chars.length)];
+                drop.style.cssText = `
+                    position: absolute;
+                    left: ${Math.random() * 100}%;
+                    top: -20px;
+                    color: #00ff00;
+                    font-size: 14px;
+                    font-family: monospace;
+                    animation: matrixDrop ${3 + Math.random() * 5}s linear infinite;
+                    animation-delay: ${Math.random() * 3}s;
+                `;
+                matrix.appendChild(drop);
+            }
+            container.appendChild(matrix);
         }
         
         function showRandomChatBubble() {
@@ -2041,23 +2270,8 @@
                     wrapper.style.display = 'none';
                     wrapper.style.animationPlayState = 'paused';
                 });
-                
-                // Show empty message
-                let emptyMsg = container.querySelector('.orbit-empty-msg');
-                if (!emptyMsg) {
-                    emptyMsg = document.createElement('div');
-                    emptyMsg.className = 'orbit-empty-msg';
-                    emptyMsg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; font-size: 0.9rem;';
-                    emptyMsg.textContent = 'No agents working';
-                    container.appendChild(emptyMsg);
-                }
-                emptyMsg.style.display = 'block';
                 return;
             }
-            
-            // Hide empty message
-            const emptyMsg = container.querySelector('.orbit-empty-msg');
-            if (emptyMsg) emptyMsg.style.display = 'none';
             
             // Show/hide agents based on working status and update glow
             const workingIds = new Set(workingAgents.map(a => a.id));

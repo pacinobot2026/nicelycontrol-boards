@@ -241,17 +241,19 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
+            border: 2px solid;
+            box-shadow: 0 0 15px currentColor;
         }
         
-        .agent-avatar.article { background: rgba(0,212,255,0.15); }
-        .agent-avatar.funnel { background: rgba(255,107,107,0.15); }
-        .agent-avatar.video { background: rgba(168,85,247,0.15); }
-        .agent-avatar.research { background: rgba(255,193,7,0.15); }
-        .agent-avatar.code { background: rgba(0,230,118,0.15); }
-        .agent-avatar.design { background: rgba(233,30,99,0.15); }
-        .agent-avatar.social { background: rgba(33,150,243,0.15); }
-        .agent-avatar.email { background: rgba(255,87,34,0.15); }
-        .agent-avatar.analytics { background: rgba(156,39,176,0.15); }
+        .agent-avatar.article { background: rgba(0,212,255,0.3); border-color: #00d4ff; color: #00d4ff; }
+        .agent-avatar.funnel { background: rgba(255,107,107,0.3); border-color: #ff6b6b; color: #ff6b6b; }
+        .agent-avatar.video { background: rgba(168,85,247,0.3); border-color: #a855f7; color: #a855f7; }
+        .agent-avatar.research { background: rgba(255,193,7,0.3); border-color: #ffc107; color: #ffc107; }
+        .agent-avatar.code { background: rgba(0,230,118,0.3); border-color: #00e676; color: #00e676; }
+        .agent-avatar.design { background: rgba(233,30,99,0.3); border-color: #e91e63; color: #e91e63; }
+        .agent-avatar.social { background: rgba(33,150,243,0.3); border-color: #2196f3; color: #2196f3; }
+        .agent-avatar.email { background: rgba(255,87,34,0.3); border-color: #ff5722; color: #ff5722; }
+        .agent-avatar.analytics { background: rgba(156,39,176,0.3); border-color: #9c27b0; color: #9c27b0; }
         
         .agent-info { flex: 1; }
         .agent-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
@@ -355,16 +357,24 @@
             justify-content: center;
             font-size: 24px;
             margin: 0 auto 12px;
+            border: 2px solid;
+            box-shadow: 0 0 20px currentColor;
         }
         
-        .working-agent-avatar.article { background: rgba(0,212,255,0.2); }
+        .working-agent-avatar.article { background: rgba(0,212,255,0.3); border-color: #00d4ff; color: #00d4ff; }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.2); }
         }
-        .working-agent-avatar.funnel { background: rgba(255,107,107,0.2); }
-        .working-agent-avatar.video { background: rgba(168,85,247,0.2); }
+        .working-agent-avatar.funnel { background: rgba(255,107,107,0.3); border-color: #ff6b6b; color: #ff6b6b; }
+        .working-agent-avatar.video { background: rgba(168,85,247,0.3); border-color: #a855f7; color: #a855f7; }
+        .working-agent-avatar.research { background: rgba(255,193,7,0.3); border-color: #ffc107; color: #ffc107; }
+        .working-agent-avatar.code { background: rgba(0,230,118,0.3); border-color: #00e676; color: #00e676; }
+        .working-agent-avatar.design { background: rgba(233,30,99,0.3); border-color: #e91e63; color: #e91e63; }
+        .working-agent-avatar.social { background: rgba(33,150,243,0.3); border-color: #2196f3; color: #2196f3; }
+        .working-agent-avatar.email { background: rgba(255,87,34,0.3); border-color: #ff5722; color: #ff5722; }
+        .working-agent-avatar.analytics { background: rgba(156,39,176,0.3); border-color: #9c27b0; color: #9c27b0; }
         
         .working-agent-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; }
         .working-agent-task { font-size: 0.75rem; color: #888; line-height: 1.4; }
@@ -484,6 +494,13 @@
                 box-shadow: 0 0 40px currentColor, 0 0 80px currentColor;
                 transform: scale(1.1);
             }
+        }
+        
+        @keyframes bubblePop {
+            0% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.8); }
+            20% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); }
         }
         
         /* Agent glow - static, no pulse */
@@ -697,6 +714,15 @@
                 <span class="setting-label">Hover Tooltips</span>
                 <div class="toggle-switch active" id="tooltip-toggle" onclick="toggleTooltips()"></div>
             </div>
+            <div class="setting-item">
+                <span class="setting-label">Agent Chat Bubbles</span>
+                <div class="toggle-switch" id="chat-bubbles-toggle" onclick="toggleChatBubbles()"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: #666; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px;">Customization</div>
+            <div class="setting-item" style="cursor: pointer;" onclick="changeLeadAgentIcon()">
+                <span class="setting-label">Lead Agent Icon</span>
+                <span id="lead-icon-preview" style="font-size: 24px;">◎</span>
+            </div>
         </div>
     </div>
     
@@ -758,8 +784,10 @@
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; height: 320px; border: 1px dashed rgba(0,212,255,0.1); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; height: 440px; border: 1px dashed rgba(0,212,255,0.1); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
                 
-                <!-- Center hub: protected zone - agents float around but never touch -->
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(0,212,255,0.3), transparent); border: 2px solid rgba(0,212,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 40px; z-index: 10; animation: hubPulse 2s ease infinite; pointer-events: none;">🎬</div>
+                <!-- Center hub: lead agent icon -->
+                <div class="lead-hub-icon" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; pointer-events: none;">
+                    <div id="center-hub-icon" style="font-size: 60px; filter: drop-shadow(0 0 20px rgba(0,212,255,0.6));">◎</div>
+                </div>
                 
                 <!-- Protected zone indicator (subtle dashed circle) -->
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; border: 1px dashed rgba(0,212,255,0.15); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
@@ -1402,6 +1430,109 @@
             const toggle = document.getElementById('tooltip-toggle');
             tooltipsEnabled = !tooltipsEnabled;
             toggle.classList.toggle('active');
+        }
+        
+        let chatBubblesEnabled = false;
+        let chatBubbleInterval = null;
+        
+        const agentMessages = [
+            "On it! 💪",
+            "Crushing this task! 🔥",
+            "Almost there... ⚡",
+            "Working hard! 💻",
+            "This is fun! 🎉",
+            "Got this! ✅",
+            "Making progress! 📈",
+            "In the zone! 🎯",
+            "Let's go! 🚀",
+            "Piece of cake! 🍰"
+        ];
+        
+        function toggleChatBubbles() {
+            if (soundEnabled.click) playClickSound();
+            const toggle = document.getElementById('chat-bubbles-toggle');
+            chatBubblesEnabled = !chatBubblesEnabled;
+            toggle.classList.toggle('active');
+            
+            if (chatBubblesEnabled) {
+                // Start random chat bubbles
+                chatBubbleInterval = setInterval(() => {
+                    showRandomChatBubble();
+                }, 3000);
+            } else {
+                // Stop chat bubbles
+                if (chatBubbleInterval) {
+                    clearInterval(chatBubbleInterval);
+                    chatBubbleInterval = null;
+                }
+                // Remove all existing bubbles
+                document.querySelectorAll('.chat-bubble').forEach(b => b.remove());
+            }
+        }
+        
+        const leadAgentIcons = ['◎', '👑', '⭐', '🚀', '🔥', '⚡', '🎬', '💎', '🦁', '🦅'];
+        let currentLeadIconIndex = 0;
+        
+        function changeLeadAgentIcon() {
+            if (soundEnabled.click) playClickSound();
+            currentLeadIconIndex = (currentLeadIconIndex + 1) % leadAgentIcons.length;
+            const newIcon = leadAgentIcons[currentLeadIconIndex];
+            
+            // Update preview in settings
+            document.getElementById('lead-icon-preview').textContent = newIcon;
+            
+            // Update center hub icon
+            const hubIcon = document.getElementById('center-hub-icon');
+            if (hubIcon) {
+                hubIcon.textContent = newIcon;
+            }
+        }
+        
+        function showRandomChatBubble() {
+            const workingAgents = Object.values(agents).filter(a => a.status === 'working');
+            if (workingAgents.length === 0) return;
+            
+            const agent = workingAgents[Math.floor(Math.random() * workingAgents.length)];
+            const message = agentMessages[Math.floor(Math.random() * agentMessages.length)];
+            
+            // Show in orbit view
+            const orbitAgent = document.getElementById(`orbit-agent-${agent.id}`);
+            if (orbitAgent) {
+                createChatBubble(orbitAgent, message);
+            }
+            
+            // Show in card view
+            const cardAgent = document.getElementById(`working-${agent.id}`);
+            if (cardAgent) {
+                createChatBubble(cardAgent, message);
+            }
+        }
+        
+        function createChatBubble(element, message) {
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.textContent = message;
+            bubble.style.cssText = `
+                position: absolute;
+                top: -35px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,212,255,0.9);
+                color: #000;
+                padding: 5px 10px;
+                border-radius: 12px;
+                font-size: 0.7rem;
+                white-space: nowrap;
+                z-index: 1000;
+                animation: bubblePop 2s ease forwards;
+                pointer-events: none;
+                font-weight: 600;
+            `;
+            
+            element.style.position = 'relative';
+            element.appendChild(bubble);
+            
+            setTimeout(() => bubble.remove(), 2000);
         }
         
         let audioCtx = null;

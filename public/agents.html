@@ -692,10 +692,6 @@
         <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
         <div class="settings-panel" id="settings-panel">
             <div class="settings-title">Settings</div>
-            <div class="setting-item">
-                <span class="setting-label">Agent Glows</span>
-                <div class="toggle-switch active" id="glow-toggle" onclick="toggleGlow()"></div>
-            </div>
             <div class="setting-item" style="flex-direction: column; align-items: stretch;">
                 <span class="setting-label" style="margin-bottom: 8px;">Orbit Speed</span>
                 <div class="speed-slider">
@@ -706,10 +702,6 @@
                         <span>Slow</span>
                     </div>
                 </div>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">Particle Trails</span>
-                <div class="toggle-switch" id="trails-toggle" onclick="toggleTrails()"></div>
             </div>
             <div style="font-size: 0.75rem; color: #666; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px;">Sound Effects</div>
             <div class="setting-item" style="padding-left: 15px;">
@@ -726,8 +718,8 @@
             </div>
             <div style="font-size: 0.75rem; color: #666; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px;">Visual Effects</div>
             <div class="setting-item">
-                <span class="setting-label">Starfield Background</span>
-                <div class="toggle-switch" id="starfield-toggle" onclick="toggleStarfield()"></div>
+                <span class="setting-label">Particle Trails</span>
+                <div class="toggle-switch" id="trails-toggle" onclick="toggleTrails()"></div>
             </div>
             <div class="setting-item">
                 <span class="setting-label">Pulsing Glow</span>
@@ -1350,29 +1342,10 @@
             }
         }
 
-        let glowEnabled = true;
-
         function toggleSettings() {
             playClickSound();
             const panel = document.getElementById('settings-panel');
             panel.classList.toggle('active');
-        }
-
-        function toggleGlow() {
-            playClickSound();
-            const toggle = document.getElementById('glow-toggle');
-            glowEnabled = !glowEnabled;
-            toggle.classList.toggle('active');
-
-            // Update all orbit agents - static glow, no pulse
-            orbitAgentsData.forEach(({ element, agentId }) => {
-                const agent = agents[agentId];
-                if (glowEnabled) {
-                    element.style.boxShadow = agent.status === 'working' ? '0 0 20px currentColor, 0 0 40px currentColor' : '0 0 15px currentColor';
-                } else {
-                    element.style.boxShadow = 'none';
-                }
-            });
         }
 
         let currentOrbitSpeed = 25;
@@ -1420,44 +1393,8 @@
             toggle.classList.toggle('active');
         }
 
-        let starfieldEnabled = false;
         let pulseGlowEnabled = false;
         let tooltipsEnabled = true;
-
-        function toggleStarfield() {
-            if (soundEnabled.click) playClickSound();
-            const toggle = document.getElementById('starfield-toggle');
-            starfieldEnabled = !starfieldEnabled;
-            toggle.classList.toggle('active');
-
-            // Apply to orbit view
-            const orbitView = document.getElementById('orbit-view');
-            let starfieldOrbit = document.getElementById('starfield-bg-orbit');
-
-            if (starfieldEnabled) {
-                if (!starfieldOrbit) {
-                    starfieldOrbit = createStarfield('starfield-bg-orbit');
-                    orbitView.appendChild(starfieldOrbit);
-                }
-                starfieldOrbit.style.display = 'block';
-            } else if (starfieldOrbit) {
-                starfieldOrbit.style.display = 'none';
-            }
-
-            // Apply to card view (working area)
-            const workingArea = document.getElementById('working-area');
-            let starfieldCard = document.getElementById('starfield-bg-card');
-
-            if (starfieldEnabled) {
-                if (!starfieldCard) {
-                    starfieldCard = createStarfield('starfield-bg-card');
-                    workingArea.appendChild(starfieldCard);
-                }
-                starfieldCard.style.display = 'block';
-            } else if (starfieldCard) {
-                starfieldCard.style.display = 'none';
-            }
-        }
 
         function createStarfield(id) {
             const starfield = document.createElement('div');
@@ -2203,7 +2140,7 @@
                     font-size: 28px;
                     cursor: pointer;
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
-                    box-shadow: ${glowEnabled ? (agent.status === 'working' ? '0 0 20px currentColor, 0 0 40px currentColor' : '0 0 15px currentColor') : 'none'};
+                    box-shadow: ${agent.status === 'working' ? '0 0 20px currentColor, 0 0 40px currentColor' : '0 0 15px currentColor'};
                 `;
                 el.innerHTML = agent.imageUrl ?
                     `<div style="width: 100%; height: 100%; border-radius: 50%; background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :

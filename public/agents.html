@@ -739,10 +739,10 @@
             
             <div class="open-tasks-section">
                 <div class="section-header">
-                    <span class="section-title">Open Tasks</span>
-                    <span class="section-count" id="open-count">0</span>
+                    <span class="section-title">Currently Working</span>
+                    <span class="working-count" id="working-panel-count">0 Active</span>
                 </div>
-                <div class="task-list" id="open-tasks"></div>
+                <div class="task-list" id="working-tasks"></div>
             </div>
             
             <div class="completed-tasks-section">
@@ -898,6 +898,7 @@
         function init() {
             renderAgentList();
             renderWorkingArea();
+            renderWorkingPanel();
             renderTasks();
             updateStats();
             simulateActivity();
@@ -1136,31 +1137,40 @@
                     </div>
                 </div>
             `}).join('');
+            
+            // Update right panel "Currently Working" section
+            renderWorkingPanel();
         }
         
-        function renderTasks() {
-            const openList = document.getElementById('open-tasks');
-            document.getElementById('open-count').textContent = openTasks.length;
+        function renderWorkingPanel() {
+            const workingList = document.getElementById('working-tasks');
+            const workingAgents = Object.values(agents).filter(a => a.status === 'working');
             
-            if (openTasks.length === 0) {
-                openList.innerHTML = `
+            document.getElementById('working-panel-count').textContent = `${workingAgents.length} Active`;
+            
+            if (workingAgents.length === 0) {
+                workingList.innerHTML = `
                     <div class="empty-tasks">
-                        <div class="empty-tasks-icon">📭</div>
-                        <p>No open tasks</p>
+                        <div class="empty-tasks-icon">😴</div>
+                        <p>No agents working</p>
                     </div>
                 `;
             } else {
-                openList.innerHTML = openTasks.map((task, index) => `
-                    <div class="task-item" onclick="openTaskModal(${index}, 'open')" style="cursor: pointer;">
-                        <div class="task-avatar ${task.agentType}">${task.agentEmoji}</div>
+                workingList.innerHTML = workingAgents.map(agent => `
+                    <div class="task-item" onclick="showAgentDetail('${agent.id}')" style="cursor: pointer;">
+                        <div class="task-avatar ${agent.type}">${agent.emoji}</div>
                         <div class="task-content">
-                            <div class="task-name">${task.name}</div>
-                            <div class="task-meta">Assigned to ${task.agentName}</div>
+                            <div class="task-name">${agent.name}</div>
+                            <div class="task-meta">${agent.currentTask || 'Working...'}</div>
                         </div>
                         <div class="task-status"></div>
                     </div>
                 `).join('');
             }
+        }
+        
+        function renderTasks() {
+            // Open tasks section removed - now showing "Currently Working" instead
             
             const completedList = document.getElementById('completed-tasks');
             document.getElementById('completed-count').textContent = completedTasks.length;

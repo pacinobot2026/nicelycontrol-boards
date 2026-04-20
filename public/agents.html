@@ -369,61 +369,29 @@
             to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
         
-        /* Floating animations - agents move all over screen, faster, keep away from center */
+        /* Floating animations - agents move everywhere, min 120px from center */
         @keyframes float1 { 
-            0% { transform: translate(-300px, 100px); opacity: 0; }
-            5% { opacity: 1; }
-            25% { transform: translate(180px, -150px); }
-            50% { transform: translate(-100px, 200px); }
-            75% { transform: translate(250px, 100px); }
-            95% { opacity: 1; }
-            100% { transform: translate(400px, -200px); opacity: 0; }
+            0%, 100% { transform: translate(120px, 0); }
+            25% { transform: translate(80px, 100px); }
+            50% { transform: translate(-60px, 80px); }
+            75% { transform: translate(-100px, -40px); }
         }
         @keyframes float2 { 
-            0% { transform: translate(350px, -250px); opacity: 0; }
-            5% { opacity: 1; }
-            25% { transform: translate(-200px, 100px); }
-            50% { transform: translate(150px, 250px); }
-            75% { transform: translate(-250px, -100px); }
-            95% { opacity: 1; }
-            100% { transform: translate(-400px, 200px); opacity: 0; }
+            0%, 100% { transform: translate(-80px, 60px); }
+            33% { transform: translate(100px, -80px); }
+            66% { transform: translate(60px, 100px); }
         }
         @keyframes float3 { 
-            0% { transform: translate(-350px, 200px); opacity: 0; }
-            5% { opacity: 1; }
-            20% { transform: translate(100px, -200px); }
-            40% { transform: translate(250px, 150px); }
-            60% { transform: translate(-150px, -250px); }
-            80% { transform: translate(200px, 100px); }
-            95% { opacity: 1; }
-            100% { transform: translate(350px, 250px); opacity: 0; }
+            0%, 100% { transform: translate(60px, -100px); }
+            20% { transform: translate(-100px, -60px); }
+            40% { transform: translate(-80px, 80px); }
+            60% { transform: translate(100px, 60px); }
+            80% { transform: translate(40px, -80px); }
         }
         @keyframes float4 { 
-            0% { transform: translate(300px, 250px); opacity: 0; }
-            5% { opacity: 1; }
-            30% { transform: translate(-180px, -200px); }
-            60% { transform: translate(200px, -100px); }
-            75% { transform: translate(-200px, 200px); }
-            95% { opacity: 1; }
-            100% { transform: translate(-350px, -150px); opacity: 0; }
-        }
-        @keyframes float5 { 
-            0% { transform: translate(0, -300px); opacity: 0; }
-            5% { opacity: 1; }
-            25% { transform: translate(200px, 200px); }
-            50% { transform: translate(-200px, 100px); }
-            75% { transform: translate(100px, -200px); }
-            95% { opacity: 1; }
-            100% { transform: translate(-300px, 0); opacity: 0; }
-        }
-        @keyframes float6 { 
-            0% { transform: translate(-250px, -200px); opacity: 0; }
-            5% { opacity: 1; }
-            30% { transform: translate(200px, 100px); }
-            60% { transform: translate(-100px, 250px); }
-            80% { transform: translate(250px, -150px); }
-            95% { opacity: 1; }
-            100% { transform: translate(300px, 200px); opacity: 0; }
+            0%, 100% { transform: translate(-100px, -40px); }
+            30% { transform: translate(80px, 80px); }
+            60% { transform: translate(-40px, 100px); }
         }
         
         /* Center hub pulse animation */
@@ -445,92 +413,6 @@
         
         .agent-glow-working {
             box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
-        }
-        
-        /* Orbit Agent Tooltip */
-        .orbit-tooltip {
-            position: absolute;
-            background: linear-gradient(145deg, rgba(15,15,35,0.98), rgba(10,10,26,0.95));
-            border: 1px solid rgba(0,212,255,0.3);
-            border-radius: 12px;
-            padding: 12px 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(0,212,255,0.1);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            pointer-events: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.2s ease;
-            min-width: 180px;
-            max-width: 260px;
-        }
-        
-        .orbit-tooltip.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .orbit-tooltip::before {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid rgba(0,212,255,0.3);
-        }
-        
-        .orbit-tooltip-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .orbit-tooltip-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-        
-        .orbit-tooltip-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #fff;
-        }
-        
-        .orbit-tooltip-desc {
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-        
-        .orbit-tooltip-task {
-            background: rgba(0,212,255,0.1);
-            border-left: 2px solid #00d4ff;
-            border-radius: 0 6px 6px 0;
-            padding: 8px 10px;
-            font-size: 0.8rem;
-            color: #ccc;
-            line-height: 1.4;
-        }
-        
-        .orbit-tooltip-task-label {
-            font-size: 0.65rem;
-            color: #00d4ff;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 3px;
         }
         
         .checkin-icon { font-size: 24px; }
@@ -740,15 +622,21 @@
             </div>
             
             <!-- Orbit View -->
-            <div id="orbit-view" style="display: none; position: fixed; top: 80px; left: 280px; right: 350px; bottom: 0; overflow: hidden;">
-                <!-- Full screen container for floating agents -->
-                <div id="orbit-agents-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
-                
-                <!-- Center hub: stays in center, agents float around it -->
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(0,212,255,0.3), transparent); border: 2px solid rgba(0,212,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 40px; z-index: 10; animation: hubPulse 2s ease infinite; pointer-events: none;">🎬</div>
-                
-                <!-- Protected zone indicator (subtle) -->
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border: 1px dashed rgba(0,212,255,0.1); border-radius: 50%; pointer-events: none;"></div>
+            <div id="orbit-view" style="display: none; flex: 1; align-items: center; justify-content: center; position: relative; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 25px;">
+                <!-- Header matching Card View -->
+                <div class="working-header" style="position: absolute; top: 25px; left: 25px; right: 25px;">
+                    <span>Currently Working</span>
+                    <span class="working-count" id="orbit-working-count">0 Active</span>
+                </div>
+                <div style="position: relative; width: 500px; height: 500px;">
+                    <!-- Rings: 200px, 320px, 440px -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; height: 320px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; height: 440px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                    <!-- Center hub: 100px with pulsing glow -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(0,212,255,0.3), transparent); border: 2px solid rgba(0,212,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 40px; z-index: 10; animation: hubPulse 2s ease infinite;">🎬</div>
+                    <div id="orbit-agents-container"></div>
+                </div>
                 
                 <!-- Orbit Info Panel (top right corner) -->
                 <div id="orbit-info-panel" style="display: none; position: absolute; top: 20px; right: 20px; width: 260px; background: linear-gradient(145deg, rgba(15,15,35,0.98), rgba(10,10,26,0.95)); border: 1px solid rgba(0,212,255,0.25); border-radius: 16px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 30px rgba(0,212,255,0.15), inset 0 1px 0 rgba(255,255,255,0.05); backdrop-filter: blur(20px); z-index: 100; transition: all 0.3s ease;"></div>
@@ -895,19 +783,6 @@
                     <button onclick="document.getElementById('icon-image-upload').click()" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; cursor: pointer; font-size: 0.9rem;">📁 Choose Image</button>
                     <div id="icon-upload-filename" style="margin-top: 8px; font-size: 0.8rem; color: #888; text-align: center;"></div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Orbit Agent Tooltip -->
-        <div id="orbit-tooltip" class="orbit-tooltip">
-            <div class="orbit-tooltip-header">
-                <div class="orbit-tooltip-icon" id="tooltip-icon">📝</div>
-                <div class="orbit-tooltip-name" id="tooltip-name">Agent Name</div>
-            </div>
-            <div class="orbit-tooltip-desc" id="tooltip-desc">Agent description goes here</div>
-            <div class="orbit-tooltip-task">
-                <div class="orbit-tooltip-task-label">Current Task</div>
-                <div id="tooltip-task">Task name goes here</div>
             </div>
         </div>
         
@@ -1154,7 +1029,10 @@
             const grid = document.getElementById('working-grid');
             const workingAgents = Object.values(agents).filter(a => a.status === 'working');
             
+            // Update both card view and orbit view counts
             document.getElementById('working-count').textContent = `${workingAgents.length} Active`;
+            const orbitCount = document.getElementById('orbit-working-count');
+            if (orbitCount) orbitCount.textContent = `${workingAgents.length} Active`;
             
             if (workingAgents.length === 0) {
                 grid.innerHTML = '';
@@ -1528,14 +1406,14 @@
             if (orbitAgentsInitialized) return;
             
             const container = document.getElementById('orbit-agents-container');
-            const floatAnimations = ['float1', 'float2', 'float3', 'float4', 'float5', 'float6'];
+            const floatAnimations = ['float1', 'float2', 'float3', 'float4'];
             
             // Create all orbit agents once
             Object.values(agents).forEach((agent, index) => {
                 const anim = floatAnimations[index % floatAnimations.length];
                 const color = orbitColors[agent.type] || '#00d4ff';
                 
-                // Wrapper handles the float animation - starts from edges
+                // Wrapper handles the orbit animation
                 const wrapper = document.createElement('div');
                 wrapper.className = 'orbit-wrapper';
                 wrapper.dataset.agentId = agent.id;
@@ -1545,8 +1423,7 @@
                     width: 70px; height: 70px; 
                     margin: -35px; 
                     display: none;
-                    animation: ${anim} 8s linear infinite;
-                    animation-play-state: paused;
+                    animation: ${anim} ${15 + index * 5}s linear infinite;
                 `;
                 
                 // Inner element handles the visual and hover - 70px with glow
@@ -1579,7 +1456,7 @@
                 
                 wrapper.appendChild(el);
                 container.appendChild(wrapper);
-                orbitAgentsData.push({ agentId: agent.id, wrapper: wrapper, element: el, animation: anim });
+                orbitAgentsData.push({ agentId: agent.id, wrapper: wrapper, element: el });
             });
             
             orbitAgentsInitialized = true;
@@ -1605,9 +1482,6 @@
             // Show info panel
             orbitHoverAgentId = agentId;
             updateOrbitInfoPanel();
-            
-            // Show tooltip
-            showOrbitTooltip(agentId, element);
         }
         
         function resumeOrbitAgent(wrapper, element) {
@@ -1633,73 +1507,6 @@
             orbitHoverAgentId = null;
             const panel = document.getElementById('orbit-info-panel');
             if (panel) panel.style.display = 'none';
-            
-            // Hide tooltip
-            hideOrbitTooltip();
-        }
-        
-        // Orbit Tooltip Functions
-        function showOrbitTooltip(agentId, element) {
-            const agent = agents[agentId];
-            if (!agent) return;
-            
-            const tooltip = document.getElementById('orbit-tooltip');
-            const iconEl = document.getElementById('tooltip-icon');
-            const nameEl = document.getElementById('tooltip-name');
-            const descEl = document.getElementById('tooltip-desc');
-            const taskEl = document.getElementById('tooltip-task');
-            
-            // Set content
-            iconEl.textContent = agent.emoji;
-            iconEl.style.background = `rgba(${parseInt((orbitColors[agent.type] || '#00d4ff').slice(1,3),16)}, ${parseInt((orbitColors[agent.type] || '#00d4ff').slice(3,5),16)}, ${parseInt((orbitColors[agent.type] || '#00d4ff').slice(5,7),16)}, 0.2)`;
-            iconEl.style.border = `1px solid ${orbitColors[agent.type] || '#00d4ff'}`;
-            nameEl.textContent = agent.name;
-            descEl.textContent = agent.tagline || `${agent.type} Specialist`;
-            taskEl.textContent = agent.currentTask || 'Working...';
-            
-            // Position tooltip above the agent
-            const rect = element.getBoundingClientRect();
-            const tooltipHeight = tooltip.offsetHeight || 120;
-            const tooltipWidth = tooltip.offsetWidth || 200;
-            
-            let top = rect.top - tooltipHeight - 10;
-            let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-            
-            // Keep within viewport
-            if (top < 10) top = rect.bottom + 10;
-            if (left < 10) left = 10;
-            if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
-            
-            tooltip.style.top = `${top}px`;
-            tooltip.style.left = `${left}px`;
-            tooltip.style.borderColor = orbitColors[agent.type] || '#00d4ff';
-            
-            // Show tooltip
-            tooltip.classList.add('visible');
-        }
-        
-        function hideOrbitTooltip() {
-            const tooltip = document.getElementById('orbit-tooltip');
-            tooltip.classList.remove('visible');
-        }
-        
-        function updateOrbitTooltipPosition(element) {
-            const tooltip = document.getElementById('orbit-tooltip');
-            if (!tooltip.classList.contains('visible')) return;
-            
-            const rect = element.getBoundingClientRect();
-            const tooltipHeight = tooltip.offsetHeight || 120;
-            const tooltipWidth = tooltip.offsetWidth || 200;
-            
-            let top = rect.top - tooltipHeight - 10;
-            let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-            
-            if (top < 10) top = rect.bottom + 10;
-            if (left < 10) left = 10;
-            if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
-            
-            tooltip.style.top = `${top}px`;
-            tooltip.style.left = `${left}px`;
         }
         
         function updateOrbitView() {
@@ -1713,10 +1520,9 @@
             const workingAgents = Object.values(agents).filter(a => a.status === 'working');
             
             if (workingAgents.length === 0) {
-                // Hide all agents and pause their animations
+                // Hide all agents
                 orbitAgentsData.forEach(({ wrapper }) => {
                     wrapper.style.display = 'none';
-                    wrapper.style.animationPlayState = 'paused';
                 });
                 
                 // Show empty message
@@ -1741,18 +1547,7 @@
             orbitAgentsData.forEach(({ agentId, wrapper, element }) => {
                 const agent = agents[agentId];
                 const isWorking = workingIds.has(agentId);
-                const wasVisible = wrapper.style.display === 'block';
-                
                 wrapper.style.display = isWorking ? 'block' : 'none';
-                
-                // Start animation when agent starts working
-                if (isWorking && !wasVisible) {
-                    wrapper.style.animationPlayState = 'running';
-                    // Random delay for natural feel
-                    wrapper.style.animationDelay = `${Math.random() * -8}s`;
-                } else if (!isWorking) {
-                    wrapper.style.animationPlayState = 'paused';
-                }
                 
                 // Update glow based on status (only if enabled) - static glow, no pulse
                 if (glowEnabled) {
@@ -1774,22 +1569,7 @@
             if (orbitHoverAgentId) updateOrbitInfoPanel();
         }, 1000);
         
-        // Update tooltip position during animation
-        function updateTooltipLoop() {
-            const tooltip = document.getElementById('orbit-tooltip');
-            if (tooltip.classList.contains('visible') && orbitHoverAgentId) {
-                const agentData = orbitAgentsData.find(d => d.agentId === orbitHoverAgentId);
-                if (agentData) {
-                    updateOrbitTooltipPosition(agentData.element);
-                }
-            }
-            requestAnimationFrame(updateTooltipLoop);
-        }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            init();
-            requestAnimationFrame(updateTooltipLoop);
-        });
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

@@ -313,6 +313,17 @@
             border-radius: 20px;
             padding: 25px;
             position: relative;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #working-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            align-content: start;
         }
 
         .working-header {
@@ -334,11 +345,7 @@
             font-size: 0.8rem;
         }
 
-        .working-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px;
-        }
+        /* .working-grid styles moved above with #working-grid */
 
         .working-agent {
             background: rgba(255,255,255,0.03);
@@ -2028,6 +2035,12 @@
             if (view === 'card') {
                 workingArea.style.display = 'block';
                 orbitView.style.display = 'none';
+                // Force grid recalculation by re-rendering
+                setTimeout(() => {
+                    renderWorkingArea();
+                    // Trigger a resize event to force grid recalculation
+                    window.dispatchEvent(new Event('resize'));
+                }, 10);
             } else {
                 workingArea.style.display = 'none';
                 orbitView.style.display = 'flex';

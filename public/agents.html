@@ -6,7 +6,7 @@
     <title>AI Agent Command Center</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0f1729 100%);
@@ -14,30 +14,30 @@
             color: #fff;
             overflow: hidden;
         }
-        
+
         .bg-grid {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px);
             background-size: 60px 60px;
             pointer-events: none;
         }
-        
+
         .header {
             text-align: center;
             padding: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .header h1 {
             font-size: 1.8rem;
             background: linear-gradient(90deg, #00d4ff, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .settings-icon {
             position: absolute;
             top: 20px;
@@ -55,12 +55,12 @@
             transition: all 0.3s ease;
             z-index: 1000;
         }
-        
+
         .settings-icon:hover {
             background: rgba(255,255,255,0.1);
             border-color: rgba(255,255,255,0.2);
         }
-        
+
         .settings-panel {
             position: absolute;
             top: 70px;
@@ -74,11 +74,11 @@
             z-index: 1001;
             display: none;
         }
-        
+
         .settings-panel.active {
             display: block;
         }
-        
+
         .settings-title {
             font-size: 0.9rem;
             font-weight: 600;
@@ -86,24 +86,24 @@
             padding-bottom: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .setting-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 10px 0;
         }
-        
+
         .setting-label {
             font-size: 0.85rem;
             color: #aaa;
         }
-        
+
         .speed-slider {
             width: 100%;
             margin-top: 8px;
         }
-        
+
         .speed-slider input[type="range"] {
             width: 100%;
             height: 4px;
@@ -112,7 +112,7 @@
             outline: none;
             -webkit-appearance: none;
         }
-        
+
         .speed-slider input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 16px;
@@ -121,7 +121,7 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        
+
         .speed-slider input[type="range"]::-moz-range-thumb {
             width: 16px;
             height: 16px;
@@ -130,7 +130,7 @@
             cursor: pointer;
             border: none;
         }
-        
+
         .speed-labels {
             display: flex;
             justify-content: space-between;
@@ -138,7 +138,7 @@
             color: #666;
             margin-top: 4px;
         }
-        
+
         .toggle-switch {
             width: 44px;
             height: 24px;
@@ -148,11 +148,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .toggle-switch.active {
             background: #00d4ff;
         }
-        
+
         .toggle-switch::after {
             content: '';
             position: absolute;
@@ -164,16 +164,16 @@
             border-radius: 50%;
             transition: all 0.3s ease;
         }
-        
+
         .toggle-switch.active::after {
             left: 22px;
         }
-        
+
         .main-container {
             display: flex;
             height: calc(100vh - 80px);
         }
-        
+
         /* Left Panel - Agent Fleet */
         .fleet-panel {
             width: 280px;
@@ -182,7 +182,7 @@
             padding: 20px;
             overflow-y: auto;
         }
-        
+
         .fleet-header {
             font-size: 0.85rem;
             color: #888;
@@ -193,7 +193,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .fleet-count {
             background: rgba(0,212,255,0.2);
             color: #00d4ff;
@@ -201,9 +201,9 @@
             border-radius: 12px;
             font-size: 0.75rem;
         }
-        
+
         .agent-list { display: flex; flex-direction: column; gap: 10px; }
-        
+
         .agent-item {
             display: flex;
             align-items: center;
@@ -216,11 +216,11 @@
             transition: all 0.3s ease;
             position: relative;
         }
-        
+
         .agent-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
         .agent-item.online { border-left: 3px solid #00ff88; }
         .agent-item.working { background: rgba(255,215,0,0.1); border-color: #ffd700; }
-        
+
         .online-indicator {
             position: absolute;
             left: 0;
@@ -232,7 +232,7 @@
             border-radius: 0 4px 4px 0;
             box-shadow: 0 0 10px #00ff88;
         }
-        
+
         .agent-avatar {
             width: 40px;
             height: 40px;
@@ -244,7 +244,7 @@
             border: 2px solid;
             box-shadow: 0 0 15px currentColor;
         }
-        
+
         .agent-avatar.article { background: rgba(0,212,255,0.3); border-color: #00d4ff; color: #00d4ff; }
         .agent-avatar.funnel { background: rgba(255,107,107,0.3); border-color: #ff6b6b; color: #ff6b6b; }
         .agent-avatar.video { background: rgba(168,85,247,0.3); border-color: #a855f7; color: #a855f7; }
@@ -254,13 +254,13 @@
         .agent-avatar.social { background: rgba(33,150,243,0.3); border-color: #2196f3; color: #2196f3; }
         .agent-avatar.email { background: rgba(255,87,34,0.3); border-color: #ff5722; color: #ff5722; }
         .agent-avatar.analytics { background: rgba(156,39,176,0.3); border-color: #9c27b0; color: #9c27b0; }
-        
+
         .agent-info { flex: 1; }
         .agent-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
         .agent-status-text { font-size: 0.7rem; }
         .agent-status-text.online { color: #00ff88; }
         .agent-status-text.working { color: #ffd700; }
-        
+
         /* Center Panel */
         .command-panel {
             flex: 1;
@@ -269,7 +269,7 @@
             padding: 30px;
             overflow-y: auto;
         }
-        
+
         .lead-agent-hub {
             background: rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
@@ -280,7 +280,7 @@
             align-items: center;
             gap: 25px;
         }
-        
+
         .lead-avatar {
             width: 80px;
             height: 80px;
@@ -292,20 +292,20 @@
             justify-content: center;
             font-size: 40px;
         }
-        
+
         .lead-info h2 { font-size: 1.5rem; margin-bottom: 8px; }
         .lead-info p { color: #888; font-size: 0.95rem; }
-        
+
         .lead-stats {
             display: flex;
             gap: 30px;
             margin-left: auto;
         }
-        
+
         .lead-stat { text-align: center; }
         .lead-stat-value { font-size: 2rem; font-weight: 700; color: #00d4ff; }
         .lead-stat-label { font-size: 0.8rem; color: #888; text-transform: uppercase; }
-        
+
         .working-area {
             flex: 1;
             background: rgba(0,0,0,0.2);
@@ -314,7 +314,7 @@
             padding: 25px;
             position: relative;
         }
-        
+
         .working-header {
             font-size: 0.85rem;
             color: #888;
@@ -325,7 +325,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .working-count {
             background: rgba(255,215,0,0.2);
             color: #ffd700;
@@ -333,13 +333,13 @@
             border-radius: 12px;
             font-size: 0.8rem;
         }
-        
+
         .working-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 20px;
         }
-        
+
         .working-agent {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,215,0,0.3);
@@ -347,7 +347,7 @@
             padding: 20px;
             text-align: center;
         }
-        
+
         .working-agent-avatar {
             width: 50px;
             height: 50px;
@@ -360,9 +360,9 @@
             border: 2px solid;
             box-shadow: 0 0 20px currentColor;
         }
-        
+
         .working-agent-avatar.article { background: rgba(0,212,255,0.3); border-color: #00d4ff; color: #00d4ff; }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.2); }
@@ -375,10 +375,10 @@
         .working-agent-avatar.social { background: rgba(33,150,243,0.3); border-color: #2196f3; color: #2196f3; }
         .working-agent-avatar.email { background: rgba(255,87,34,0.3); border-color: #ff5722; color: #ff5722; }
         .working-agent-avatar.analytics { background: rgba(156,39,176,0.3); border-color: #9c27b0; color: #9c27b0; }
-        
+
         .working-agent-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; }
         .working-agent-task { font-size: 0.75rem; color: #888; line-height: 1.4; }
-        
+
         .working-progress {
             margin-top: 12px;
             height: 4px;
@@ -386,14 +386,14 @@
             border-radius: 2px;
             overflow: hidden;
         }
-        
+
         .working-progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #ffd700, #ff9800);
             border-radius: 2px;
             transition: width 0.3s ease;
         }
-        
+
         .checkin-popup {
             position: absolute;
             background: rgba(0,255,136,0.15);
@@ -407,31 +407,31 @@
             pointer-events: none;
             z-index: 50;
         }
-        
+
         .checkin-popup .checkin-icon {
             font-size: 16px;
         }
-        
+
         .checkin-popup .checkin-text {
             font-size: 0.75rem;
             line-height: 1.3;
         }
-        
+
         .checkin-popup .checkin-text strong {
             color: #00ff88;
         }
-        
+
         @keyframes checkinSlide {
             from { opacity: 0; transform: translateX(-50px); }
             to { opacity: 1; transform: translateX(0); }
         }
-        
+
         @keyframes checkinFade {
             to { opacity: 0; transform: translateY(-20px); }
         }
-        
+
         /* Floating animations - agents orbit around center, never touch or cross hub */
-        @keyframes float1 { 
+        @keyframes float1 {
             0% { transform: translate(-350px, 0px); opacity: 0; }
             5% { opacity: 1; }
             25% { transform: translate(-200px, -250px); }
@@ -440,7 +440,7 @@
             95% { opacity: 1; }
             100% { transform: translate(-200px, 250px); opacity: 0; }
         }
-        @keyframes float2 { 
+        @keyframes float2 {
             0% { transform: translate(350px, 0px); opacity: 0; }
             5% { opacity: 1; }
             25% { transform: translate(200px, 250px); }
@@ -449,7 +449,7 @@
             95% { opacity: 1; }
             100% { transform: translate(200px, -250px); opacity: 0; }
         }
-        @keyframes float3 { 
+        @keyframes float3 {
             0% { transform: translate(0px, -300px); opacity: 0; }
             5% { opacity: 1; }
             25% { transform: translate(250px, -150px); }
@@ -458,7 +458,7 @@
             95% { opacity: 1; }
             100% { transform: translate(-250px, -150px); opacity: 0; }
         }
-        @keyframes float4 { 
+        @keyframes float4 {
             0% { transform: translate(0px, 300px); opacity: 0; }
             5% { opacity: 1; }
             25% { transform: translate(-250px, 150px); }
@@ -467,78 +467,78 @@
             95% { opacity: 1; }
             100% { transform: translate(250px, 150px); opacity: 0; }
         }
-        
+
         /* Center hub pulse animation */
         @keyframes hubPulse {
-            0%, 100% { 
+            0%, 100% {
                 box-shadow: 0 0 30px rgba(0,212,255,0.4), 0 0 60px rgba(0,212,255,0.2);
                 transform: translate(-50%, -50%) scale(1);
             }
-            50% { 
+            50% {
                 box-shadow: 0 0 60px rgba(0,212,255,0.8), 0 0 100px rgba(0,212,255,0.4);
                 transform: translate(-50%, -50%) scale(1.05);
             }
         }
-        
+
         @keyframes twinkle {
             0%, 100% { opacity: 0.3; }
             50% { opacity: 1; }
         }
-        
+
         @keyframes pulseGlow {
-            0%, 100% { 
+            0%, 100% {
                 box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
                 transform: scale(1);
             }
-            50% { 
+            50% {
                 box-shadow: 0 0 40px currentColor, 0 0 80px currentColor;
                 transform: scale(1.1);
             }
         }
-        
+
         @keyframes bubblePop {
             0% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.8); }
             20% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
             80% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
             100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); }
         }
-        
+
         @keyframes waveMove {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(20px); }
         }
-        
+
         @keyframes waveSlide {
             0%, 100% { transform: translateX(-100%); opacity: 0; }
             50% { transform: translateX(0); opacity: 1; }
             100% { transform: translateX(100%); opacity: 0; }
         }
-        
+
         @keyframes matrixDrop {
             0% { transform: translateY(-20px); opacity: 1; }
             100% { transform: translateY(100vh); opacity: 0; }
         }
-        
+
         @keyframes float {
             0%, 100% { transform: translateY(0) translateX(0); }
             25% { transform: translateY(-20px) translateX(10px); }
             50% { transform: translateY(0) translateX(20px); }
             75% { transform: translateY(20px) translateX(10px); }
         }
-        
+
         /* Agent glow - static, no pulse */
         .agent-glow-idle {
             box-shadow: 0 0 15px currentColor;
         }
-        
+
         .agent-glow-working {
             box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
         }
-        
+
         .checkin-icon { font-size: 24px; }
         .checkin-text { font-size: 0.85rem; }
         .checkin-text strong { color: #00ff88; }
-        
+
         /* Agent Detail Panel */
         .agent-detail-panel { display: none; flex-direction: column; height: 100%; }
         .agent-detail-panel.active { display: flex; }
@@ -577,7 +577,7 @@
         .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 10px 15px; color: #fff; font-size: 0.9rem; outline: none; }
         .chat-input:focus { border-color: #00d4ff; }
         .chat-send { width: 40px; height: 40px; border-radius: 50%; border: none; background: linear-gradient(135deg, #00d4ff, #a855f7); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
+
         /* Right Panel */
         .menu-panel {
             width: 350px;
@@ -586,36 +586,36 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .menu-header {
             padding: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .menu-header h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
-        
+
         .open-tasks-section, .completed-tasks-section {
             padding: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             overflow-y: auto;
         }
-        
+
         .completed-tasks-section { flex: 1; }
-        
+
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
         }
-        
+
         .section-title {
             font-size: 0.8rem;
             color: #888;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         .section-count {
             padding: 2px 10px;
             border-radius: 10px;
@@ -623,14 +623,14 @@
             background: rgba(255,107,107,0.2);
             color: #ff6b6b;
         }
-        
+
         .completed-tasks-section .section-count {
             background: rgba(0,255,136,0.2);
             color: #00ff88;
         }
-        
+
         .task-list { display: flex; flex-direction: column; gap: 10px; }
-        
+
         .task-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.05);
@@ -642,10 +642,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .task-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
         .task-item.completed { border-left: 3px solid #00ff88; opacity: 0.8; }
-        
+
         .task-avatar {
             width: 32px;
             height: 32px;
@@ -655,38 +655,38 @@
             justify-content: center;
             font-size: 16px;
         }
-        
+
         .task-avatar.article { background: rgba(0,212,255,0.15); }
         .task-avatar.funnel { background: rgba(255,107,107,0.15); }
         .task-avatar.video { background: rgba(168,85,247,0.15); }
-        
+
         .task-content { flex: 1; }
         .task-name { font-size: 0.85rem; margin-bottom: 3px; }
         .task-meta { font-size: 0.7rem; color: #666; }
         .completion-time { font-size: 0.7rem; color: #00ff88; margin-top: 3px; }
-        
+
         .task-status {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             background: #ffd700;
         }
-        
+
         .task-item.completed .task-status { background: #00ff88; }
-        
+
         .empty-tasks {
             text-align: center;
             padding: 30px;
             color: #666;
             font-size: 0.85rem;
         }
-        
+
         .empty-tasks-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
     </style>
 </head>
 <body>
     <div class="bg-grid"></div>
-    
+
     <div class="header">
         <h1>🎬 AI Agent Command Center</h1>
         <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
@@ -752,7 +752,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="main-container">
         <!-- Left Panel -->
         <div class="fleet-panel">
@@ -762,7 +762,7 @@
             </div>
             <div class="agent-list" id="agent-list"></div>
         </div>
-        
+
         <!-- Center Panel -->
         <div class="command-panel">
             <div class="lead-agent-hub">
@@ -786,7 +786,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="working-area" id="working-area">
                 <div class="working-header">
                     <span>Currently Working</span>
@@ -794,7 +794,7 @@
                 </div>
                 <div class="working-grid" id="working-grid"></div>
             </div>
-            
+
             <!-- Orbit View -->
             <div id="orbit-view" style="display: none; flex: 1; position: relative; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; overflow: hidden;">
                 <!-- Header matching Card View -->
@@ -802,34 +802,36 @@
                     <span>Currently Working</span>
                     <span class="working-count" id="orbit-working-count">0 Active</span>
                 </div>
-                
+
                 <!-- Full screen floating area -->
                 <div id="orbit-agents-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
-                
+
                 <!-- Orbital rings: 200px, 320px, 440px -->
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 1px dashed rgba(0,212,255,0.1); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; height: 320px; border: 1px dashed rgba(0,212,255,0.1); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; height: 440px; border: 1px dashed rgba(0,212,255,0.1); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
-                
+
                 <!-- Center hub: lead agent icon -->
                 <div class="lead-hub-icon" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; pointer-events: none;">
                     <div id="center-hub-icon" style="font-size: 60px; filter: drop-shadow(0 0 20px rgba(0,212,255,0.6));">◎</div>
                 </div>
-                
+
                 <!-- Protected zone indicator (subtle dashed circle) -->
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; border: 1px dashed rgba(0,212,255,0.15); border-radius: 50%; pointer-events: none; z-index: 5;"></div>
-                
+
                 <!-- Orbit Info Panel (top right corner) -->
                 <div id="orbit-info-panel" style="display: none; position: absolute; top: 60px; right: 20px; width: 260px; background: linear-gradient(145deg, rgba(15,15,35,0.98), rgba(10,10,26,0.95)); border: 1px solid rgba(0,212,255,0.25); border-radius: 16px; padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.7), 0 0 30px rgba(0,212,255,0.15), inset 0 1px 0 rgba(255,255,255,0.05); backdrop-filter: blur(20px); z-index: 100; transition: all 0.3s ease;"></div>
             </div>
-            
+
+
+
             <!-- View Toggle -->
             <div style="text-align: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1);">
                 <button onclick="switchCenterView('card')" id="btn-card" style="padding: 6px 16px; background: rgba(0,212,255,0.1); border: 1px solid #00d4ff; border-radius: 6px 0 0 6px; color: #fff; cursor: pointer; font-size: 0.8rem;">Card View</button>
                 <button onclick="switchCenterView('orbit')" id="btn-orbit" style="padding: 6px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 6px 6px 0; color: #888; cursor: pointer; font-size: 0.8rem; margin-left: -1px;">Orbit View</button>
             </div>
         </div>
-        
+
         <!-- Right Panel -->
         <div class="menu-panel">
             <!-- Main Menu View -->
@@ -837,7 +839,7 @@
             <div class="menu-header">
                 <h2>📋 Main Menu</h2>
             </div>
-            
+
             <div class="open-tasks-section">
                 <div class="section-header">
                     <span class="section-title">Currently Working</span>
@@ -845,7 +847,7 @@
                 </div>
                 <div class="task-list" id="working-tasks"></div>
             </div>
-            
+
             <div class="completed-tasks-section">
                 <div class="section-header">
                     <span class="section-title">Recently Completed</span>
@@ -854,7 +856,7 @@
                 <div class="task-list" id="completed-tasks"></div>
             </div>
             </div>
-            
+
             <!-- Agent Detail View -->
             <div class="agent-detail-panel" id="agent-detail-panel">
                 <div class="detail-tabs">
@@ -871,7 +873,7 @@
                         <div id="agent-info-content"></div>
                     </div>
                 </div>
-                
+
                 <!-- Edit Popup -->
                 <div id="edit-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
                     <div style="background: linear-gradient(135deg, #1a1a2e, #0f1729); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 35px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto;">
@@ -879,25 +881,25 @@
                             <h3 style="font-size: 1.2rem;">Edit Agent</h3>
                             <button onclick="closeEditPopup()" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button>
                         </div>
-                        
+
                         <!-- Name -->
                         <div style="margin-bottom: 20px;">
                             <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Name</div>
                             <input type="text" id="edit-popup-name" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; color: #fff; font-size: 1rem;">
                         </div>
-                        
+
                         <!-- Description -->
                         <div style="margin-bottom: 20px;">
                             <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">Description</div>
                             <input type="text" id="edit-popup-desc" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; color: #fff; font-size: 0.95rem;">
                         </div>
-                        
+
                         <!-- About -->
                         <div style="margin-bottom: 20px;">
                             <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 8px;">About</div>
                             <textarea id="edit-popup-about" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; color: #fff; font-size: 0.85rem; min-height: 60px; resize: vertical;"></textarea>
                         </div>
-                        
+
                         <!-- Capabilities -->
                         <div style="margin-bottom: 25px;">
                             <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 10px;">Capabilities</div>
@@ -907,7 +909,7 @@
                                 <button onclick="addEditCap()" style="padding: 10px 18px; background: rgba(0,212,255,0.1); border: 1px solid #00d4ff; border-radius: 8px; color: #00d4ff; cursor: pointer; font-size: 0.85rem;">Add</button>
                             </div>
                         </div>
-                        
+
                         <!-- Save Button -->
                         <button onclick="saveEditPopup()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #00d4ff, #a855f7); border: none; border-radius: 10px; color: #fff; cursor: pointer; font-size: 1rem; font-weight: 500;">Save Changes</button>
                     </div>
@@ -929,7 +931,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Icon Change Modal -->
         <div id="icon-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
             <div style="background: linear-gradient(135deg, #1a1a2e, #0f1729); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; width: 90%; max-width: 320px;">
@@ -937,7 +939,7 @@
                     <h3 style="font-size: 1.1rem;">Change Icon</h3>
                     <button onclick="closeIconModal()" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button>
                 </div>
-                
+
                 <!-- Option 1: Choose Different Icon -->
                 <div style="margin-bottom: 20px;">
                     <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 10px;">Choose Icon</div>
@@ -956,7 +958,7 @@
                         <span onclick="changeAgentIcon('🚀')" style="cursor: pointer; font-size: 20px; padding: 10px; text-align: center; border-radius: 8px; background: rgba(255,255,255,0.05); line-height: 1;">🚀</span>
                     </div>
                 </div>
-                
+
                 <!-- Option 2: Upload Image -->
                 <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 10px;">Or Upload Image</div>
@@ -966,7 +968,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Task Detail Modal -->
         <div id="task-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
             <div style="background: linear-gradient(135deg, #1a1a2e, #0f1729); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; width: 90%; max-width: 380px;">
@@ -978,7 +980,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         const agents = {
             article: { id: 'article', name: 'Article Agent', emoji: '📝', type: 'article', status: 'online', currentTask: null, sessionId: '91e452b5-775b-49cc-85ff-05608c7937e4' },
@@ -991,11 +993,11 @@
             email: { id: 'email', name: 'Email Agent', emoji: '📧', type: 'email', status: 'idle', currentTask: null, sessionId: null },
             analytics: { id: 'analytics', name: 'Analytics Agent', emoji: '📊', type: 'analytics', status: 'idle', currentTask: null, sessionId: null }
         };
-        
+
         let openTasks = [];
         let completedTasks = [];
         let taskIdCounter = 1;
-        
+
         function init() {
             renderAgentList();
             renderWorkingArea();
@@ -1004,7 +1006,7 @@
             updateStats();
             simulateActivity();
         }
-        
+
         const agentColors = {
             article: '#00d4ff',
             funnel: '#ff6b6b',
@@ -1016,38 +1018,38 @@
             email: '#ff5722',
             analytics: '#9c27b0'
         };
-        
+
         function renderAgentList() {
             const list = document.getElementById('agent-list');
             list.innerHTML = '';
-            
+
             Object.values(agents).forEach(agent => {
                 const item = document.createElement('div');
                 item.className = `agent-item ${agent.status}`;
-                
+
                 // Grey out idle agents
                 if (agent.status === 'idle') {
                     item.style.opacity = '0.4';
                     item.style.filter = 'grayscale(100%)';
                 }
-                
+
                 // Add colored border for active agents
                 if (agent.status === 'working') {
                     const color = agentColors[agent.type] || '#00d4ff';
                     item.style.borderColor = color;
                     item.style.boxShadow = `0 0 10px ${color}40`;
                 }
-                
+
                 const avatarHtml = agent.imageUrl ?
                     `<div class="agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
                     `<div class="agent-avatar ${agent.type}">${agent.emoji}</div>`;
-                
-                const statusDot = agent.status === 'online' ? 
+
+                const statusDot = agent.status === 'online' ?
                     `<div style="position: absolute; top: 10px; right: 10px; width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 4px #00ff88;"></div>` :
                     agent.status === 'working' ?
                     `<div style="position: absolute; top: 10px; right: 10px; width: 6px; height: 6px; background: #ffd700; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; box-shadow: 0 0 4px #ffd700;"></div>` :
                     '';
-                
+
                 item.style.position = 'relative';
                 item.innerHTML = `
                     ${statusDot}
@@ -1058,7 +1060,7 @@
                     </div>
                     ${statusDot}
                 `;
-                
+
                 // Add click handler for the whole item
                 item.addEventListener('click', (e) => {
                     // If clicked on avatar, open icon modal
@@ -1069,30 +1071,30 @@
                         showAgentDetail(agent.id);
                     }
                 });
-                
+
                 // Make avatar cursor indicate it's clickable
                 const avatar = item.querySelector('.agent-avatar');
                 if (avatar) {
                     avatar.style.cursor = 'pointer';
                     avatar.title = 'Click to change icon';
                 }
-                
+
                 list.appendChild(item);
             });
         }
-        
+
         let selectedAgentId = null;
         let chatHistories = {};
-        
+
         function showAgentDetail(agentId) {
             selectedAgentId = agentId;
             const agent = agents[agentId];
-            
+
             document.getElementById('main-menu-view').style.display = 'none';
             document.getElementById('agent-detail-panel').classList.add('active');
-            
+
             switchDetailTab('agent');
-            
+
             const infoContent = document.getElementById('agent-info-content');
             const avatarHtml = agent.imageUrl ?
                 `<div class="detail-avatar-large ${agent.type}" onclick="openIconModal()" style="cursor: pointer; width: 70px; height: 70px; font-size: 35px; margin: 0 auto 10px; background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
@@ -1124,52 +1126,52 @@
                     <p class="detail-description">${agent.about || 'Specialized in ' + agent.type + ' tasks and workflows.'}</p>
                 </div>
             `;
-            
+
             const currentTaskEl = document.getElementById('agent-current-task');
             if (agent.currentTask) {
                 currentTaskEl.innerHTML = `<span style="color: #ffd700;">⟳ ${agent.currentTask}</span>`;
             } else {
                 currentTaskEl.innerHTML = '<span style="color: #666;">No active task</span>';
             }
-            
+
             const chatContainer = document.getElementById('chat-messages');
             chatContainer.innerHTML = (chatHistories[agentId] || []).length === 0 ?
                 '<div style="text-align: center; color: #666; padding: 40px;">Start a conversation...</div>' :
                 chatHistories[agentId].map(msg => `<div class="chat-message ${msg.sender}">${msg.text}</div>`).join('');
         }
-        
+
         function closeAgentDetail() {
             document.getElementById('agent-detail-panel').classList.remove('active');
             document.getElementById('main-menu-view').style.display = 'flex';
             selectedAgentId = null;
         }
-        
+
         // Edit Popup Functions
         let tempEditCaps = [];
-        
+
         function openEditPopup() {
             if (!selectedAgentId) return;
-            
+
             const agent = agents[selectedAgentId];
             agent.tagline = agent.tagline || `${agent.type} Specialist`;
             agent.about = agent.about || `Specialized in ${agent.type} tasks and workflows.`;
             agent.capabilities = agent.capabilities || ['Task 1', 'Task 2', 'Task 3'];
-            
+
             tempEditCaps = [...agent.capabilities];
-            
+
             document.getElementById('edit-popup-name').value = agent.name;
             document.getElementById('edit-popup-desc').value = agent.tagline;
             document.getElementById('edit-popup-about').value = agent.about;
-            
+
             renderEditCaps();
-            
+
             document.getElementById('edit-popup').style.display = 'flex';
         }
-        
+
         function closeEditPopup() {
             document.getElementById('edit-popup').style.display = 'none';
         }
-        
+
         function renderEditCaps() {
             const container = document.getElementById('edit-popup-caps');
             container.innerHTML = tempEditCaps.map((cap, i) => `
@@ -1179,7 +1181,7 @@
                 </span>
             `).join('');
         }
-        
+
         function addEditCap() {
             const input = document.getElementById('edit-popup-new-cap');
             const cap = input.value.trim();
@@ -1188,29 +1190,29 @@
             input.value = '';
             renderEditCaps();
         }
-        
+
         function removeEditCap(index) {
             tempEditCaps.splice(index, 1);
             renderEditCaps();
         }
-        
+
         function saveEditPopup() {
             if (!selectedAgentId) return;
-            
+
             const agent = agents[selectedAgentId];
             agent.name = document.getElementById('edit-popup-name').value || agent.name;
             agent.tagline = document.getElementById('edit-popup-desc').value || agent.tagline;
             agent.about = document.getElementById('edit-popup-about').value || agent.about;
             agent.capabilities = tempEditCaps;
-            
+
             closeEditPopup();
-            
+
             // Refresh all views
             showAgentDetail(selectedAgentId);
             renderAgentList();
             renderWorkingArea();
         }
-        
+
         function switchDetailTab(tabName) {
             document.querySelectorAll('.detail-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.tab === tabName);
@@ -1220,23 +1222,23 @@
             });
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
-        
+
         function sendDetailMessage() {
             const input = document.getElementById('detail-message-input');
             const text = input.value.trim();
             if (!text || !selectedAgentId) return;
-            
+
             if (!chatHistories[selectedAgentId]) {
                 chatHistories[selectedAgentId] = [];
             }
-            
+
             chatHistories[selectedAgentId].push({ sender: 'user', text });
             input.value = '';
-            
+
             const chatContainer = document.getElementById('chat-messages');
             chatContainer.innerHTML = chatHistories[selectedAgentId].map(msg => `<div class="chat-message ${msg.sender}">${msg.text}</div>`).join('');
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            
+
             setTimeout(() => {
                 const responses = ["I'm on it!", "Got it.", "Processing...", "Will do!"];
                 const response = responses[Math.floor(Math.random() * responses.length)];
@@ -1245,16 +1247,16 @@
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }, 800);
         }
-        
+
         function renderWorkingArea() {
             const grid = document.getElementById('working-grid');
             const workingAgents = Object.values(agents).filter(a => a.status === 'working');
-            
+
             // Update both card view and orbit view counts
             document.getElementById('working-count').textContent = `${workingAgents.length} Active`;
             const orbitCount = document.getElementById('orbit-working-count');
             if (orbitCount) orbitCount.textContent = `${workingAgents.length} Active`;
-            
+
             if (workingAgents.length === 0) {
                 grid.innerHTML = '';
                 document.querySelector('.working-header span:first-child').textContent = 'No Agents Working';
@@ -1262,7 +1264,7 @@
             } else {
                 document.querySelector('.working-header span:first-child').textContent = 'Currently Working';
             }
-            
+
             grid.innerHTML = workingAgents.map(agent => {
                 const color = agentColors[agent.type] || '#00d4ff';
                 const avatarHtml = agent.imageUrl ?
@@ -1278,17 +1280,17 @@
                     </div>
                 </div>
             `}).join('');
-            
+
             // Update right panel "Currently Working" section
             renderWorkingPanel();
         }
-        
+
         function renderWorkingPanel() {
             const workingList = document.getElementById('working-tasks');
             const workingAgents = Object.values(agents).filter(a => a.status === 'working');
-            
+
             document.getElementById('working-panel-count').textContent = `${workingAgents.length} Active`;
-            
+
             if (workingAgents.length === 0) {
                 workingList.innerHTML = `
                     <div class="empty-tasks">
@@ -1309,13 +1311,13 @@
                 `).join('');
             }
         }
-        
+
         function renderTasks() {
             // Open tasks section removed - now showing "Currently Working" instead
-            
+
             const completedList = document.getElementById('completed-tasks');
             document.getElementById('completed-count').textContent = completedTasks.length;
-            
+
             if (completedTasks.length === 0) {
                 completedList.innerHTML = `
                     <div class="empty-tasks">
@@ -1336,21 +1338,21 @@
                 `).join('');
             }
         }
-        
+
         let glowEnabled = true;
-        
+
         function toggleSettings() {
             playClickSound();
             const panel = document.getElementById('settings-panel');
             panel.classList.toggle('active');
         }
-        
+
         function toggleGlow() {
             playClickSound();
             const toggle = document.getElementById('glow-toggle');
             glowEnabled = !glowEnabled;
             toggle.classList.toggle('active');
-            
+
             // Update all orbit agents - static glow, no pulse
             orbitAgentsData.forEach(({ element, agentId }) => {
                 const agent = agents[agentId];
@@ -1361,26 +1363,26 @@
                 }
             });
         }
-        
+
         let currentOrbitSpeed = 25;
         let trailsEnabled = false;
-        
+
         function updateOrbitSpeed(value) {
             currentOrbitSpeed = parseInt(value);
             document.getElementById('speed-value').textContent = currentOrbitSpeed + 's';
-            
+
             // Update all orbit agents with new speed
             orbitAgentsData.forEach(({ wrapper }) => {
                 wrapper.style.animationDuration = currentOrbitSpeed + 's';
             });
         }
-        
+
         function toggleTrails() {
             playClickSound();
             const toggle = document.getElementById('trails-toggle');
             trailsEnabled = !trailsEnabled;
             toggle.classList.toggle('active');
-            
+
             // Add/remove trail effect using CSS filter on orbit agents
             orbitAgentsData.forEach(({ element }) => {
                 if (trailsEnabled) {
@@ -1389,38 +1391,38 @@
                     element.style.filter = 'none';
                 }
             });
-            
+
             // Re-render card view to apply/remove trails
             renderWorkingArea();
         }
-        
+
         let soundEnabled = {
             click: false,
             start: false,
             complete: false
         };
-        
+
         function toggleSoundType(type) {
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById(`sound-${type}-toggle`);
             soundEnabled[type] = !soundEnabled[type];
             toggle.classList.toggle('active');
         }
-        
+
         let starfieldEnabled = false;
         let pulseGlowEnabled = false;
         let tooltipsEnabled = true;
-        
+
         function toggleStarfield() {
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById('starfield-toggle');
             starfieldEnabled = !starfieldEnabled;
             toggle.classList.toggle('active');
-            
+
             // Apply to orbit view
             const orbitView = document.getElementById('orbit-view');
             let starfieldOrbit = document.getElementById('starfield-bg-orbit');
-            
+
             if (starfieldEnabled) {
                 if (!starfieldOrbit) {
                     starfieldOrbit = createStarfield('starfield-bg-orbit');
@@ -1430,11 +1432,11 @@
             } else if (starfieldOrbit) {
                 starfieldOrbit.style.display = 'none';
             }
-            
+
             // Apply to card view (working area)
             const workingArea = document.getElementById('working-area');
             let starfieldCard = document.getElementById('starfield-bg-card');
-            
+
             if (starfieldEnabled) {
                 if (!starfieldCard) {
                     starfieldCard = createStarfield('starfield-bg-card');
@@ -1445,7 +1447,7 @@
                 starfieldCard.style.display = 'none';
             }
         }
-        
+
         function createStarfield(id) {
             const starfield = document.createElement('div');
             starfield.id = id;
@@ -1469,7 +1471,7 @@
             }
             return starfield;
         }
-        
+
         function createStarfieldTheme(container) {
             const starfield = document.createElement('div');
             starfield.className = 'bg-effect';
@@ -1494,13 +1496,13 @@
             }
             container.appendChild(starfield);
         }
-        
+
         function togglePulseGlow() {
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById('pulse-toggle');
             pulseGlowEnabled = !pulseGlowEnabled;
             toggle.classList.toggle('active');
-            
+
             // Add/remove pulsing animation to working agents in orbit view
             orbitAgentsData.forEach(({ element, agentId }) => {
                 const agent = agents[agentId];
@@ -1512,21 +1514,21 @@
                     }
                 }
             });
-            
+
             // Re-render card view to apply/remove pulse glow
             renderWorkingArea();
         }
-        
+
         function toggleTooltips() {
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById('tooltip-toggle');
             tooltipsEnabled = !tooltipsEnabled;
             toggle.classList.toggle('active');
         }
-        
+
         let chatBubblesEnabled = false;
         let chatBubbleInterval = null;
-        
+
         const agentMessages = [
             "On it! 💪",
             "Crushing this task! 🔥",
@@ -1539,13 +1541,13 @@
             "Let's go! 🚀",
             "Piece of cake! 🍰"
         ];
-        
+
         function toggleChatBubbles() {
             if (soundEnabled.click) playClickSound();
             const toggle = document.getElementById('chat-bubbles-toggle');
             chatBubblesEnabled = !chatBubblesEnabled;
             toggle.classList.toggle('active');
-            
+
             if (chatBubblesEnabled) {
                 // Start random chat bubbles
                 chatBubbleInterval = setInterval(() => {
@@ -1561,87 +1563,87 @@
                 document.querySelectorAll('.chat-bubble').forEach(b => b.remove());
             }
         }
-        
+
         const leadAgentIcons = ['◎', '👑', '⭐', '🚀', '🔥', '⚡', '🎬', '💎', '🦁', '🦅'];
         let currentLeadIconIndex = 0;
-        
+
         function changeLeadAgentIcon() {
             if (soundEnabled.click) playClickSound();
             currentLeadIconIndex = (currentLeadIconIndex + 1) % leadAgentIcons.length;
             const newIcon = leadAgentIcons[currentLeadIconIndex];
-            
+
             // Update preview in settings
             document.getElementById('lead-icon-preview').textContent = newIcon;
-            
+
             // Update center hub icon
             const hubIcon = document.getElementById('center-hub-icon');
             if (hubIcon) {
                 hubIcon.textContent = newIcon;
             }
         }
-        
+
         const backgroundThemes = ['Clean', 'Starfield', 'Grid', 'Particles', 'Waves', 'Matrix'];
         let currentBgThemeIndex = 0;
-        
+
         function changeBackgroundTheme() {
             if (soundEnabled.click) playClickSound();
             currentBgThemeIndex = (currentBgThemeIndex + 1) % backgroundThemes.length;
             const newTheme = backgroundThemes[currentBgThemeIndex];
-            
+
             // Update preview in settings
             document.getElementById('bg-theme-preview').textContent = newTheme;
-            
+
             // Apply theme
             applyBackgroundTheme(newTheme);
         }
-        
+
         function applyBackgroundTheme(theme) {
             // Remove existing background effects
             document.querySelectorAll('.bg-effect').forEach(el => el.remove());
-            
+
             const orbitView = document.getElementById('orbit-view');
             const workingArea = document.getElementById('working-area');
-            
+
             switch(theme) {
                 case 'Starfield':
                     // Create starfield directly for theme
                     createStarfieldTheme(orbitView);
                     createStarfieldTheme(workingArea);
                     break;
-                    
+
                 case 'Grid':
                     createGridBackground(orbitView);
                     createGridBackground(workingArea);
                     break;
-                    
+
                 case 'Particles':
                     createParticlesBackground(orbitView);
                     createParticlesBackground(workingArea);
                     break;
-                    
+
                 case 'Waves':
                     createWavesBackground(orbitView);
                     createWavesBackground(workingArea);
                     break;
-                    
+
                 case 'Matrix':
                     createMatrixBackground(orbitView);
                     createMatrixBackground(workingArea);
                     break;
-                    
+
                 case 'Clean':
                     // No background effects
                     break;
             }
         }
-        
+
         function createGridBackground(container) {
             const grid = document.createElement('div');
             grid.className = 'bg-effect';
             grid.style.cssText = `
                 position: absolute;
                 top: 0; left: 0; width: 100%; height: 100%;
-                background-image: 
+                background-image:
                     linear-gradient(rgba(0,212,255,0.1) 1px, transparent 1px),
                     linear-gradient(90deg, rgba(0,212,255,0.1) 1px, transparent 1px);
                 background-size: 50px 50px;
@@ -1651,12 +1653,12 @@
             `;
             container.appendChild(grid);
         }
-        
+
         function createParticlesBackground(container) {
             const particles = document.createElement('div');
             particles.className = 'bg-effect';
             particles.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;';
-            
+
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 const size = Math.random() * 4 + 2;
@@ -1675,7 +1677,7 @@
             }
             container.appendChild(particles);
         }
-        
+
         function createWavesBackground(container) {
             // Create multiple wave layers for better visibility
             for (let i = 0; i < 3; i++) {
@@ -1686,9 +1688,9 @@
                     position: absolute;
                     top: ${20 + i * 30}%;
                     left: 0; width: 100%; height: 60px;
-                    background: linear-gradient(90deg, 
-                        transparent 0%, 
-                        rgba(0,212,255,0.15) 50%, 
+                    background: linear-gradient(90deg,
+                        transparent 0%,
+                        rgba(0,212,255,0.15) 50%,
                         transparent 100%);
                     pointer-events: none;
                     z-index: 1;
@@ -1698,7 +1700,7 @@
                 container.appendChild(wave);
             }
         }
-        
+
         function createMatrixBackground(container) {
             const matrix = document.createElement('div');
             matrix.className = 'bg-effect';
@@ -1710,7 +1712,7 @@
                 z-index: 1;
                 opacity: 0.3;
             `;
-            
+
             const chars = '01アイウエオカキクケコ';
             for (let i = 0; i < 20; i++) {
                 const drop = document.createElement('div');
@@ -1729,27 +1731,27 @@
             }
             container.appendChild(matrix);
         }
-        
+
         function showRandomChatBubble() {
             const workingAgents = Object.values(agents).filter(a => a.status === 'working');
             if (workingAgents.length === 0) return;
-            
+
             const agent = workingAgents[Math.floor(Math.random() * workingAgents.length)];
             const message = agentMessages[Math.floor(Math.random() * agentMessages.length)];
-            
+
             // Show in orbit view
             const orbitAgent = document.getElementById(`orbit-agent-${agent.id}`);
             if (orbitAgent) {
                 createChatBubble(orbitAgent, message);
             }
-            
+
             // Show in card view
             const cardAgent = document.getElementById(`working-${agent.id}`);
             if (cardAgent) {
                 createChatBubble(cardAgent, message);
             }
         }
-        
+
         function createChatBubble(element, message) {
             const bubble = document.createElement('div');
             bubble.className = 'chat-bubble';
@@ -1770,15 +1772,15 @@
                 pointer-events: none;
                 font-weight: 600;
             `;
-            
+
             element.style.position = 'relative';
             element.appendChild(bubble);
-            
+
             setTimeout(() => bubble.remove(), 2000);
         }
-        
+
         let audioCtx = null;
-        
+
         function getAudioContext() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1788,88 +1790,88 @@
             }
             return audioCtx;
         }
-        
+
         function playCheckinSound() {
             if (!soundEnabled.complete) return;
             try {
                 const audioContext = getAudioContext();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-                
+
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-                
+
                 oscillator.frequency.value = 880;
                 oscillator.type = 'sine';
                 gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                
+
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.2);
             } catch(e) {
                 console.log('Audio play failed:', e);
             }
         }
-        
+
         function playTaskStartSound() {
             if (!soundEnabled.start) return;
             try {
                 const audioContext = getAudioContext();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-                
+
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-                
+
                 oscillator.frequency.value = 440;
                 oscillator.type = 'sine';
                 gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-                
+
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.15);
             } catch(e) {
                 console.log('Audio play failed:', e);
             }
         }
-        
+
         function playClickSound() {
             if (!soundEnabled.click) return;
             try {
                 const audioContext = getAudioContext();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-                
+
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-                
+
                 oscillator.frequency.value = 1200;
                 oscillator.type = 'triangle';
                 gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
-                
+
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.05);
             } catch(e) {
                 console.log('Audio play failed:', e);
             }
         }
-        
+
         function updateStats() {
             const working = Object.values(agents).filter(a => a.status === 'working').length;
             const online = Object.values(agents).filter(a => a.status !== 'idle').length;
-            
+
             document.getElementById('stat-active').textContent = working;
             document.getElementById('stat-completed').textContent = completedTasks.length;
             document.getElementById('stat-online').textContent = online;
         }
-        
+
         let checkinOffset = 0;
-        
+
         function showCheckin(agent) {
             // Play sound if enabled
             playCheckinSound();
-            
+
             // Create popup for both views
             const popupHTML = `
                 <div class="checkin-icon">${agent.emoji}</div>
@@ -1878,11 +1880,11 @@
                     Task completed successfully
                 </div>
             `;
-            
+
             // Calculate offset for stacking multiple checkins
             const topOffset = 80 + (checkinOffset * 45);
             checkinOffset = (checkinOffset + 1) % 4; // Max 4 stacked, then reset
-            
+
             // Show in Card View (working-area) - positioned right next to Active badge
             const workingArea = document.getElementById('working-area');
             const cardPopup = document.createElement('div');
@@ -1894,7 +1896,7 @@
                 cardPopup.remove();
                 if (checkinOffset > 0) checkinOffset--;
             }, 3500);
-            
+
             // Show in Orbit View - positioned right next to Active badge
             const orbitView = document.getElementById('orbit-view');
             const orbitPopup = document.createElement('div');
@@ -1904,22 +1906,22 @@
             orbitView.appendChild(orbitPopup);
             setTimeout(() => orbitPopup.remove(), 3500);
         }
-        
+
         // Icon Modal Functions
         function openIconModal() {
             document.getElementById('icon-modal').style.display = 'flex';
             document.getElementById('icon-upload-filename').textContent = '';
         }
-        
+
         function closeIconModal() {
             document.getElementById('icon-modal').style.display = 'none';
         }
-        
+
         // Task Modal Functions
         function openTaskModal(index, type) {
             const task = type === 'open' ? openTasks[index] : completedTasks[index];
             if (!task) return;
-            
+
             const modalContent = document.getElementById('task-modal-content');
             modalContent.innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -1932,41 +1934,41 @@
                     <div style="font-size: 0.9rem; color: #aaa; line-height: 1.5;">${task.description || 'No description provided for this task.'}</div>
                 </div>
             `;
-            
+
             document.getElementById('task-modal').style.display = 'flex';
         }
-        
+
         function closeTaskModal() {
             document.getElementById('task-modal').style.display = 'none';
         }
-        
+
         function changeAgentIcon(emoji) {
             if (!selectedAgentId) return;
-            
+
             agents[selectedAgentId].emoji = emoji;
             agents[selectedAgentId].imageUrl = null;
-            
+
             closeIconModal();
-            
+
             // Refresh all views
             showAgentDetail(selectedAgentId);
             renderAgentList();
             renderWorkingArea();
         }
-        
+
         function handleIconImageUpload(event) {
             const file = event.target.files[0];
             if (!file || !selectedAgentId) return;
-            
+
             document.getElementById('icon-upload-filename').textContent = file.name;
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 agents[selectedAgentId].imageUrl = e.target.result;
                 agents[selectedAgentId].emoji = null;
-                
+
                 closeIconModal();
-                
+
                 // Refresh all views
                 showAgentDetail(selectedAgentId);
                 renderAgentList();
@@ -1974,7 +1976,7 @@
             };
             reader.readAsDataURL(file);
         }
-        
+
         function simulateActivity() {
             const activeAgents = ['article', 'funnel', 'video', 'research', 'code', 'design'];
             const taskTemplates = {
@@ -1985,7 +1987,7 @@
                 code: ['Build feature', 'Fix bug', 'Code review', 'Deploy update'],
                 design: ['Create mockup', 'Design assets', 'UI improvements', 'Brand guidelines']
             };
-            
+
             // Create tasks more frequently
             setInterval(() => {
                 const busyCount = Object.values(agents).filter(a => a.status === 'working').length;
@@ -1993,9 +1995,9 @@
                     const agentId = activeAgents[Math.floor(Math.random() * activeAgents.length)];
                     const agent = agents[agentId];
                     if (agent.status === 'working') return;
-                    
+
                     const taskName = taskTemplates[agentId][Math.floor(Math.random() * taskTemplates[agentId].length)];
-                    
+
                     const task = {
                         id: taskIdCounter++,
                         name: taskName,
@@ -2006,48 +2008,48 @@
                         agentType: agent.type,
                         createdAt: new Date()
                     };
-                    
+
                     openTasks.push(task);
                     renderTasks();
                     setTimeout(() => assignTask(task), 500);
                 }
             }, 1500);
         }
-        
+
         function assignTask(task) {
             const agent = agents[task.agentId];
             if (agent.status === 'working') return;
-            
+
             // Play task start sound
             playTaskStartSound();
-            
+
             openTasks = openTasks.filter(t => t.id !== task.id);
-            
+
             agent.status = 'working';
             agent.currentTask = task.name;
             agent.taskAssignedAt = new Date();
-            
+
             renderAgentList();
             renderWorkingArea();
             renderTasks();
             updateStats();
             updateOrbitView();
-            
+
             let progress = 0;
             const progressInterval = setInterval(() => {
                 progress += Math.random() * 15;
                 if (progress > 100) progress = 100;
-                
+
                 const bar = document.getElementById(`progress-${agent.id}`);
                 if (bar) bar.style.width = `${progress}%`;
-                
+
                 if (progress >= 100) {
                     clearInterval(progressInterval);
                     completeTask(task, agent);
                 }
             }, 300);
         }
-        
+
         function completeTask(task, agent) {
             const completedTask = {
                 ...task,
@@ -2056,26 +2058,26 @@
             };
             completedTasks.unshift(completedTask);
             if (completedTasks.length > 20) completedTasks.pop();
-            
+
             agent.status = 'online';
             agent.currentTask = null;
             agent.taskAssignedAt = null;
-            
+
             showCheckin(agent);
-            
+
             renderAgentList();
             renderWorkingArea();
             renderTasks();
             updateStats();
             updateOrbitView();
         }
-        
+
         function switchCenterView(view) {
             const workingArea = document.getElementById('working-area');
             const orbitView = document.getElementById('orbit-view');
             const btnCard = document.getElementById('btn-card');
             const btnOrbit = document.getElementById('btn-orbit');
-            
+
             if (view === 'card') {
                 workingArea.style.display = 'block';
                 orbitView.style.display = 'none';
@@ -2100,7 +2102,7 @@
         
         // Orbit hover info panel - shows in right corner
         let orbitHoverAgentId = null;
-        
+
         const orbitColors = {
             article: '#00d4ff',
             funnel: '#ff6b6b',
@@ -2112,25 +2114,25 @@
             email: '#ff5722',
             analytics: '#9c27b0'
         };
-        
+
         function updateOrbitInfoPanel() {
             const panel = document.getElementById('orbit-info-panel');
             if (!panel || !orbitHoverAgentId) return;
-            
+
             const agent = agents[orbitHoverAgentId];
             if (!agent || agent.status !== 'working') {
                 panel.style.display = 'none';
                 return;
             }
-            
+
             const tagline = agent.tagline || agent.type + ' Specialist';
             const task = agent.currentTask || 'Working...';
-            const assignedTime = agent.taskAssignedAt 
+            const assignedTime = agent.taskAssignedAt
                 ? new Date(agent.taskAssignedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                 : 'Just now';
-            
+
             const agentColor = orbitColors[agent.type] || '#00d4ff';
-            
+
             panel.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                     <div style="width: 44px; height: 44px; border-radius: 12px; background: ${agent.imageUrl ? `url(${agent.imageUrl}) center/cover` : `linear-gradient(135deg, ${agentColor}30, ${agentColor}10)`}; border: 2px solid ${agentColor}; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px ${agentColor}40;">
@@ -2152,36 +2154,36 @@
             `;
             panel.style.display = 'block';
         }
-        
+
         let orbitAgentsData = [];
         let orbitAgentsInitialized = false;
-        
+
         function initOrbitAgents() {
             if (orbitAgentsInitialized) return;
-            
+
             const container = document.getElementById('orbit-agents-container');
             const floatAnimations = ['float1', 'float2', 'float3', 'float4'];
-            
+
             // Create all orbit agents once
             Object.values(agents).forEach((agent, index) => {
                 const anim = floatAnimations[index % floatAnimations.length];
                 const color = orbitColors[agent.type] || '#00d4ff';
-                
+
                 // Wrapper handles the float animation - full screen, enters from edges
                 const wrapper = document.createElement('div');
                 wrapper.className = 'orbit-wrapper';
                 wrapper.dataset.agentId = agent.id;
                 wrapper.style.cssText = `
-                    position: absolute; 
-                    top: 50%; left: 50%; 
-                    width: 70px; height: 70px; 
-                    margin: -35px; 
+                    position: absolute;
+                    top: 50%; left: 50%;
+                    width: 70px; height: 70px;
+                    margin: -35px;
                     display: none;
                     animation: ${anim} ${currentOrbitSpeed}s linear infinite;
                     animation-play-state: paused;
                     z-index: 15;
                 `;
-                
+
                 // Inner element handles the visual and hover - 70px with glow
                 const el = document.createElement('div');
                 el.className = `orbit-agent ${agent.type} ${agent.status}`;
@@ -2189,43 +2191,43 @@
                 el.dataset.agentId = agent.id;
                 el.dataset.color = color;
                 el.style.cssText = `
-                    width: 70px; height: 70px; 
-                    border-radius: 50%; 
-                    background: rgba(${parseInt(color.slice(1,3),16)}, ${parseInt(color.slice(3,5),16)}, ${parseInt(color.slice(5,7),16)}, 0.3); 
-                    border: 2px solid ${color}; 
+                    width: 70px; height: 70px;
+                    border-radius: 50%;
+                    background: rgba(${parseInt(color.slice(1,3),16)}, ${parseInt(color.slice(3,5),16)}, ${parseInt(color.slice(5,7),16)}, 0.3);
+                    border: 2px solid ${color};
                     color: ${color};
                     display: flex;
-                    align-items: center; 
-                    justify-content: center; 
-                    font-size: 28px; 
-                    cursor: pointer; 
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                    cursor: pointer;
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
                     box-shadow: ${glowEnabled ? (agent.status === 'working' ? '0 0 20px currentColor, 0 0 40px currentColor' : '0 0 15px currentColor') : 'none'};
                 `;
-                el.innerHTML = agent.imageUrl ? 
+                el.innerHTML = agent.imageUrl ?
                     `<div style="width: 100%; height: 100%; border-radius: 50%; background-image: url(${agent.imageUrl}); background-size: cover; background-position: center;"></div>` :
                     agent.emoji;
-                
+
                 el.onclick = () => showAgentDetail(agent.id);
                 el.onmouseenter = () => pauseOrbitAgent(wrapper, el, agent.id);
                 el.onmouseleave = () => resumeOrbitAgent(wrapper, el);
-                
+
                 wrapper.appendChild(el);
                 container.appendChild(wrapper);
                 orbitAgentsData.push({ agentId: agent.id, wrapper: wrapper, element: el });
             });
-            
+
             orbitAgentsInitialized = true;
         }
-        
+
         function pauseOrbitAgent(wrapper, element, agentId) {
             // Pause the orbit animation
             wrapper.style.animationPlayState = 'paused';
-            
+
             // Scale up the inner element
             element.style.transform = 'scale(1.15)';
             wrapper.style.zIndex = '100';
-            
+
             // Enhance glow (only if enabled)
             if (glowEnabled) {
                 const agent = agents[agentId];
@@ -2234,22 +2236,22 @@
                     element.style.boxShadow = `0 0 50px ${color}, 0 0 80px ${color}60`;
                 }
             }
-            
+
             // Show info panel only if tooltips enabled
             if (tooltipsEnabled) {
                 orbitHoverAgentId = agentId;
                 updateOrbitInfoPanel();
             }
         }
-        
+
         function resumeOrbitAgent(wrapper, element) {
             // Resume animation
             wrapper.style.animationPlayState = 'running';
-            
+
             // Reset inner element
             element.style.transform = 'scale(1)';
             wrapper.style.zIndex = '';
-            
+
             // Restore glow (only if enabled)
             if (glowEnabled) {
                 const agent = agents[element.dataset.agentId];
@@ -2260,23 +2262,23 @@
             } else {
                 element.style.boxShadow = 'none';
             }
-            
+
             // Hide info panel
             orbitHoverAgentId = null;
             const panel = document.getElementById('orbit-info-panel');
             if (panel) panel.style.display = 'none';
         }
-        
+
         function updateOrbitView() {
             const container = document.getElementById('orbit-agents-container');
-            
+
             // Initialize orbit agents on first call
             if (!orbitAgentsInitialized) {
                 initOrbitAgents();
             }
-            
+
             const workingAgents = Object.values(agents).filter(a => a.status === 'working');
-            
+
             if (workingAgents.length === 0) {
                 // Hide all agents and pause animations
                 orbitAgentsData.forEach(({ wrapper }) => {
@@ -2285,16 +2287,16 @@
                 });
                 return;
             }
-            
+
             // Show/hide agents based on working status and update glow
             const workingIds = new Set(workingAgents.map(a => a.id));
             orbitAgentsData.forEach(({ agentId, wrapper, element }) => {
                 const agent = agents[agentId];
                 const isWorking = workingIds.has(agentId);
                 const wasVisible = wrapper.style.display === 'block';
-                
+
                 wrapper.style.display = isWorking ? 'block' : 'none';
-                
+
                 // Start animation when agent starts working
                 if (isWorking && !wasVisible) {
                     wrapper.style.animationPlayState = 'running';
@@ -2303,7 +2305,7 @@
                 } else if (!isWorking) {
                     wrapper.style.animationPlayState = 'paused';
                 }
-                
+
                 // Update glow based on status (only if enabled) - static glow, no pulse
                 if (glowEnabled) {
                     if (isWorking) {
@@ -2318,12 +2320,12 @@
                 }
             });
         }
-        
+
         // Update orbit info panel every second to refresh time
         setInterval(() => {
             if (orbitHoverAgentId) updateOrbitInfoPanel();
         }, 1000);
-        
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

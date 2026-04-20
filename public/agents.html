@@ -321,9 +321,29 @@
         #working-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 20px;
             align-content: start;
+        }
+
+        /* Fixed size working agent cards to prevent freezing/stuck cards */
+        .working-agent {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .working-agent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,215,0,0.2);
         }
 
         .working-header {
@@ -345,15 +365,7 @@
             font-size: 0.8rem;
         }
 
-        /* .working-grid styles moved above with #working-grid */
-
-        .working-agent {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-        }
+        /* .working-grid and .working-agent styles moved above with #working-grid */
 
         .working-agent-avatar {
             width: 50px;
@@ -1275,21 +1287,57 @@
                 document.querySelector('.working-header span:first-child').textContent = 'Currently Working';
             }
 
-            grid.innerHTML = workingAgents.map(agent => {
+            // Get existing card IDs to avoid re-rendering cards that are already there
+            const existingCards = new Set();
+            grid.querySelectorAll('.working-agent').forEach(card => {
+                const agentId = card.id.replace('working-', '');
+                existingCards.add(agentId);
+            });
+
+            // Get current working agent IDs
+            const workingIds = new Set(workingAgents.map(a => a.id));
+
+            // Remove cards for agents that are no longer working
+            existingCards.forEach(agentId => {
+                if (!workingIds.has(agentId)) {
+                    const card = document.getElementById(`working-${agentId}`);
+                    if (card) card.remove();
+                }
+            });
+
+            // Add or update cards for working agents
+            workingAgents.forEach(agent => {
                 const color = agentColors[agent.type] || '#00d4ff';
-                const avatarHtml = agent.imageUrl ?
-                    `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center; border-color: ${color}; box-shadow: 0 0 15px ${color}; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}"></div>` :
-                    `<div class="working-agent-avatar ${agent.type}" style="border-color: ${color}; box-shadow: 0 0 15px ${color}; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}">${agent.emoji}</div>`;
-                return `
-                <div class="working-agent" id="working-${agent.id}" style="border-color: ${color}; box-shadow: 0 0 10px ${color}30;">
-                    ${avatarHtml}
-                    <div class="working-agent-name">${agent.name}</div>
-                    <div class="working-agent-task">${agent.currentTask}</div>
-                    <div class="working-progress">
-                        <div class="working-progress-bar" id="progress-${agent.id}" style="width: 0%"></div>
-                    </div>
-                </div>
-            `}).join('');
+                let card = document.getElementById(`working-${agent.id}`);
+
+                if (!card) {
+                    // Create new card
+                    const avatarHtml = agent.imageUrl ?
+                        `<div class="working-agent-avatar ${agent.type}" style="background-image: url(${agent.imageUrl}); background-size: cover; background-position: center; border-color: ${color}; box-shadow: 0 0 15px ${color}; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}"></div>` :
+                        `<div class="working-agent-avatar ${agent.type}" style="border-color: ${color}; box-shadow: 0 0 15px ${color}; ${trailsEnabled ? 'filter: drop-shadow(0 0 8px currentColor);' : ''} ${pulseGlowEnabled ? 'animation: pulseGlow 2s ease-in-out infinite;' : ''}">${agent.emoji}</div>`;
+
+                    card = document.createElement('div');
+                    card.className = 'working-agent';
+                    card.id = `working-${agent.id}`;
+                    card.style.borderColor = color;
+                    card.style.boxShadow = `0 0 10px ${color}30`;
+                    card.innerHTML = `
+                        ${avatarHtml}
+                        <div class="working-agent-name">${agent.name}</div>
+                        <div class="working-agent-task">${agent.currentTask}</div>
+                        <div class="working-progress">
+                            <div class="working-progress-bar" id="progress-${agent.id}" style="width: 0%"></div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                } else {
+                    // Update existing card content (task name might change)
+                    const taskEl = card.querySelector('.working-agent-task');
+                    if (taskEl && taskEl.textContent !== agent.currentTask) {
+                        taskEl.textContent = agent.currentTask;
+                    }
+                }
+            });
 
             // Update right panel "Currently Working" section
             renderWorkingPanel();
@@ -1973,7 +2021,13 @@
 
         function assignTask(task) {
             const agent = agents[task.agentId];
-            if (agent.status === 'working') return;
+            if (agent.status === 'working') {
+                // Clear any existing interval to prevent stuck cards
+                if (agent.progressInterval) {
+                    clearInterval(agent.progressInterval);
+                    agent.progressInterval = null;
+                }
+            }
 
             // Play task start sound
             playTaskStartSound();
@@ -1991,21 +2045,30 @@
             updateOrbitView();
 
             let progress = 0;
-            const progressInterval = setInterval(() => {
+            agent.progressInterval = setInterval(() => {
                 progress += Math.random() * 15;
                 if (progress > 100) progress = 100;
 
                 const bar = document.getElementById(`progress-${agent.id}`);
-                if (bar) bar.style.width = `${progress}%`;
+                if (bar) {
+                    bar.style.width = `${progress}%`;
+                }
 
                 if (progress >= 100) {
-                    clearInterval(progressInterval);
+                    clearInterval(agent.progressInterval);
+                    agent.progressInterval = null;
                     completeTask(task, agent);
                 }
             }, 300);
         }
 
         function completeTask(task, agent) {
+            // Clear the progress interval to prevent stuck cards
+            if (agent.progressInterval) {
+                clearInterval(agent.progressInterval);
+                agent.progressInterval = null;
+            }
+
             const completedTask = {
                 ...task,
                 completedAt: new Date(),

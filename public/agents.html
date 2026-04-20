@@ -655,6 +655,19 @@
                 <span class="setting-label">Particle Trails</span>
                 <div class="toggle-switch" id="trails-toggle" onclick="toggleTrails()"></div>
             </div>
+            <div style="font-size: 0.75rem; color: #666; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px;">Sound Effects</div>
+            <div class="setting-item" style="padding-left: 15px;">
+                <span class="setting-label">UI Clicks</span>
+                <div class="toggle-switch" id="sound-click-toggle" onclick="toggleSoundType('click')"></div>
+            </div>
+            <div class="setting-item" style="padding-left: 15px;">
+                <span class="setting-label">Task Start</span>
+                <div class="toggle-switch" id="sound-start-toggle" onclick="toggleSoundType('start')"></div>
+            </div>
+            <div class="setting-item" style="padding-left: 15px;">
+                <span class="setting-label">Task Complete</span>
+                <div class="toggle-switch" id="sound-complete-toggle" onclick="toggleSoundType('complete')"></div>
+            </div>
         </div>
     </div>
     
@@ -1203,11 +1216,13 @@
         let glowEnabled = true;
         
         function toggleSettings() {
+            playClickSound();
             const panel = document.getElementById('settings-panel');
             panel.classList.toggle('active');
         }
         
         function toggleGlow() {
+            playClickSound();
             const toggle = document.getElementById('glow-toggle');
             glowEnabled = !glowEnabled;
             toggle.classList.toggle('active');
@@ -1237,6 +1252,7 @@
         }
         
         function toggleTrails() {
+            playClickSound();
             const toggle = document.getElementById('trails-toggle');
             trailsEnabled = !trailsEnabled;
             toggle.classList.toggle('active');
@@ -1251,6 +1267,97 @@
             });
         }
         
+        let soundEnabled = {
+            click: false,
+            start: false,
+            complete: false
+        };
+        
+        function toggleSoundType(type) {
+            if (soundEnabled.click) playClickSound();
+            const toggle = document.getElementById(`sound-${type}-toggle`);
+            soundEnabled[type] = !soundEnabled[type];
+            toggle.classList.toggle('active');
+        }
+        
+        let audioCtx = null;
+        
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+        
+        function playCheckinSound() {
+            if (!soundEnabled.complete) return;
+            try {
+                const audioContext = getAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 880;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch(e) {
+                console.log('Audio play failed:', e);
+            }
+        }
+        
+        function playTaskStartSound() {
+            if (!soundEnabled.start) return;
+            try {
+                const audioContext = getAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 440;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+            } catch(e) {
+                console.log('Audio play failed:', e);
+            }
+        }
+        
+        function playClickSound() {
+            if (!soundEnabled.click) return;
+            try {
+                const audioContext = getAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 1200;
+                oscillator.type = 'triangle';
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.05);
+            } catch(e) {
+                console.log('Audio play failed:', e);
+            }
+        }
+        
         function updateStats() {
             const working = Object.values(agents).filter(a => a.status === 'working').length;
             const online = Object.values(agents).filter(a => a.status !== 'idle').length;
@@ -1263,6 +1370,9 @@
         let checkinOffset = 0;
         
         function showCheckin(agent) {
+            // Play sound if enabled
+            playCheckinSound();
+            
             // Create popup for both views
             const popupHTML = `
                 <div class="checkin-icon">${agent.emoji}</div>
@@ -1410,6 +1520,9 @@
         function assignTask(task) {
             const agent = agents[task.agentId];
             if (agent.status === 'working') return;
+            
+            // Play task start sound
+            playTaskStartSound();
             
             openTasks = openTasks.filter(t => t.id !== task.id);
             

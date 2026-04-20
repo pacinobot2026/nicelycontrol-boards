@@ -651,6 +651,10 @@
                     </div>
                 </div>
             </div>
+            <div class="setting-item">
+                <span class="setting-label">Particle Trails</span>
+                <div class="toggle-switch" id="trails-toggle" onclick="toggleTrails()"></div>
+            </div>
         </div>
     </div>
     
@@ -1220,6 +1224,7 @@
         }
         
         let currentOrbitSpeed = 25;
+        let trailsEnabled = false;
         
         function updateOrbitSpeed(value) {
             currentOrbitSpeed = parseInt(value);
@@ -1228,6 +1233,21 @@
             // Update all orbit agents with new speed
             orbitAgentsData.forEach(({ wrapper }) => {
                 wrapper.style.animationDuration = currentOrbitSpeed + 's';
+            });
+        }
+        
+        function toggleTrails() {
+            const toggle = document.getElementById('trails-toggle');
+            trailsEnabled = !trailsEnabled;
+            toggle.classList.toggle('active');
+            
+            // Add/remove trail effect using CSS filter
+            orbitAgentsData.forEach(({ element }) => {
+                if (trailsEnabled) {
+                    element.style.filter = 'drop-shadow(0 0 8px currentColor)';
+                } else {
+                    element.style.filter = 'none';
+                }
             });
         }
         

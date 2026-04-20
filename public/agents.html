@@ -825,10 +825,21 @@
 
 
 
-            <!-- View Toggle -->
+            <!-- View Dropdown -->
             <div style="text-align: center; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1);">
-                <button onclick="switchCenterView('card')" id="btn-card" style="padding: 6px 16px; background: rgba(0,212,255,0.1); border: 1px solid #00d4ff; border-radius: 6px 0 0 6px; color: #fff; cursor: pointer; font-size: 0.8rem;">Card View</button>
-                <button onclick="switchCenterView('orbit')" id="btn-orbit" style="padding: 6px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 6px 6px 0; color: #888; cursor: pointer; font-size: 0.8rem; margin-left: -1px;">Orbit View</button>
+                <select id="view-dropdown" onchange="switchCenterView(this.value)" style="
+                    background: rgba(0,212,255,0.1);
+                    border: 1px solid #00d4ff;
+                    border-radius: 8px;
+                    padding: 8px 16px;
+                    color: #fff;
+                    font-size: 0.85rem;
+                    cursor: pointer;
+                    outline: none;
+                ">
+                    <option value="card" style="background: #1a1a2e;">📋 Card View</option>
+                    <option value="orbit" style="background: #1a1a2e;">🪐 Orbit View</option>
+                </select>
             </div>
         </div>
 
@@ -2075,29 +2086,19 @@
         function switchCenterView(view) {
             const workingArea = document.getElementById('working-area');
             const orbitView = document.getElementById('orbit-view');
-            const btnCard = document.getElementById('btn-card');
-            const btnOrbit = document.getElementById('btn-orbit');
+            const dropdown = document.getElementById('view-dropdown');
 
             if (view === 'card') {
                 workingArea.style.display = 'block';
                 orbitView.style.display = 'none';
-                btnCard.style.background = 'rgba(0,212,255,0.1)';
-                btnCard.style.borderColor = '#00d4ff';
-                btnCard.style.color = '#fff';
-                btnOrbit.style.background = 'rgba(255,255,255,0.05)';
-                btnOrbit.style.borderColor = 'rgba(255,255,255,0.1)';
-                btnOrbit.style.color = '#888';
             } else {
                 workingArea.style.display = 'none';
                 orbitView.style.display = 'flex';
-                btnOrbit.style.background = 'rgba(0,212,255,0.1)';
-                btnOrbit.style.borderColor = '#00d4ff';
-                btnOrbit.style.color = '#fff';
-                btnCard.style.background = 'rgba(255,255,255,0.05)';
-                btnCard.style.borderColor = 'rgba(255,255,255,0.1)';
-                btnCard.style.color = '#888';
                 updateOrbitView();
             }
+            
+            // Update dropdown to match
+            if (dropdown) dropdown.value = view;
         }
         
         // Orbit hover info panel - shows in right corner

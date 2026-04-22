@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { id: "control", label: "Command Center", icon: "⚡", href: "/" },
   { id: "commands", label: "Custom Commands", icon: "⌘", href: "/commands" },
   { id: "businesses", label: "Business Board", icon: "◉", href: "/businesses" },
+  { id: "prospects", label: "Prospect Board", icon: "🎯", href: "/prospects" },
   { id: "team", label: "Team Board", icon: "▦", href: "/teamboard" },
   { id: "vault", label: "Operator Vault", icon: "□", href: "/vault" },
   { id: "projects", label: "Project Board", icon: "▶", href: "/projects" },

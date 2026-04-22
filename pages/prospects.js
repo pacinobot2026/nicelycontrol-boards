@@ -4,12 +4,12 @@ import NavigationSidebar from "../components/NavigationSidebar";
 
 const DEFAULT_STAGES = ["New Lead", "Contacted", "Qualified", "Proposal", "Won", "Lost"];
 const LABEL_COLORS = {
-  hot: { bg: "#dc2626", text: "#fff" },      // Red - Hot lead
-  warm: { bg: "#f59e0b", text: "#000" },     // Orange - Warm lead
+  hot: { bg: "#ef4444", text: "#fff" },      // Bright Red - Hot lead
+  warm: { bg: "#f97316", text: "#fff" },     // Bright Orange - Warm lead
   cold: { bg: "#3b82f6", text: "#fff" },     // Blue - Cold lead
-  callback: { bg: "#8b5cf6", text: "#fff" }, // Purple - Callback scheduled
-  nurture: { bg: "#10b981", text: "#fff" },  // Green - Nurture sequence
-  dead: { bg: "#6b7280", text: "#fff" },     // Gray - Dead/unresponsive
+  callback: { bg: "#a855f7", text: "#fff" }, // Purple - Callback scheduled
+  nurture: { bg: "#22c55e", text: "#fff" },  // Green - Nurture sequence
+  dead: { bg: "#64748b", text: "#fff" },     // Slate - Dead/unresponsive
 };
 
 export default function ProspectBoard() {

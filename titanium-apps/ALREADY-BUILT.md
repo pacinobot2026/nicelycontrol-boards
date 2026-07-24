@@ -60,24 +60,37 @@ So the UI supports users storing their own Letterman key. Don't rip this out.
 
 ---
 
-## ⚠️ Two Letterman base paths are in use — verify which is right
+## ✅ RESOLVED — and approve/reject is confirmed broken
 
-Reads use `/api/ai/`:
-```
-https://api.letterman.ai/api/ai/newsletters-storage
-https://api.letterman.ai/api/ai/newsletters-storage/{pubId}/newsletters
-https://api.letterman.ai/api/ai/newsletters/{articleId}/sections
-```
+Verified live against the API on 2026-07-24. The earlier "two base paths" theory was
+wrong: **both** were stale. The whole `/api/...` prefix is gone; everything moved to
+the domain root.
 
-But approve/reject write to `/api/` with **no** `ai` segment:
-```
-PUT https://api.letterman.ai/api/newsletters/{articleId}
-```
+| Path | Result |
+|---|---|
+| `GET /api/ai/newsletters-storage` (old reads) | **404** |
+| `GET /api/newsletters/{id}` (old approve/reject target) | **404** |
+| `GET /publications` | 200 |
+| `GET /newsletters?storageId={pubId}` | 200 |
+| `GET /newsletters/{id}` | 200 |
 
-One of these is probably wrong, or the API genuinely splits read/write namespaces.
-**This is the single highest-value thing to verify first** once network access is
-open — if approve/reject has been silently 404ing, the whole approval workflow is
-broken and nobody would necessarily have noticed.
+**`pages/api/articles.js` is fixed** (on branch `claude/titanium-apps-api-setup-0zucdb`)
+and verified end-to-end: 74 articles sync correctly, 71 + 3 across the two publications.
+
+**Still broken — `pages/api/articles/approve.js` and `reject.js`.** They `PUT` to
+`https://api.letterman.ai/api/newsletters/{articleId}`, which 404s. This means the
+approve/reject workflow on the Article Board has been silently failing. The `.catch`
+in those handlers only tolerates *Supabase* failures — a 404 from Letterman throws, so
+the user gets a 500, but the Supabase row may already say "approved." Local state can
+therefore disagree with Letterman.
+
+Fixing it means pointing them at `/newsletters/{id}` — but the correct **write** verb,
+body shape, and status field have not been confirmed (that requires a mutating call on
+real data, which was deliberately not attempted). Confirm against Letterman's own docs
+or a throwaway draft before shipping a fix.
+
+Also still on stale paths, unfixed: `scripts/populate-articles.js`,
+`scripts/populate-with-sections.js`.
 
 ---
 

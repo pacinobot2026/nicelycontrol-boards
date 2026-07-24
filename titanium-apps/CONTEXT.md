@@ -49,14 +49,20 @@ This is the part that matters most for the work ahead. Verified working by the p
 agent (per `BOT-INVENTORY.md`, dated 2026-03).
 
 ### Letterman (newsletters)
-- Base: `https://api.letterman.ai/api/ai/`
+**Endpoints verified live 2026-07-24. Earlier notes in this file were wrong — the
+`/api/ai/` prefix is dead (404). Everything is at the domain root now.**
+
+- Base: `https://api.letterman.ai` (no path prefix)
 - Auth: `Authorization: Bearer <LETTERMAN_API_KEY>` (JWT)
-- Known endpoints: `newsletters-storage` (list publications),
-  `newsletters-storage/{pubId}/newsletters`, `newsletters/{id}/sections`
-- Verified commands: `letterman.me`, `letterman.publications.list`
-- **Existing publications:**
-  - "From The Desk Of Joe The Goat Farmer" — id `6655628d315bdaa9aa76a0f8`
-  - "Nature Coast Hub" — id `68ae2566892184 70f729a68a`
+- `GET /publications` → `{publications: [{id, name, description, authorName, logoUrl, ...}]}`
+- `GET /newsletters?storageId=<publicationId>` → `{newsletters: [...]}`
+  (the query param is **`storageId`**, not `publicationId`)
+- `GET /newsletters/{id}` → single article, 200 OK
+- Article fields: `id` (not `_id`), `subject` (title fallback — there is no `name`),
+  `createdAt` (there is no separate `updatedAt` on newsletters)
+- **Existing publications (verified live):**
+  - "Nature Coast Hub" — id `68ae256689218470f729a68a` — 71 articles
+  - "From The Desk Of Joe The Goat Farmer" — id `6655628d315bdaa9aa76a0f8` — 3 articles
 - Safety rails the prior agent locked in: draft-only by default, never auto-publish,
   delete requires explicit confirmation.
 - **This repo already integrates Letterman** — see `pages/api/articles.js`, the

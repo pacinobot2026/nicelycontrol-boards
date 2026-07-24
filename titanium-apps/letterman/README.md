@@ -5,16 +5,76 @@ from the existing Article Board code elsewhere in this repo.
 
 ## Status
 
-- API key: loaded locally in `.env.local` as `LETTERMAN_API_KEY` (not committed — gitignored).
-- Live API calls to `api.letterman.ai` are currently blocked by this environment's
-  network policy (outbound requests need `api.letterman.ai` added to the allowlist).
-- Base URL: `https://api.letterman.ai/api/ai/`
+- API key: loaded as `LETTERMAN_API_KEY` in the environment. **Verified working** — smoke
+  test on 2026-07-24 successfully listed both known publications.
+- Network access to `api.letterman.ai` is reachable from this environment (no longer
+  blocked).
 - Auth: `Authorization: Bearer <LETTERMAN_API_KEY>`
-- Known publications (from earlier ops notes): "From The Desk Of Joe The Goat Farmer",
-  "Nature Coast Hub"
+
+### Base URL correction
+
+The base URL previously recorded here (`https://api.letterman.ai/api/ai/`) and the one
+hardcoded in the existing integration (`pages/api/articles.js`,
+`LETTERMAN_BASE = 'https://api.letterman.ai/api/ai/newsletters-storage'`) both **404** on
+the live API now — `GET /api/ai/newsletters-storage` returns Express's generic
+`Cannot GET ...` page, meaning the route doesn't exist at all (not an auth failure).
+
+The live API's actual base URL is just the domain root, no `/api` or `/api/ai` prefix:
+
+- `GET https://api.letterman.ai/health` → `{"status":"ok"}` (unauthenticated liveness check)
+- `GET https://api.letterman.ai/publications` → `{"publications": [...]}`, list of
+  publications (**this is the working "list publications" endpoint** — replaces the old
+  `newsletters-storage` path). Each publication uses `id`, not `_id`.
+- `GET https://api.letterman.ai/newsletters?storageId=<publicationId>` → `{"newsletters":
+  [...]}`, list of newsletters/articles for that publication. The query param is
+  **`storageId`**, not `publicationId` (brute-forced param names against the live API —
+  `publicationId`/`publication_id`/`pubId`/etc. all return `{"error":"A publication id is
+  required."}`; `storageId` is what actually works). Each newsletter uses `id`, not
+  `_id`, has no `updatedAt` field (only `createdAt`), and the real headline is split
+  across `title` (often `null` for drafts) and `subject` (the email subject line —
+  usually present even when `title` isn't).
+- `GET https://api.letterman.ai/newsletters/<newsletterId>` → single newsletter by id
+  (404 with `{"error":"newsletter '<id>' was not found."}` if the id doesn't exist —
+  confirms this path expects a *newsletter* id, not a publication id).
+
+**Fixed:** `pages/api/articles.js` now points at `/publications` and
+`/newsletters?storageId=...`, and the field mapping was updated for `id` (not `_id`)
+and `title || subject` (not `name || title`). Verified end-to-end against the live API:
+syncs 74 articles total (71 from Nature Coast Hub, 3 from From The Desk Of Joe The Goat
+Farmer).
+
+**Still stale** (not yet fixed — out of scope for this pass): `scripts/populate-articles.js`
+and `scripts/populate-with-sections.js` still hardcode `/api/ai/newsletters-storage`;
+`pages/api/articles/approve.js` and `pages/api/articles/reject.js` still PUT to
+`https://api.letterman.ai/api/newsletters/{id}` (also missing the `/api` prefix removal).
+
+**Approve/reject confirmed broken (verified 2026-07-24).** `GET /api/newsletters/{id}`
+returns 404 while `GET /newsletters/{id}` returns 200, so the Article Board's
+approve/reject workflow has been silently failing. Note the failure mode: the `.catch`
+in those handlers only tolerates *Supabase* errors, so a Letterman 404 throws a 500 to
+the caller — but the Supabase row may already read `approved`. Local state can
+therefore disagree with Letterman. Fixing it needs the correct write verb and body
+shape confirmed first (see Next), which requires a mutating call — do that against a
+throwaway draft, not a real article.
+
+### Verified publications (via `GET /publications`)
+
+| name | id | slug | status |
+|---|---|---|---|
+| Nature Coast Hub | `68ae256689218470f729a68a` | `nature-coast-hub` | active |
+| From The Desk Of Joe The Goat Farmer | `6655628d315bdaa9aa76a0f8` | `from-the-desk-of-joe-the-goat-farmer` | active |
+
+Full response includes rich metadata per publication: description, authorName, logoUrl,
+websiteUrl/customDomainUrl, sendingConfigured, commentSettings, sendSchedule
+(sendDays/sendTime), style/theme settings, footer HTML, createdAt/updatedAt, etc.
 
 ## Next
 
-- Get `api.letterman.ai` allowlisted, then re-run a smoke test (list publications).
+- Fix the remaining stale callers: `scripts/populate-articles.js`,
+  `scripts/populate-with-sections.js`, `pages/api/articles/approve.js`,
+  `pages/api/articles/reject.js`.
+- Confirm the write endpoints against the corrected base URL (old docs mention
+  `POST /newsletters`, `PUT /newsletters/{id}`, `POST
+  /newsletters/update-seo-settings/{id}` — none of these have been smoke-tested yet).
 - Figure out what "manage a newsletter" should actually mean day to day (draft review,
   scheduling, etc.) before building anything further.

@@ -44,11 +44,12 @@ async function populateArticles() {
 
   try {
     // Fetch publications from Letterman
-    const pubsRes = await fetch('https://api.letterman.ai/api/ai/newsletters-storage', {
+    const pubsRes = await fetch('https://api.letterman.ai/publications', {
       headers: { Authorization: `Bearer ${lettermanKey}` },
     });
 
-    const publications = await pubsRes.json();
+    const pubsData = await pubsRes.json();
+    const publications = pubsData?.publications;
 
     if (!Array.isArray(publications)) {
       console.error('❌ Invalid Letterman API response');
@@ -61,18 +62,19 @@ async function populateArticles() {
 
     // Fetch articles for each publication
     for (const pub of publications) {
-      const pubId = pub._id;
+      const pubId = pub.id;
       const pubName = pub.name || 'Unknown';
 
       console.log(`📖 Fetching articles from "${pubName}"...`);
 
       try {
         const response = await fetch(
-          `https://api.letterman.ai/api/ai/newsletters-storage/${pubId}/newsletters`,
+          `https://api.letterman.ai/newsletters?storageId=${pubId}`,
           { headers: { Authorization: `Bearer ${lettermanKey}` } }
         );
 
-        const newsletters = await response.json();
+        const newslettersData = await response.json();
+        const newsletters = newslettersData?.newsletters;
 
         if (!Array.isArray(newsletters)) {
           console.log(`   ⚠️  No articles found\n`);
@@ -83,18 +85,18 @@ async function populateArticles() {
 
         // Prepare articles for Supabase
         const articles = newsletters.map(article => ({
-          id: article._id,
-          title: article.name || article.title || 'Untitled',
+          id: article.id,
+          title: article.title || article.subject || 'Untitled',
           publication: pubName,
           publication_id: pubId,
           status: article.state || 'draft',
           image_url: article.previewImageUrl || article.archiveThumbnailImageUrl || null,
-          seo_title: article.name || article.title || null,
+          seo_title: article.title || article.subject || null,
           seo_description: article.description || null,
           url_path: article.urlPath || null,
           content: null,
           created_at: article.createdAt || new Date().toISOString(),
-          updated_at: article.updatedAt || new Date().toISOString(),
+          updated_at: article.createdAt || new Date().toISOString(),
           letterman_data: article,
         }));
 

@@ -19,10 +19,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Letterman API key not configured' });
     }
 
-    // Update article status to rejected in Letterman
+    // Clear the NEED_APPROVAL flag on Letterman's side (their state enum has no
+    // "rejected" value — DRAFT is the safe, verified transition off NEED_APPROVAL)
     await axios.put(
-      `https://api.letterman.ai/api/newsletters/${articleId}`,
-      { status: 'rejected' },
+      `https://api.letterman.ai/newsletters/${articleId}`,
+      { state: 'DRAFT' },
       {
         headers: {
           'Authorization': `Bearer ${LETTERMAN_API_KEY}`,

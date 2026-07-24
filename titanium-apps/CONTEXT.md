@@ -104,16 +104,76 @@ agent (per `BOT-INVENTORY.md`, dated 2026-03).
 
 ---
 
+## Operational protocols the prior agent ran
+
+These are the recurring workflows Alex/Johnny Price operated. Useful as a spec for
+what "taking over" actually means — and as a warning about what was over-engineered.
+
+### Juma digest cadence
+- `JUMA-DIGEST.md` is a recurring status report Alex produced: system health, pipeline
+  status, flags needing Joe's attention, cost tracking, active tasks. Juma (the
+  read-only Custom GPT) consumes it and returns strategic guidance.
+- `titanium-juma-digest-protocol.md` is a **separate, stricter** protocol scoped to
+  Titanium oversight. Two modes: DAILY and INCIDENT. Hard authority boundary — the
+  agent may *observe and pause*, but may **not resolve money-affecting incidents
+  without Joe's explicit approval**. Worth preserving that rule.
+- `JUMA-KB-SYNC-CHECKLIST.md` + `JUMA-VIEW-PROMPT.md` cover keeping Juma's knowledge
+  base current, including a nonce-based verification trick to detect "drift" (Juma
+  answering from a stale KB). Clever, but it exists because manual sync is fragile.
+- `new-file-notification-sop.md` — any new shared-context file had to be announced to
+  sibling agents to stop their KBs diverging.
+
+### Skills / release pipeline
+- Skills were packaged as zips and installed onto a bot via **Telegram DM upload**
+  (no SSH) — `joes-ai-skill-loader-sop-v1.0.4.md`.
+- Naming is locked: `<skill>_vYYYY-MM-DD_p<N>.zip`
+  (`certified-skill-zip-naming-standard.md`).
+- `PUBLISH-PACKET-SOP.md` + manifest schema/template: changes get bundled into a
+  "publish packet," scanned for secrets and personal data (including UUID leaks),
+  and then **a human pushes to GitHub** — the AI was explicitly barred from holding
+  a GitHub token.
+- `RELEASE-KB-CHECKLIST.md` — what must/must-not enter Juma's KB on each release.
+- Certification gate per app: delete → drag/drop → configure → smoke test. That's how
+  letterman/mintbird/globalcontrol got marked verified.
+
+### Comms
+- Telegram is the primary human channel. 4 groups, 25+ forum topics, mapped in
+  `telegram-groups-inventory.md` / `telegram-topics-map.md`: **JTGF – Company Test
+  Ground** (ops), **Harmony Oaks Stuff** (household), **Open Claw Demo** (Chad's
+  affiliate demo room), **The Goat Pen** (course buyer lobby).
+- Escalation ladder: Telegram for routine → **SMS for urgent** (trigger words:
+  "priority", "urgent", "text me", "SMS"), sent via the HighLevel conversations API.
+  `sms-escalation-system.md` tracks unanswered SMS so late replies reconcile to
+  original context.
+- `group-chat-protocol.md` — when to speak vs stay silent in a group where the agent
+  sees every message.
+- `email-reply-monitoring.md` — watches joe@joethegoatfarmer.com, alerts to Telegram.
+
+### Cost / model routing
+- `model-routing.md` — route by cost/complexity across Claude Sonnet/Haiku/Opus and
+  Kimi K2.5; different defaults for Joe vs employees.
+- `llm-pricing-reference.json`, `token-tracking-system.md`, `daily-cost-tracker.json`
+  — cost tracking, **self-described as rough estimates and "way off" per Joe.** Don't
+  trust those numbers.
+
+### Honest assessment
+Much of the above is ceremony that existed to compensate for unreliable agents and
+manual file syncing (memory loss, heartbeat failures, KB drift). Preserve the *rules*
+that encode real judgment — the money-incident authority boundary, draft-only
+defaults, human-pushes-to-GitHub, secrets scanning. Don't import the machinery built
+to work around problems this setup doesn't have.
+
+---
+
 ## Open threads inherited from the prior setup
 
 1. Johnny Price's offline status was never confirmed resolved.
 2. The Supabase inter-agent messaging layer is admitted-unreliable; a rebuild-vs-pivot
    decision was never made.
-3. **`scripts/create-vault-table.js` and `scripts/seed-businesses.js` in this repo
-   hardcode a live Supabase Postgres password in plaintext, and it's in git history.**
-   Joe could not locate the Supabase project in his own account — it's likely owned
-   on Chad Nicely's side. Needs rotation by whoever owns that project, plus a cleanup
-   commit to make those two scripts read from env like every other script here.
+3. **Three scripts in this repo hardcode live Supabase credentials in git history** —
+   including a `service_role` JWT (full RLS bypass). Details, affected files, and the
+   Supabase project ref are in `ALREADY-BUILT.md`. Needs rotation by whoever owns the
+   project, plus a cleanup commit.
 4. `shared-anthropic-key-system.md` in the Drive folder contains a live Anthropic API
    key in cleartext, attributed to Chad Nicely (tier_4). Joe is aware. Not ours to
    rotate, but worth raising with Chad.

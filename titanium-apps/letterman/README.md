@@ -56,8 +56,23 @@ Approve and Reject both map to the same Letterman-side transition (`DRAFT`) — 
 diverge in our own Supabase `status` column (`approved` vs `rejected`), since Letterman
 has no concept that distinguishes the two.
 
-**Still stale** (not yet fixed — out of scope for this pass): `scripts/populate-articles.js`
-and `scripts/populate-with-sections.js` still hardcode `/api/ai/newsletters-storage`.
+**Fixed:** `scripts/populate-articles.js` and `scripts/populate-with-sections.js` now use
+the same `/publications` + `/newsletters?storageId=...` pattern, with `id`/`title`/
+`subject` field mapping. `populate-with-sections.js` also dropped its per-article
+`.../sections` fetch (`https://api.letterman.ai/api/ai/newsletters/{id}/sections`) — that
+endpoint 404s on every path variant tried and the current newsletter object has no
+sections data embedded, so it's gone from the live API. Since the corrected `/newsletters`
+response already includes real `title`/`subject` fields directly, the sections-based
+title-building workaround wasn't needed anymore — removing it also removed the "first 5
+articles only" cap that existed solely to bound the extra per-article calls.
+
+All four Letterman-calling files in the Article Board pipeline (`pages/api/articles.js`,
+`pages/api/articles/approve.js`, `pages/api/articles/reject.js`,
+`scripts/populate-articles.js`, `scripts/populate-with-sections.js`) are now fixed and
+verified against the live API. Fetch/mapping logic was verified directly (74 articles
+resolve correctly); the two scripts' actual Supabase write path wasn't exercised since
+they require a `.env.local` file not present in this environment — same upsert code path
+as `pages/api/articles.js` (already verified end-to-end), so low risk.
 
 ### Verified publications (via `GET /publications`)
 
@@ -72,8 +87,6 @@ websiteUrl/customDomainUrl, sendingConfigured, commentSettings, sendSchedule
 
 ## Next
 
-- Fix the remaining stale callers: `scripts/populate-articles.js`,
-  `scripts/populate-with-sections.js`.
 - Confirm the remaining write endpoints against the corrected base URL (old docs
   mention `POST /newsletters` for create, and `POST
   /newsletters/update-seo-settings/{id}` — neither has been smoke-tested yet).

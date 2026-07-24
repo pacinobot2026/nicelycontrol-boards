@@ -115,13 +115,20 @@ request paths, so they're lower priority, but they will fail if run today.
 
 ## 🔴 Hardcoded credentials found in this repo
 
-Three files carry live secrets in plaintext, committed to git history:
+**Nine** files carry live secrets in plaintext, committed to git history (an earlier
+version of this file said three — that undercounted):
 
 | File | Secret |
 |---|---|
 | `scripts/create-vault-table.js` | Supabase Postgres password |
 | `scripts/seed-businesses.js` | same password |
 | `scripts/create-article-queue-table.js` | **Supabase `service_role` JWT** |
+| `scripts/upload-sales-pages.js` | same service_role JWT |
+| `scripts/load-west-valley-queue.js` | same |
+| `scripts/populate-article-queue.js` | same |
+| `scripts/populate-ideas.js` | same |
+| `scripts/populate-real-ideas.js` | same |
+| `scripts/update-titles.js` | same |
 
 The `service_role` key is the serious one — it bypasses row-level security entirely,
 i.e. full read/write on every table.

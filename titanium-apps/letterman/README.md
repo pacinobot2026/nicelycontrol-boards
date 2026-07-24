@@ -79,6 +79,12 @@ So the old handlers were wrong three ways at once: dead URL, wrong field name
 `preHeader` is empty. This is expected and actionable, so both handlers now pass
 Letterman's message through to the caller rather than swallowing it in a generic 500.
 
+**`APPROVED` is a real Letterman state — verified twice.** `PUT {state:'APPROVED'}`
+returns 200 and reads back as `APPROVED` on a subsequent GET. If anything claims
+Letterman has no concept of "approved" and that approving in the Article Board leaves
+it showing as `Draft`, that's incorrect at the API level. (Letterman's *own dashboard*
+may label the state differently in its UI, but the stored value is `APPROVED`.)
+
 **Note on `reject`:** the enum has no `REJECTED`. `FOR_REVISION` was chosen as the
 closest match to "send back," and it accepts cleanly (200). If the intended behaviour
 is "return to the author's drafts," change it to `DRAFT` — it's a one-word edit in

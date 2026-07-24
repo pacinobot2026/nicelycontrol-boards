@@ -1,15 +1,6 @@
-const { Client } = require('pg');
+const { getPgClient } = require('./lib/supabase-env');
 
-const client = new Client({
-  host: 'aws-1-us-east-1.pooler.supabase.com',
-  port: 5432,
-  database: 'postgres',
-  user: 'postgres.jqqvqdjxviqnsgpxcgfs',
-  password: 'HUxTv6nSBmk9y1Qm',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const client = getPgClient();
 
 async function createVaultTable() {
   try {

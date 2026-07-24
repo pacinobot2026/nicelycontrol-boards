@@ -113,22 +113,29 @@ request paths, so they're lower priority, but they will fail if run today.
 
 ---
 
-## 🔴 Hardcoded credentials found in this repo
+## 🟡 Hardcoded credentials — removed from source, still need rotating
 
-**Nine** files carry live secrets in plaintext, committed to git history (an earlier
-version of this file said three — that undercounted):
+**Thirteen** files carried live secrets in plaintext. (Earlier revisions of this file
+said three, then nine — both undercounted. The last four hid the credentials inside a
+full `postgres://user:password@host/db` connection string, which a scan for `eyJ` or
+`password:` doesn't catch.)
 
-| File | Secret |
+| Files | Secret |
 |---|---|
-| `scripts/create-vault-table.js` | Supabase Postgres password |
-| `scripts/seed-businesses.js` | same password |
-| `scripts/create-article-queue-table.js` | **Supabase `service_role` JWT** |
-| `scripts/upload-sales-pages.js` | same service_role JWT |
-| `scripts/load-west-valley-queue.js` | same |
-| `scripts/populate-article-queue.js` | same |
-| `scripts/populate-ideas.js` | same |
-| `scripts/populate-real-ideas.js` | same |
-| `scripts/update-titles.js` | same |
+| `create-article-queue-table.js`, `upload-sales-pages.js`, `load-west-valley-queue.js`, `populate-article-queue.js`, `populate-ideas.js`, `populate-real-ideas.js`, `update-titles.js` | Supabase **`service_role` JWT** |
+| `create-vault-table.js`, `seed-businesses.js` | Postgres password |
+| `seed-teamboard.js`, `seed-control.js`, `migrate-commands.js`, `seed-projects-bookmarks.js` | Postgres password, inside a connection string |
+
+**All thirteen now read from the environment** via `scripts/lib/supabase-env.js`
+(`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`, or `SUPABASE_DB_URL`). Six of them also
+set `NODE_TLS_REJECT_UNAUTHORIZED = '0'`, disabling certificate validation for the
+whole Node process; the shared helper scopes that to the database connection instead.
+
+**Still outstanding: rotation.** Removing the values from HEAD does not remove them
+from git history — anyone with repo access can still read them from an old commit. The
+Postgres password and the `service_role` key (which bypasses row-level security
+entirely) both need rotating by whoever owns the Supabase project, and the new values
+set in Vercel's environment variables.
 
 The `service_role` key is the serious one — it bypasses row-level security entirely,
 i.e. full read/write on every table.

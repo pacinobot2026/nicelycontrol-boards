@@ -5,23 +5,18 @@
  *   node scripts/seed-businesses.js
  */
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+// NOTE: this file used to set NODE_TLS_REJECT_UNAUTHORIZED = '0', which turns
+// off certificate validation for the entire Node process. getPgClient() scopes
+// the relaxed TLS setting to this one database connection instead.
 
 const fs = require('fs');
 const path = require('path');
-const { Client } = require('pg');
+const { getPgClient } = require('./lib/supabase-env');
 
 const USER_ID = '08dee908-d31b-4c19-ae7d-227ccbb068cf';
 const DATA_FILE = path.join(__dirname, '..', 'data', 'businesses.json');
 
-const client = new Client({
-  host: 'aws-1-us-east-1.pooler.supabase.com',
-  port: 5432,
-  database: 'postgres',
-  user: 'postgres.jqqvqdjxviqnsgpxcgfs',
-  password: 'HUxTv6nSBmk9y1Qm',
-  ssl: true,
-});
+const client = getPgClient();
 
 async function seed() {
   const raw = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));

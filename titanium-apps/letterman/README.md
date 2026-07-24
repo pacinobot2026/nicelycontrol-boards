@@ -163,13 +163,33 @@ and the safest material.
   headlines (0.83), same-story-different-framing (0.86), and within-run repeats (1.00),
   while scoring unrelated stories at 0.00 and same-town-different-event at 0.33.
 - **Letterman reads — verified** via the endpoints documented above.
-- **Supabase read/insert — NOT verified.** `supabase.co` isn't on this environment's
-  network allowlist and `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` are unset. Run
-  `--dry-run` first once those are available.
-- **Sandbox note:** Node's built-in `fetch` ignores `HTTPS_PROXY`, so this script can't
-  reach allowlisted hosts from inside a proxied cloud session even though `curl` can.
-  That's an environment artifact — on Vercel or a normal machine there's no proxy and
-  plain `fetch` is correct.
+- **Letterman fetch path in the script — verified against live data.** Resolves the
+  publication by name, pulls all 71 Nature Coast Hub articles, and errors clearly on an
+  unknown publication name.
+- **Dedupe against real Letterman records — verified.** Testing against live data
+  exposed a bug: records frequently carry a `title` and a `subject` that describe the
+  same story completely differently (article headline vs. email subject line with emoji
+  and teaser copy). Comparing concatenated blobs diluted a candidate that matched only
+  one field, so real duplicates scored low and slipped through. Now every candidate
+  field is compared against every record field and the strongest signal wins — those
+  cases score 1.00. Note that 20 of the 71 records have neither `title` nor `subject`;
+  they contribute nothing to dedupe and are skipped.
+- **Supabase read/insert — NOT verified.** `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`
+  are unset. Run `--dry-run` first once they're available.
+
+### Running from a proxied cloud session
+
+Node's built-in `fetch` ignores `HTTPS_PROXY`, so scripts fail with
+`Host not in allowlist` even for hosts that *are* allowlisted (and that `curl` reaches
+fine). Prefix with `NODE_USE_ENV_PROXY=1`, which makes Node honour the proxy env vars:
+
+```bash
+NODE_USE_ENV_PROXY=1 node scripts/research-articles.js --file candidates.json \
+  --publication "Nature Coast Hub" --dry-run
+```
+
+Node 22+ only, and it prints an experimental-API warning that's safe to ignore. Not
+needed on Vercel or a normal machine, where there's no proxy.
 
 ## Next
 

@@ -136,15 +136,25 @@ function scoreAgainstAll(candidate, existing) {
     const recTokens = new Set(tokenize(recText));
     if (recTokens.size === 0) continue;
 
-    // Compare the whole blob, and also title-to-title. A story can carry very
-    // different headline copy while naming the same event in the title, so take
-    // whichever signal is strongest.
-    const fullScore = similarity(candText, recText);
-    const titleScore = similarity(
-      candidate.title || candidate.headline,
-      record.title || record.subject || record.headline,
-    );
-    const score = Math.max(fullScore, titleScore);
+    // Compare every candidate field against every record field, and take the
+    // strongest signal.
+    //
+    // Blob-to-blob alone is not enough: real Letterman records often carry a
+    // `title` and a `subject` that describe the same story completely
+    // differently (one is the article headline, the other the email subject
+    // line, sometimes with emoji and teaser copy). Concatenating them dilutes
+    // a candidate that legitimately matches just one, so a genuine duplicate
+    // scores low. Field-to-field comparison catches those.
+    const candFields = [candidate.title, candidate.headline, candText].filter(Boolean);
+    const recFields = [record.title, record.subject, record.headline, recText].filter(Boolean);
+
+    let score = 0;
+    for (const cf of candFields) {
+      for (const rf of recFields) {
+        const s = similarity(cf, rf);
+        if (s > score) score = s;
+      }
+    }
 
     const smaller = candTokens.size <= recTokens.size ? candTokens : recTokens;
     const larger = smaller === candTokens ? recTokens : candTokens;

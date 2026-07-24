@@ -22,14 +22,31 @@ the live API now — `GET /api/ai/newsletters-storage` returns Express's generic
 The live API's actual base URL is just the domain root, no `/api` or `/api/ai` prefix:
 
 - `GET https://api.letterman.ai/health` → `{"status":"ok"}` (unauthenticated liveness check)
-- `GET https://api.letterman.ai/publications` → list of publications (**this is the
-  working "list publications" endpoint** — replaces the old `newsletters-storage` path)
-- `GET https://api.letterman.ai/newsletters` → requires `?publicationId=<id>`
-  (confirmed via `{"error":"A publication id is required."}` on a bare call)
+- `GET https://api.letterman.ai/publications` → `{"publications": [...]}`, list of
+  publications (**this is the working "list publications" endpoint** — replaces the old
+  `newsletters-storage` path). Each publication uses `id`, not `_id`.
+- `GET https://api.letterman.ai/newsletters?storageId=<publicationId>` → `{"newsletters":
+  [...]}`, list of newsletters/articles for that publication. The query param is
+  **`storageId`**, not `publicationId` (brute-forced param names against the live API —
+  `publicationId`/`publication_id`/`pubId`/etc. all return `{"error":"A publication id is
+  required."}`; `storageId` is what actually works). Each newsletter uses `id`, not
+  `_id`, has no `updatedAt` field (only `createdAt`), and the real headline is split
+  across `title` (often `null` for drafts) and `subject` (the email subject line —
+  usually present even when `title` isn't).
+- `GET https://api.letterman.ai/newsletters/<newsletterId>` → single newsletter by id
+  (404 with `{"error":"newsletter '<id>' was not found."}` if the id doesn't exist —
+  confirms this path expects a *newsletter* id, not a publication id).
 
-The existing `pages/api/articles.js` / `scripts/populate-articles.js` code targeting
-`/api/ai/newsletters-storage` is stale and will need updating to point at `/publications`
-and `/newsletters?publicationId=...` before it will work again against the current API.
+**Fixed:** `pages/api/articles.js` now points at `/publications` and
+`/newsletters?storageId=...`, and the field mapping was updated for `id` (not `_id`)
+and `title || subject` (not `name || title`). Verified end-to-end against the live API:
+syncs 74 articles total (71 from Nature Coast Hub, 3 from From The Desk Of Joe The Goat
+Farmer).
+
+**Still stale** (not yet fixed — out of scope for this pass): `scripts/populate-articles.js`
+and `scripts/populate-with-sections.js` still hardcode `/api/ai/newsletters-storage`;
+`pages/api/articles/approve.js` and `pages/api/articles/reject.js` still PUT to
+`https://api.letterman.ai/api/newsletters/{id}` (also missing the `/api` prefix removal).
 
 ### Verified publications (via `GET /publications`)
 
@@ -44,12 +61,11 @@ websiteUrl/customDomainUrl, sendingConfigured, commentSettings, sendSchedule
 
 ## Next
 
-- Decide whether to fix `pages/api/articles.js` in place (point it at `/publications` +
-  `/newsletters?publicationId=`) or build the new wrapper separately here before
-  touching the existing Article Board code.
-- Map out `/newsletters?publicationId=` response shape (article list) and figure out
-  create/update/publish endpoints (the old docs mention `POST /newsletters`,
-  `PUT /newsletters/{id}`, `POST /newsletters/update-seo-settings/{id}` — none of these
-  have been smoke-tested yet against the corrected base URL).
+- Fix the remaining stale callers: `scripts/populate-articles.js`,
+  `scripts/populate-with-sections.js`, `pages/api/articles/approve.js`,
+  `pages/api/articles/reject.js`.
+- Confirm the write endpoints against the corrected base URL (old docs mention
+  `POST /newsletters`, `PUT /newsletters/{id}`, `POST
+  /newsletters/update-seo-settings/{id}` — none of these have been smoke-tested yet).
 - Figure out what "manage a newsletter" should actually mean day to day (draft review,
   scheduling, etc.) before building anything further.

@@ -43,10 +43,21 @@ and `title || subject` (not `name || title`). Verified end-to-end against the li
 syncs 74 articles total (71 from Nature Coast Hub, 3 from From The Desk Of Joe The Goat
 Farmer).
 
+**Fixed:** `pages/api/articles/approve.js` and `pages/api/articles/reject.js` now PUT to
+`https://api.letterman.ai/newsletters/{id}` (domain root, matching the pattern above).
+The request body also changed — Letterman's real `state` enum is only `DRAFT` /
+`NEED_APPROVAL` / `PUBLISHED` / `REVISED`, there's no `approved`/`rejected` value, so the
+old `{status: 'approved'|'rejected'}` body never matched Letterman's schema even once the
+path was fixed. Both handlers now send `{state: 'DRAFT'}`, which just clears the
+`NEED_APPROVAL` flag — verified live against a non-sending draft (JTGF publication has
+`sendingConfigured: false`): PUT `NEED_APPROVAL` → `DRAFT` confirmed via a follow-up GET,
+no side effects (no send triggered), then restored to its original state. Per Joe's call,
+Approve and Reject both map to the same Letterman-side transition (`DRAFT`) — they only
+diverge in our own Supabase `status` column (`approved` vs `rejected`), since Letterman
+has no concept that distinguishes the two.
+
 **Still stale** (not yet fixed — out of scope for this pass): `scripts/populate-articles.js`
-and `scripts/populate-with-sections.js` still hardcode `/api/ai/newsletters-storage`;
-`pages/api/articles/approve.js` and `pages/api/articles/reject.js` still PUT to
-`https://api.letterman.ai/api/newsletters/{id}` (also missing the `/api` prefix removal).
+and `scripts/populate-with-sections.js` still hardcode `/api/ai/newsletters-storage`.
 
 ### Verified publications (via `GET /publications`)
 
@@ -62,10 +73,9 @@ websiteUrl/customDomainUrl, sendingConfigured, commentSettings, sendSchedule
 ## Next
 
 - Fix the remaining stale callers: `scripts/populate-articles.js`,
-  `scripts/populate-with-sections.js`, `pages/api/articles/approve.js`,
-  `pages/api/articles/reject.js`.
-- Confirm the write endpoints against the corrected base URL (old docs mention
-  `POST /newsletters`, `PUT /newsletters/{id}`, `POST
-  /newsletters/update-seo-settings/{id}` — none of these have been smoke-tested yet).
+  `scripts/populate-with-sections.js`.
+- Confirm the remaining write endpoints against the corrected base URL (old docs
+  mention `POST /newsletters` for create, and `POST
+  /newsletters/update-seo-settings/{id}` — neither has been smoke-tested yet).
 - Figure out what "manage a newsletter" should actually mean day to day (draft review,
   scheduling, etc.) before building anything further.

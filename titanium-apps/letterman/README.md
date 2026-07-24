@@ -104,6 +104,67 @@ Full response includes rich metadata per publication: description, authorName, l
 websiteUrl/customDomainUrl, sendingConfigured, commentSettings, sendSchedule
 (sendDays/sendTime), style/theme settings, footer HTML, createdAt/updatedAt, etc.
 
+## Article research → queue pipeline
+
+`scripts/research-articles.js` + `scripts/lib/article-dedupe.js`.
+
+Takes candidate story ideas gathered from the web, drops anything already covered,
+and writes survivors into `article_queue` as `pending` rows. It does not publish,
+approve, or call Letterman's write API — the Article Board approval gate is untouched.
+
+```bash
+node scripts/research-articles.js --file candidates.json \
+  --publication "Nature Coast Hub" --dry-run
+```
+
+### Why dedupe is the core of it
+
+"Deduplication strategy" was the **highest-priority unresolved item** on the old
+Alex/Manus coordination board — right next to "Search strategies for finding
+articles" and "Content quality guidelines," all still sitting in the Inbox column.
+The search half was never actually specified; it ran on the Manus agent doing ad-hoc
+lookups. So this is a fresh build, not a port.
+
+Without dedupe, recurring events (a festival, a weekly market) get re-queued on every
+run. Candidates are compared against both the existing queue **and** the articles
+already published in Letterman, plus against each other within a single run.
+
+Matching is Jaccard similarity over content words, with:
+- **Number normalization** — "Fourth of July" == "4th of July" == "July 4". This was
+  a real bug found in testing: without it, that pair scored 0.50 and slipped through
+  as a fresh story.
+- **Title-vs-title scoring** alongside whole-text, taking whichever is stronger, since
+  headline copy can diverge wildly while titles name the same event.
+- **Containment** — a short title fully inside a longer one counts as a match.
+- **Near-miss warnings** for anything scoring within 0.15 under the threshold, since
+  that band is where the heuristic is least trustworthy.
+
+Default threshold is **0.5**, deliberately biased toward over-deduping: a wrongly
+skipped story just means a human doesn't see one suggestion, while a missed duplicate
+means readers get the same story twice. Tune with `--threshold`.
+
+### On sourcing
+
+Every candidate must carry a `sources` value or the script refuses the batch. Facts
+aren't copyrightable, but close paraphrase of a single outlet's structure and phrasing
+is where local-news aggregators get into trouble. Pull from 2+ sources, write fresh
+copy, keep the attribution line. Event listings (times, places, prices) are pure fact
+and the safest material.
+
+### Verification status
+
+- **Dedupe logic — tested.** Correctly catches ordinal variants (0.80), reworded
+  headlines (0.83), same-story-different-framing (0.86), and within-run repeats (1.00),
+  while scoring unrelated stories at 0.00 and same-town-different-event at 0.33.
+- **Letterman reads — verified** via the endpoints documented above.
+- **Supabase read/insert — NOT verified.** `supabase.co` isn't on this environment's
+  network allowlist and `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` are unset. Run
+  `--dry-run` first once those are available.
+- **Sandbox note:** Node's built-in `fetch` ignores `HTTPS_PROXY`, so this script can't
+  reach allowlisted hosts from inside a proxied cloud session even though `curl` can.
+  That's an environment artifact — on Vercel or a normal machine there's no proxy and
+  plain `fetch` is correct.
+
 ## Next
 
 - Fix the remaining stale callers: `scripts/populate-articles.js`,

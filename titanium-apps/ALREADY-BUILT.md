@@ -77,20 +77,20 @@ the domain root.
 **`pages/api/articles.js` is fixed** (on branch `claude/titanium-apps-api-setup-0zucdb`)
 and verified end-to-end: 74 articles sync correctly, 71 + 3 across the two publications.
 
-**Still broken — `pages/api/articles/approve.js` and `reject.js`.** They `PUT` to
-`https://api.letterman.ai/api/newsletters/{articleId}`, which 404s. This means the
-approve/reject workflow on the Article Board has been silently failing. The `.catch`
-in those handlers only tolerates *Supabase* failures — a 404 from Letterman throws, so
-the user gets a 500, but the Supabase row may already say "approved." Local state can
-therefore disagree with Letterman.
+**`pages/api/articles/approve.js` and `reject.js` — fixed and verified 2026-07-24.**
+They were wrong three ways: dead URL, wrong field (`status` instead of `state`), and
+wrong value casing. Now `PUT /newsletters/{id}` with `{state: 'APPROVED'}` /
+`{state: 'FOR_REVISION'}`, and they pass Letterman's own 400 messages through instead
+of swallowing them. Full write-API details and the state enum are in
+`letterman/README.md`.
 
-Fixing it means pointing them at `/newsletters/{id}` — but the correct **write** verb,
-body shape, and status field have not been confirmed (that requires a mutating call on
-real data, which was deliberately not attempted). Confirm against Letterman's own docs
-or a throwaway draft before shipping a fix.
+(An earlier version of this file claimed a failed approve could leave Supabase and
+Letterman disagreeing. That was wrong — the Letterman call runs first, so a failure
+throws before Supabase is touched.)
 
-Also still on stale paths, unfixed: `scripts/populate-articles.js`,
-`scripts/populate-with-sections.js`.
+Still on stale paths, unfixed: `scripts/populate-articles.js`,
+`scripts/populate-with-sections.js`. These are seed/sync scripts rather than live
+request paths, so they're lower priority, but they will fail if run today.
 
 ---
 

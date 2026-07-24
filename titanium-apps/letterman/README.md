@@ -48,14 +48,50 @@ and `scripts/populate-with-sections.js` still hardcode `/api/ai/newsletters-stor
 `pages/api/articles/approve.js` and `pages/api/articles/reject.js` still PUT to
 `https://api.letterman.ai/api/newsletters/{id}` (also missing the `/api` prefix removal).
 
-**Approve/reject confirmed broken (verified 2026-07-24).** `GET /api/newsletters/{id}`
-returns 404 while `GET /newsletters/{id}` returns 200, so the Article Board's
-approve/reject workflow has been silently failing. Note the failure mode: the `.catch`
-in those handlers only tolerates *Supabase* errors, so a Letterman 404 throws a 500 to
-the caller — but the Supabase row may already read `approved`. Local state can
-therefore disagree with Letterman. Fixing it needs the correct write verb and body
-shape confirmed first (see Next), which requires a mutating call — do that against a
-throwaway draft, not a real article.
+**Approve/reject were broken — now fixed and verified (2026-07-24).**
+
+Correction to an earlier note in this file: it claimed a failed approve could leave the
+Supabase row reading `approved` while Letterman disagreed. That was wrong. The
+Letterman call runs *before* the Supabase update, so a 404 throws first and Supabase is
+never touched. There was no state divergence — approve simply failed with a generic 500.
+
+## Write API (verified against a throwaway draft, since deleted)
+
+| Operation | Call |
+|---|---|
+| Create | `POST /newsletters` with `{storageId, subject, title}` → **201**, returns the new object |
+| Update | `PUT /newsletters/{id}` (PATCH is **not** supported — 404) |
+| Delete | `DELETE /newsletters/{id}` → **204** |
+
+**The state field is `state`, not `status`, and values are uppercase.** Full enum, as
+reported by the API itself when given an invalid value:
+
+```
+DRAFT | PUBLISHED | READY | SENT | NEED_APPROVAL | DONE
+APPROVED | REVISED | FOR_FORMATTING | FOR_REVISION | FOR_APPROVAL
+```
+
+So the old handlers were wrong three ways at once: dead URL, wrong field name
+(`status`), and wrong value casing (`approved`).
+
+**Approval has preconditions.** `PUT {state: 'APPROVED'}` returns **400** with
+`"Add a subject and pre-header before approving this newsletter."` if `subject` or
+`preHeader` is empty. This is expected and actionable, so both handlers now pass
+Letterman's message through to the caller rather than swallowing it in a generic 500.
+
+**Note on `reject`:** the enum has no `REJECTED`. `FOR_REVISION` was chosen as the
+closest match to "send back," and it accepts cleanly (200). If the intended behaviour
+is "return to the author's drafts," change it to `DRAFT` — it's a one-word edit in
+`pages/api/articles/reject.js`.
+
+Also fixed: both handlers now write the raw uppercase state to Supabase, matching what
+the sync in `pages/api/articles.js` writes (`status: article.state`). Previously they
+wrote lowercase `approved`/`rejected`, which disagreed with every sync.
+
+Verification method: created a draft in "From The Desk Of Joe The Goat Farmer", probed
+the enum, set a pre-header, transitioned to APPROVED (200, confirmed by re-GET), tested
+FOR_REVISION / REVISED / DRAFT (all 200), then deleted it (204, GET now 404). The
+publication is back to its original 3 articles.
 
 ### Verified publications (via `GET /publications`)
 

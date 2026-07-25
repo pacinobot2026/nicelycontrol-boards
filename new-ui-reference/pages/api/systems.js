@@ -4,11 +4,11 @@
 export default async function handler(req, res) {
   try {
     const apis = [
-      { name: 'MintBird/PopLinks', endpoint: 'https://api.poplinks.io/api/ai/bridge-pages', key: 'Bearer z12Y1nJjkG275WIEJKM58QsnGoAoIhuW' },
+      { name: 'MintBird/PopLinks', endpoint: 'https://api.poplinks.io/api/ai/bridge-pages', key: process.env.MINTBIRD_API_KEY ? `Bearer ${process.env.MINTBIRD_API_KEY}` : '' },
       { name: 'Global Control', endpoint: 'https://api.globalcontrol.io/api/ai/me', key: '' },
-      { name: 'Course Sprout', endpoint: 'https://api.coursesprout.com/api/ai/courses', key: 'fMhZm1Z8ZQfUqAqGUaYN2Uy1zX2Ngg' },
-      { name: 'Letterman', endpoint: 'https://api.letterman.io/api/ai/publications', key: 'uU3SdxaggBGvnZK2U1j8GVsZxuTl4B' },
-      { name: 'SaaSOnboard', endpoint: 'https://api.saasonboard.com/api/ai/companies', key: '9OcdwOqcMYDu3dMlTKOw66YoSwdnXa' }
+      { name: 'Course Sprout', endpoint: 'https://api.coursesprout.com/api/ai/courses', key: process.env.COURSESPROUT_API_KEY || '' },
+      { name: 'Letterman', endpoint: 'https://api.letterman.io/api/ai/publications', key: process.env.LETTERMAN_API_KEY || '' },
+      { name: 'SaaSOnboard', endpoint: 'https://api.saasonboard.com/api/ai/companies', key: process.env.SAASONBOARD_API_KEY || '' }
     ];
 
     const urls = [
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     const apiChecks = await Promise.allSettled(
       apis.map(api => 
         fetch(api.endpoint, {
-          headers: api.key.startsWith('Bearer') 
+          headers: (api.key || '').startsWith('Bearer') 
             ? { 'Authorization': api.key }
             : { 'X-API-KEY': api.key },
           signal: AbortSignal.timeout(5000)

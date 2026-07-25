@@ -1,9 +1,6 @@
-const { createClient } = require('@supabase/supabase-js');
+const { getSupabaseClient } = require('./lib/supabase-env');
 
-const supabase = createClient(
-  'https://jqqvqdjxviqnsgpxcgfs.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxcXZxZGp4dmlxbnNncHhjZ2ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTk2MjIwOSwiZXhwIjoyMDg3NTM4MjA5fQ.ibJyHrxx2TlfRbfh-9IKD3-kY9aSXAfrDJ1ZHVFijOQ'
-);
+const supabase = getSupabaseClient();
 
 async function updateTitles() {
   console.log('📝 Updating article titles...\n');

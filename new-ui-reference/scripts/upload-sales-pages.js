@@ -1,9 +1,7 @@
-const { createClient } = require('@supabase/supabase-js');
+const { getSupabaseClient } = require('../../scripts/lib/supabase-env');
 
-const supabaseUrl = 'https://jqqvqdjxviqnsgpxcgfs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxcXZxZGp4dmlxbnNncHhjZ2ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTk2MjIwOSwiZXhwIjoyMDg3NTM4MjA5fQ.ibJyHrxx2TlfRbfh-9IKD3-kY9aSXAfrDJ1ZHVFijOQ';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = getSupabaseClient();
 
 const salesPages = [
   { title: 'Key Elements Diagram', url: 'https://files.catbox.moe/05oe8o.jpg', notes: 'Clean visual breakdown of sales page structure - 7 core elements' },

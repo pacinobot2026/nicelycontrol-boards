@@ -1,8 +1,9 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-const { Client } = require('pg');
+// NOTE: this file used to set NODE_TLS_REJECT_UNAUTHORIZED = '0', disabling
+// certificate validation process-wide. getPgClient() scopes the relaxed TLS
+// setting to the database connection only.
+const { getPgClient } = require('./lib/supabase-env');
 
 const CHAD_USER_ID = '08dee908-d31b-4c19-ae7d-227ccbb068cf';
-const DB_URL = 'postgres://postgres.jqqvqdjxviqnsgpxcgfs:HUxTv6nSBmk9y1Qm@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require';
 
 const projects = [
   { title: 'Titanium AI Platform', description: 'Core AI assistant platform powering all Nicely Control automation workflows and team operations.', category: 'AI / Automation', status: 'active', tags: ['ai', 'automation', 'core'] },
@@ -33,7 +34,7 @@ const bookmarks = [
 ];
 
 async function run() {
-  const client = new Client({ connectionString: DB_URL });
+  const client = getPgClient();
   await client.connect();
 
   // Ensure tables exist
